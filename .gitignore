@@ -1,4 +1,4 @@
 .gradle
 .idea
 build
-src/**/*.txt
+data/**/*_output.txt
