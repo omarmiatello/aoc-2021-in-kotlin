@@ -1,7 +1,4 @@
-/**
-description
- */
-
+// https://adventofcode.com/2021/day/xx
 fun dayExample() = adventOfCode(
     day = 0,
     part1 = { input ->

@@ -1,3 +1,4 @@
+// https://adventofcode.com/2021/day/1
 fun day1() = adventOfCode(
     day = 1,
     part1 = { input ->

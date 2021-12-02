@@ -1,31 +1,33 @@
 import java.io.File
 
-fun <R1 : Any, R2 : Any> adventOfCode(
+fun adventOfCode(
     day: Int,
-    part1: (List<String>) -> R1,
-    expectedTest1: R1,
-    part2: (List<String>) -> R2,
-    expectedTest2: R2,
+    part1: (List<String>) -> Int,
+    expectedTest1: Int,
+    part2: (List<String>) -> Int,
+    expectedTest2: Int,
+    filenamePart1: String = "Day${day}",
+    filenamePart2: String = "Day${day}",
 ) {
     println("Day $day")
 
-    on(filename = "Day${day}_part1_test") { input ->
+    on(filename = "${filenamePart1}_test") { input ->
         val output = part1(input)
         println("Part 1 (test) - expected value: $expectedTest1")
         check(output == expectedTest1) { "Something goes wrong, current result: $output" }
         output
     }
 
-    on(filename = "Day${day}_part1") { input -> part1(input) }
+    on(filename = filenamePart1) { input -> part1(input) }
 
-    on(filename = "Day${day}_part2_test") { input ->
+    on(filename = "${filenamePart2}_test") { input ->
         val result = part2(input)
         println("Part 2 (test) - expected value: $expectedTest2")
         check(result == expectedTest2) { "Something goes wrong, current result: $result" }
         result
     }
 
-    on(filename = "Day${day}_part2") { input -> part2(input) }
+    on(filename = filenamePart2) { input -> part2(input) }
 }
 
 private fun on(
