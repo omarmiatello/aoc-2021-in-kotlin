@@ -4,31 +4,35 @@ import kotlin.math.sign
 // https://adventofcode.com/2021/day/5
 fun day5() = adventOfCode(
     day = 5,
-    part1 = { input ->
-        val parsed = parse(input).filter { it.start.x == it.end.x || it.start.y == it.end.y }
-        val allPoints = mutableSetOf<Pair<Int, Int>>()
-        val doublePoints = mutableSetOf<Pair<Int, Int>>()
-        parsed.forEach { it.points.forEach { p -> if (!allPoints.add(p)) doublePoints.add(p) } }
-        doublePoints.size
+    parser = { input ->
+        input.map { it.split(" -> ").map { it.split(",").map { it.toInt() } } }
+            .map { Line(start = Dot(it[0][0], it[0][1]), end = Dot(it[1][0], it[1][1])) }
+    },
+    part1 = { parsed ->
+        parsed
+            .filter { it.start.x == it.end.x || it.start.y == it.end.y }
+            .findDoublePoints()
+            .size
     },
     expectedTest1 = 5,
-    part2 = { input ->
-        val parsed = parse(input).filter {
-            it.start.x == it.end.x
-                    || it.start.y == it.end.y
-                    || abs(it.start.x - it.end.x) == abs(it.start.y - it.end.y)
-        }
-        val allPoints = mutableSetOf<Pair<Int, Int>>()
-        val doublePoints = mutableSetOf<Pair<Int, Int>>()
-        parsed.forEach { it.points.forEach { p -> if (!allPoints.add(p)) doublePoints.add(p) } }
-        doublePoints.size
+    part2 = { parsed ->
+        parsed
+            .filter {
+                it.start.x == it.end.x
+                        || it.start.y == it.end.y
+                        || abs(it.start.x - it.end.x) == abs(it.start.y - it.end.y)
+            }
+            .findDoublePoints()
+            .size
     },
     expectedTest2 = 12,
 )
 
-private fun parse(input: List<String>): List<Line> {
-    return input.map { it.split(" -> ").map { it.split(",").map { it.toInt() } } }
-        .map { Line(start = Dot(it[0][0], it[0][1]), end = Dot(it[1][0], it[1][1])) }
+private fun List<Line>.findDoublePoints(): Set<Pair<Int, Int>> {
+    val allPoints = mutableSetOf<Pair<Int, Int>>()
+    val doublePoints = mutableSetOf<Pair<Int, Int>>()
+    forEach { it.points.forEach { p -> if (!allPoints.add(p)) doublePoints.add(p) } }
+    return doublePoints
 }
 
 class Line(

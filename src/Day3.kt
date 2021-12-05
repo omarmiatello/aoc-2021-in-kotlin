@@ -1,15 +1,16 @@
 // https://adventofcode.com/2021/day/3
 fun day3() = adventOfCode(
     day = 3,
-    part1 = { input ->
-        val parsed = input.map { it.map { it == '1' } }
+    parser = { input ->
+        input.map { it.map { it == '1' } }
+    },
+    part1 = { parsed ->
         val gamma = parsed.mostCommon.toInt(valueFor1 = true)
         val epsilon = parsed.mostCommon.toInt(valueFor1 = false)
         gamma * epsilon
     },
     expectedTest1 = 198,
-    part2 = { input ->
-        val parsed = input.map { it.map { it == '1' } }
+    part2 = { parsed ->
         val oxygen = findBest(
             initial = parsed,
             condition = { current, mostCommon -> current == mostCommon },

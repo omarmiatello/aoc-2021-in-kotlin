@@ -1,26 +1,21 @@
 // https://adventofcode.com/2021/day/1
 fun day1() = adventOfCode(
     day = 1,
-    part1 = { input ->
-        var res = 0
+    parser = { input ->
         input.map { it.toInt() }
-            .reduce { acc, i ->
-                if (i > acc) res++
-                i
-            }
-        res
+    },
+    part1 = { parsed ->
+        parsed
+            .windowed(2)
+            .count { it[1] > it[0] }
     },
     expectedTest1 = 7,
-    part2 = { input ->
-        var res = 0
-        input.map { it.toInt() }
+    part2 = { parsed ->
+        parsed
             .windowed(3)
             .map { it.sum() }
-            .reduce { acc, i ->
-                if (i > acc) res++
-                i
-            }
-        res
+            .windowed(2)
+            .count { it[1] > it[0] }
     },
     expectedTest2 = 5,
 )
