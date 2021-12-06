@@ -1,12 +1,12 @@
 import java.io.File
 
-fun <PARSED> adventOfCode(
+fun <PARSED, RES1, RES2> adventOfCode(
     day: Int,
     parser: (List<String>) -> PARSED,
-    part1: (PARSED) -> Int,
-    expectedTest1: Int,
-    part2: (PARSED) -> Int,
-    expectedTest2: Int,
+    part1: (PARSED) -> RES1,
+    expectedTest1: RES1,
+    part2: (PARSED) -> RES2,
+    expectedTest2: RES2,
     filenamePart1: String = "Day${day}",
     filenamePart2: String = "Day${day}",
 ) {
@@ -31,9 +31,9 @@ fun <PARSED> adventOfCode(
     on(filename = filenamePart2) { input -> part2(parser(input)) }
 }
 
-private fun on(
+private fun <RES> on(
     filename: String,
-    block: (List<String>) -> Any,
+    block: (List<String>) -> RES,
 ) {
     val input = File("data", "$filename.txt").readLines()
     val output = block(input)
