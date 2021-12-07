@@ -1,11 +1,9 @@
 // https://adventofcode.com/2021/day/2
-fun day2() = adventOfCode(
+object Day02 : AdventOfCode, Solution by Omar_Miatello(
     day = 2,
-    parser = { input ->
-        input.map { it.split(" ").run { get(0) to get(1).toInt() } }
-    },
-    part1 = { parsed ->
-        parsed
+    parser = { lines -> lines.map { line -> line.split(" ").let { it[0] to it[1].toInt() } } },
+    part1 = { input: List<Pair<String, Int>> ->
+        input
             .map { (direction, steps) ->
                 when (direction) {
                     "forward" -> steps to 0
@@ -17,7 +15,7 @@ fun day2() = adventOfCode(
             .reduce { acc, pair -> acc.first + pair.first to acc.second + pair.second }
             .let { (x, y) -> x * y }
     },
-    expectedTest1 = 150,
+    expectedTestPart1 = 150,
     part2 = { parsed ->
         var aim = 0
         var res = 0 to 0
@@ -31,6 +29,5 @@ fun day2() = adventOfCode(
         }
         res.first * res.second
     },
-    expectedTest2 = 900,
+    expectedTestPart2 = 900,
 )
-

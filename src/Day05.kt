@@ -2,21 +2,21 @@ import kotlin.math.abs
 import kotlin.math.sign
 
 // https://adventofcode.com/2021/day/5
-fun day5() = adventOfCode(
+object Day05 : AdventOfCode, Solution by Omar_Miatello(
     day = 5,
-    parser = { input ->
-        input.map { it.split(" -> ").map { it.split(",").map { it.toInt() } } }
+    parser = { lines ->
+        lines.map { it.split(" -> ").map { it.split(",").map { it.toInt() } } }
             .map { Line(start = Dot(it[0][0], it[0][1]), end = Dot(it[1][0], it[1][1])) }
     },
-    part1 = { parsed ->
-        parsed
+    part1 = { input ->
+        input
             .filter { it.start.x == it.end.x || it.start.y == it.end.y }
             .findDoublePoints()
             .size
     },
-    expectedTest1 = 5,
-    part2 = { parsed ->
-        parsed
+    expectedTestPart1 = 5,
+    part2 = { input ->
+        input
             .filter {
                 it.start.x == it.end.x
                         || it.start.y == it.end.y
@@ -25,7 +25,7 @@ fun day5() = adventOfCode(
             .findDoublePoints()
             .size
     },
-    expectedTest2 = 12,
+    expectedTestPart2 = 12,
 )
 
 private fun List<Line>.findDoublePoints(): Set<Pair<Int, Int>> {

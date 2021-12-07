@@ -1,15 +1,13 @@
 // https://adventofcode.com/2021/day/xx
-fun dayExample() = adventOfCode(
-    day = 0,
-    parser = { input ->
-        input.map { it.toInt() }
-    },
-    part1 = { parsed ->
-        parsed.size
-    },
-    expectedTest1 = 1,
-    part2 = { parsed ->
-        parsed.size + 1
-    },
-    expectedTest2 = 2,
-)
+//object Day00 : AdventOfCode, Solution by Omar_Miatello(
+//    day = 0,
+//    parser = { lines -> lines.first().split(",").map { it.toInt() } },
+//    part1 = { input ->
+//        input.size
+//    },
+//    expectedTestPart1 = 1,
+//    part2 = { input ->
+//        input.size + 1
+//    },
+//    expectedTestPart2 = 2,
+//)
