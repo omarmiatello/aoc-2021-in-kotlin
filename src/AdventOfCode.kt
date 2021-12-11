@@ -15,16 +15,12 @@ fun <PARSED, RES1, RES2> Omar_Miatello(
     expectedTestPart1: RES1,
     part2: (PARSED) -> RES2,
     expectedTestPart2: RES2,
-    filenamePart1: String = "Day${day}",
-    filenamePart2: String = "Day${day}",
 ) = Solution {
     fun <RES> on(
-        filename: String,
         expected: RES? = null,
-        block: (List<String>) -> RES,
+        block: () -> RES,
     ) {
-        val input = File("data", "$filename.txt").readLines()
-        val (output, duration) = measureTimedValue { block(input) }
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { "[$millis ms] Something goes wrong! expected: $expected | current: $output" }
@@ -34,8 +30,10 @@ fun <PARSED, RES1, RES2> Omar_Miatello(
     }
 
     println("Day $day")
-    on(filename = "${filenamePart1}_test", expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = "${filenamePart2}_test", expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parsedTest = parser(File("data", "Day${day}_test.txt").readLines())
+    val parserDay = parser(File("data", "Day${day}.txt").readLines())
+    on(expected = expectedTestPart1) { part1(parsedTest) }
+    on { part1(parserDay) }
+    on(expected = expectedTestPart2) { part2(parsedTest) }
+    on { part2(parserDay) }
 }
