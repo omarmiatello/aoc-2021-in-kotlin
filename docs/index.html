@@ -6623,7 +6623,70 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 //sampleStart
+// https://adventofcode.com/2021/day/11
+object Day11 : AdventOfCode, Solution by Omar_Miatello(
+    day = 11,
+    parser = { lines -&gt; lines.map { line -&gt; line.map { &quot;$it&quot;.toInt() } } },
+    part1 = { input -&gt;
+        var flashes = 0
+        input.loopUntil { loopIdx, frame -&gt;
+            flashes += frame.sumOf { row -&gt; row.count { it == 0 } }
+            loopIdx &lt; 100
+        }
+        flashes
+    },
+    expectedTestPart1 = 1656,
+    part2 = { input -&gt;
+        var all0Idx = 0
+        input.loopUntil { loopIdx, frame -&gt;
+            val all0 = frame.all { row -&gt; row.all { it == 0 } }
+            all0Idx = loopIdx
+            !all0
+        }
+        all0Idx
+    },
+    expectedTestPart2 = 195,
+)
 
+private val nearbyPos: List&lt;Pair&lt;Int, Int&gt;&gt; = (-1..1).flatMap { x -&gt; (-1..1).map { y -&gt; x to y } } - (0 to 0)
+
+private fun List&lt;List&lt;Int&gt;&gt;.loopUntil(
+    condition: (loopIdx: Int, frame: List&lt;List&lt;Int&gt;&gt;) -&gt; Boolean,
+) {
+    var loopIndex = 0
+    val frame = map { it.toMutableList() }
+    while (condition(loopIndex++, frame)) {
+        val willExplode = mutableSetOf&lt;Pair&lt;Int, Int&gt;&gt;()
+        val exploded = mutableSetOf&lt;Pair&lt;Int, Int&gt;&gt;()
+        frame.forEachIndexed { y, row -&gt;
+            row.indices.forEach { x -&gt;
+                if (++row[x] &gt; 9) {
+                    willExplode += x to y
+                }
+            }
+        }
+        while (willExplode.isNotEmpty()) {
+            willExplode.toList().forEach { (x, y) -&gt;
+                nearbyPos.forEach { (xNear, yNear) -&gt;
+                    val x1 = x + xNear
+                    val y1 = y + yNear
+                    if (x1 &gt;= 0 && x1 &lt; frame.size && y1 &gt;= 0 && y1 &lt; frame.first().size) {
+                        if (++frame[y1][x1] &gt; 9 && x1 to y1 !in exploded && x1 to y1 !in willExplode) {
+                            willExplode += x1 to y1
+                        }
+                    }
+                }
+                willExplode -= x to y
+                exploded += x to y
+            }
+        }
+        frame.forEachIndexed { y, row -&gt;
+            row.indices.forEach { x -&gt;
+                if (row[x] &gt; 9) row[x] = 0
+            }
+        }
+    }
+}
 //sampleEnd
 
 fun main() {
@@ -6666,9 +6729,27 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     on(filename = filenamePart2) { part2(parser(it)) }
 }
 
-val inputTest = &quot;&quot;&quot; &quot;&quot;&quot;.lines()
+val inputTest = &quot;&quot;&quot;5483143223
+2745854711
+5264556173
+6141336146
+6357385478
+4167524645
+2176841721
+6882881134
+4846848554
+5283751526&quot;&quot;&quot;.lines()
 
-val inputDay = &quot;&quot;&quot; &quot;&quot;&quot;.lines()
+val inputDay = &quot;&quot;&quot;1553421288
+5255384882
+1224315732
+4258242274
+1658564216
+6872651182
+5775552238
+5622545172
+8766672318
+2178374835&quot;&quot;&quot;.lines()
 </code>
 
 <h2>Day 12</h2>
