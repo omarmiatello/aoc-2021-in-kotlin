@@ -35,9 +35,7 @@ private fun List<List<Int>>.loopUntil(
         val exploded = mutableSetOf<Pair<Int, Int>>()
         frame.forEachIndexed { y, row ->
             row.indices.forEach { x ->
-                if (++row[x] > 9) {
-                    willExplode += x to y
-                }
+                if (++row[x] > 9) willExplode += x to y
             }
         }
         while (willExplode.isNotEmpty()) {
@@ -45,20 +43,15 @@ private fun List<List<Int>>.loopUntil(
                 nearbyPos.forEach { (xNear, yNear) ->
                     val x1 = x + xNear
                     val y1 = y + yNear
-                    if (x1 >= 0 && x1 < frame.size && y1 >= 0 && y1 < frame.first().size) {
-                        if (++frame[y1][x1] > 9 && x1 to y1 !in exploded && x1 to y1 !in willExplode) {
-                            willExplode += x1 to y1
-                        }
+                    val item = frame.getOrNull(y1)?.getOrNull(x1)
+                    if (item != null && ++frame[y1][x1] > 9 && x1 to y1 !in exploded) {
+                        willExplode += x1 to y1
                     }
                 }
                 willExplode -= x to y
                 exploded += x to y
             }
         }
-        frame.forEachIndexed { y, row ->
-            row.indices.forEach { x ->
-                if (row[x] > 9) row[x] = 0
-            }
-        }
+        exploded.forEach { (x, y) -> frame[y][x] = 0 }
     }
 }

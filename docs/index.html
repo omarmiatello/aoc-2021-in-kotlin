@@ -6660,9 +6660,7 @@ private fun List&lt;List&lt;Int&gt;&gt;.loopUntil(
         val exploded = mutableSetOf&lt;Pair&lt;Int, Int&gt;&gt;()
         frame.forEachIndexed { y, row -&gt;
             row.indices.forEach { x -&gt;
-                if (++row[x] &gt; 9) {
-                    willExplode += x to y
-                }
+                if (++row[x] &gt; 9) willExplode += x to y
             }
         }
         while (willExplode.isNotEmpty()) {
@@ -6670,21 +6668,16 @@ private fun List&lt;List&lt;Int&gt;&gt;.loopUntil(
                 nearbyPos.forEach { (xNear, yNear) -&gt;
                     val x1 = x + xNear
                     val y1 = y + yNear
-                    if (x1 &gt;= 0 && x1 &lt; frame.size && y1 &gt;= 0 && y1 &lt; frame.first().size) {
-                        if (++frame[y1][x1] &gt; 9 && x1 to y1 !in exploded && x1 to y1 !in willExplode) {
-                            willExplode += x1 to y1
-                        }
+                    val item = frame.getOrNull(y1)?.getOrNull(x1)
+                    if (item != null && ++frame[y1][x1] &gt; 9 && x1 to y1 !in exploded) {
+                        willExplode += x1 to y1
                     }
                 }
                 willExplode -= x to y
                 exploded += x to y
             }
         }
-        frame.forEachIndexed { y, row -&gt;
-            row.indices.forEach { x -&gt;
-                if (row[x] &gt; 9) row[x] = 0
-            }
-        }
+        exploded.forEach { (x, y) -&gt; frame[y][x] = 0 }
     }
 }
 //sampleEnd
