@@ -6751,7 +6751,66 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 //sampleStart
+// https://adventofcode.com/2021/day/12
+object Day12 : AdventOfCode, Solution by Omar_Miatello(
+    day = 12,
+    parser = { lines -&gt; lines.map { it.split(&quot;-&quot;) } },
+    part1 = { input -&gt;
+        val nodesMap = input.toNodesMap()
+        fun buildPaths(node: String, path: List&lt;String&gt; = emptyList()): List&lt;List&lt;String&gt;&gt; {
+            val newPath = path + node
+            return nodesMap.getValue(node).flatMap { child -&gt;
+                when {
+                    child == &quot;end&quot; -&gt; listOf(newPath + child)
+                    !child.isSmallCave() || child !in path -&gt; buildPaths(child, newPath)
+                    else -&gt; emptyList()
+                }
+            }
+        }
 
+        buildPaths(&quot;start&quot;).size
+    },
+    expectedTestPart1 = 10,
+    part2 = { input -&gt;
+        fun visitSmallCave(path: List&lt;String&gt;, child: String, canTwice: Boolean) = if (canTwice) {
+            path.count { it == child } &lt; 2
+        } else {
+            child !in path
+        }
+
+        fun nowCanTwice(path: List&lt;String&gt;, canTwice: Boolean) = if (canTwice) {
+            val nodes = mutableSetOf&lt;String&gt;()
+            path.forEach { node -&gt;
+                if (node.isSmallCave() && !nodes.add(node)) return false
+            }
+            true
+        } else false
+
+        val nodesMap = input.toNodesMap()
+        fun buildPaths(node: String, path: List&lt;String&gt; = emptyList(), canTwice: Boolean = true): List&lt;List&lt;String&gt;&gt; {
+            val newPath = path + node
+            return nodesMap.getValue(node).flatMap { child -&gt;
+                when {
+                    child == &quot;start&quot; -&gt; emptyList()
+                    child == &quot;end&quot; -&gt; listOf(newPath + child)
+                    !child.isSmallCave() || visitSmallCave(path, child, canTwice) -&gt; {
+                        buildPaths(child, newPath, nowCanTwice(path + child, canTwice))
+                    }
+                    else -&gt; emptyList()
+                }
+            }
+        }
+
+        buildPaths(&quot;start&quot;).size
+    },
+    expectedTestPart2 = 36,
+)
+
+private fun List&lt;List&lt;String&gt;&gt;.toNodesMap() = flatMap { (v1, v2) -&gt; listOf(v1 to v2, v2 to v1) }
+    .distinct()
+    .groupBy(keySelector = { it.first }, valueTransform = { it.second })
+
+private fun String.isSmallCave() = all { it.isLowerCase() }
 //sampleEnd
 
 fun main() {
@@ -6794,9 +6853,38 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     on(filename = filenamePart2) { part2(parser(it)) }
 }
 
-val inputTest = &quot;&quot;&quot; &quot;&quot;&quot;.lines()
+val inputTest = &quot;&quot;&quot;start-A
+start-b
+A-c
+A-b
+b-d
+A-end
+b-end&quot;&quot;&quot;.lines()
 
-val inputDay = &quot;&quot;&quot; &quot;&quot;&quot;.lines()
+val inputDay = &quot;&quot;&quot;EG-bj
+LN-end
+bj-LN
+yv-start
+iw-ch
+ch-LN
+EG-bn
+OF-iw
+LN-yv
+iw-TQ
+iw-start
+TQ-ch
+EG-end
+bj-OF
+OF-end
+TQ-start
+TQ-bj
+iw-LN
+EG-ch
+yv-iw
+KW-bj
+OF-ch
+bj-ch
+yv-TQ&quot;&quot;&quot;.lines()
 </code>
 
 
