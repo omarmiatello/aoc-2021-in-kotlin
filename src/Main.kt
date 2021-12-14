@@ -1,3 +1,5 @@
 fun main() {
-    AdventOfCode::class.sealedSubclasses.forEach { (it.objectInstance as Solution).launch() }
+    val days = AdventOfCode::class.sealedSubclasses
+    days.launchAll()
+    days.toLinesOfCode().writeDocIndex()
 }

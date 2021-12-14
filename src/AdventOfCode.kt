@@ -1,12 +1,15 @@
 @file:OptIn(ExperimentalTime::class)
 
 import java.io.File
+import kotlin.reflect.KClass
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 sealed interface AdventOfCode
 
 fun interface Solution { fun launch() }
+
+fun List<KClass<out AdventOfCode>>.launchAll() = forEach { (it.objectInstance as Solution).launch() }
 
 fun <PARSED, RES1, RES2> Omar_Miatello(
     day: Int,

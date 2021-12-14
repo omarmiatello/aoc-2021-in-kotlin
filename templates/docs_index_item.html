@@ -1,0 +1,54 @@
+
+<h2 id="day<!--dayn-->"><a href="#day<!--dayn-->">Day <!--dayn--></a> (<a href="https://adventofcode.com/2021/day/<!--dayn-->">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+<!--source-->
+//sampleEnd
+
+fun main() {
+    Day<!--day0n-->.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;<!--inputTest-->&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;<!--inputDay-->&quot;&quot;&quot;.lines()
+</code>
