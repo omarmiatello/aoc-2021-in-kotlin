@@ -25,24 +25,19 @@ object Day14 : AdventOfCode, Solution by Omar_Miatello(
     },
     expectedTestPart1 = 1588,
     part2 = { (initialValue, converter) ->
-        val cache = mutableMapOf<Triple<Char, Char, Int>, Map<Char, Long>>()
-        fun charCounter(c1: Char, c2: Char, steps: Int): Map<Char, Long> = cache.getOrPut(Triple(c1, c2, steps)) {
-            if (steps == 1) buildMap {
-                inc(converter.convert(c1, c2))
-                inc(c1)
-                inc(c2)
-            } else buildMap {
-                val x = converter.convert(c1, c2)
-                charCounter(c1, x, steps - 1).forEach { (c, n) -> inc(c, n) }
-                charCounter(x, c2, steps - 1).forEach { (c, n) -> inc(c, n) }
-                dec(x)
+        (1..40)
+            .fold(initialValue.toList().windowed(2).map { (c1, c2) -> (c1 to c2) to 1L }.sum()) { acc, _ ->
+                acc.flatMap { (pair, n) ->
+                    val (c1, c2) = pair
+                    val x = converter.convert(c1, c2)
+                    listOf((c1 to x) to n, (x to c2) to n)
+                }.sum()
             }
-        }
-
-        initialValue.toList()
-            .windowed(2) { (c1, c2) -> charCounter(c1, c2, 40).mutate { it.dec(c2) } }
-            .reduce { acc, map -> acc.mutate { map.forEach { (c, n) -> it.inc(c, n) } } }
-            .let { map -> map.mutate { it.inc(initialValue.last()) } }
+            .map { (pair, n) -> pair.first to n }
+            .groupBy({ it.first }) { it.second }
+            .mapValues { it.value.sum() }
+            .toMutableMap()
+            .also { map -> map[initialValue.last()] = map.getValue(initialValue.last()) + 1 }
             .values
             .sorted()
             .let { counter -> counter.last() - counter.first() }
@@ -50,12 +45,14 @@ object Day14 : AdventOfCode, Solution by Omar_Miatello(
     expectedTestPart2 = 2188189693529,
 )
 
+
 data class SubmarinePolymerization(
     val initialValue: String,
     val converter: Map<Char, Map<Char, Char>>,
 )
 
 private fun Map<Char, Map<Char, Char>>.convert(c1: Char, c2: Char) = getValue(c1).getValue(c2)
-private fun Map<Char, Long>.mutate(block: (MutableMap<Char, Long>) -> Unit) = toMutableMap().also(block)
-private fun MutableMap<Char, Long>.inc(c3: Char, n: Long = 1) = put(c3, getOrElse(c3) { 0L } + n)
-private fun MutableMap<Char, Long>.dec(c3: Char, n: Long = 1) = put(c3, getOrElse(c3) { 0L } - n)
+
+private fun List<Pair<Pair<Char, Char>, Long>>.sum() = groupBy({ it.first }) { it.second }
+    .mapValues { it.value.sum() }
+    .toList()
