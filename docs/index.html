@@ -7949,6 +7949,239 @@ fold along y=13
 fold along y=6&quot;&quot;&quot;.lines()
 </code>
 
+
+<h2 id="day14"><a href="#day14">Day 14</a> (<a href="https://adventofcode.com/2021/day/14">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/14
+object Day14 : AdventOfCode, Solution by Omar_Miatello(
+    day = 14,
+    parser = { lines -&gt;
+        SubmarinePolymerization(
+            initialValue = lines.first(),
+            converter = lines.drop(2)
+                .map { it.split(&quot; -&gt; &quot;).let { it[0] to it[1].first() } }
+                .groupBy({ it.first.first() }) { it.first[1] to it.second }
+                .mapValues { it.value.toMap() },
+        )
+    },
+    part1 = { (initialValue, converter) -&gt;
+        (1..10)
+            .fold(initialValue.toList()) { acc, _ -&gt;
+                acc.toList()
+                    .windowed(2) { (c1, c2) -&gt; listOf(c1, converter.convert(c1, c2)) }
+                    .flatten() + acc.last()
+            }
+            .groupingBy { it }
+            .eachCount()
+            .values
+            .sorted()
+            .let { counter -&gt; counter.last() - counter.first() }
+    },
+    expectedTestPart1 = 1588,
+    part2 = { (initialValue, converter) -&gt;
+        val cache = mutableMapOf&lt;Triple&lt;Char, Char, Int&gt;, Map&lt;Char, Long&gt;&gt;()
+        fun charCounter(c1: Char, c2: Char, steps: Int): Map&lt;Char, Long&gt; = cache.getOrPut(Triple(c1, c2, steps)) {
+            if (steps == 1) buildMap {
+                inc(converter.convert(c1, c2))
+                inc(c1)
+                inc(c2)
+            } else buildMap {
+                val x = converter.convert(c1, c2)
+                charCounter(c1, x, steps - 1).forEach { (c, n) -&gt; inc(c, n) }
+                charCounter(x, c2, steps - 1).forEach { (c, n) -&gt; inc(c, n) }
+                dec(x)
+            }
+        }
+
+        initialValue.toList()
+            .windowed(2) { (c1, c2) -&gt; charCounter(c1, c2, 40).mutate { it.dec(c2) } }
+            .reduce { acc, map -&gt; acc.mutate { map.forEach { (c, n) -&gt; it.inc(c, n) } } }
+            .let { map -&gt; map.mutate { it.inc(initialValue.last()) } }
+            .values
+            .sorted()
+            .let { counter -&gt; counter.last() - counter.first() }
+    },
+    expectedTestPart2 = 2188189693529,
+)
+
+data class SubmarinePolymerization(
+    val initialValue: String,
+    val converter: Map&lt;Char, Map&lt;Char, Char&gt;&gt;,
+)
+
+private fun Map&lt;Char, Map&lt;Char, Char&gt;&gt;.convert(c1: Char, c2: Char) = getValue(c1).getValue(c2)
+private fun Map&lt;Char, Long&gt;.mutate(block: (MutableMap&lt;Char, Long&gt;) -&gt; Unit) = toMutableMap().also(block)
+private fun MutableMap&lt;Char, Long&gt;.inc(c3: Char, n: Long = 1) = put(c3, getOrElse(c3) { 0L } + n)
+private fun MutableMap&lt;Char, Long&gt;.dec(c3: Char, n: Long = 1) = put(c3, getOrElse(c3) { 0L } - n)
+//sampleEnd
+
+fun main() {
+    Day14.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;NNCB
+
+CH -&gt; B
+HH -&gt; N
+CB -&gt; H
+NH -&gt; C
+HB -&gt; C
+HC -&gt; B
+HN -&gt; C
+NN -&gt; C
+BH -&gt; H
+NC -&gt; B
+NB -&gt; B
+BN -&gt; B
+BB -&gt; N
+BC -&gt; B
+CC -&gt; N
+CN -&gt; C&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;KOKHCCHNKKFHBKVVHNPN
+
+BN -&gt; C
+OS -&gt; K
+BK -&gt; C
+KO -&gt; V
+HF -&gt; K
+PS -&gt; B
+OK -&gt; C
+OC -&gt; B
+FH -&gt; K
+NV -&gt; F
+HO -&gt; H
+KK -&gt; H
+CV -&gt; P
+SC -&gt; C
+FK -&gt; N
+VV -&gt; F
+FN -&gt; F
+KP -&gt; O
+SB -&gt; O
+KF -&gt; B
+CH -&gt; K
+VF -&gt; K
+BH -&gt; H
+KV -&gt; F
+CO -&gt; N
+PK -&gt; N
+NH -&gt; P
+NN -&gt; C
+PP -&gt; H
+SH -&gt; N
+VO -&gt; O
+NC -&gt; F
+BC -&gt; B
+HC -&gt; H
+FS -&gt; C
+PN -&gt; F
+CK -&gt; K
+CN -&gt; V
+HS -&gt; S
+CB -&gt; N
+OF -&gt; B
+OV -&gt; K
+SK -&gt; S
+HP -&gt; C
+SN -&gt; P
+SP -&gt; B
+BP -&gt; C
+VP -&gt; C
+BS -&gt; K
+FV -&gt; F
+PH -&gt; P
+FF -&gt; P
+VK -&gt; F
+BV -&gt; S
+VB -&gt; S
+BF -&gt; O
+BB -&gt; H
+OB -&gt; B
+VS -&gt; P
+KB -&gt; P
+SF -&gt; N
+PF -&gt; S
+HH -&gt; P
+KN -&gt; K
+PC -&gt; B
+NB -&gt; O
+VC -&gt; P
+PV -&gt; H
+KH -&gt; O
+OP -&gt; O
+NF -&gt; K
+HN -&gt; P
+FC -&gt; H
+PO -&gt; B
+OH -&gt; C
+ON -&gt; N
+VN -&gt; B
+VH -&gt; F
+FO -&gt; B
+FP -&gt; B
+BO -&gt; H
+CC -&gt; P
+CS -&gt; K
+NO -&gt; V
+CF -&gt; N
+PB -&gt; H
+KS -&gt; P
+HK -&gt; S
+HB -&gt; K
+HV -&gt; O
+SV -&gt; H
+CP -&gt; S
+NP -&gt; N
+FB -&gt; B
+KC -&gt; V
+NS -&gt; P
+OO -&gt; V
+SO -&gt; O
+NK -&gt; K
+SS -&gt; H&quot;&quot;&quot;.lines()
+</code>
+
 </div>
 </body>
 </html>
