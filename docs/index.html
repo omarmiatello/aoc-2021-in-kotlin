@@ -1,18 +1,8184 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
+<!doctype html>
+<html lang="en">
 <meta charset="UTF-8">
-<html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/pico.min.css">
+
+    <script src="https://unpkg.com/kotlin-playground@1"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { KotlinPlayground('.code-blocks-selector'); });</script>
+
     <title>aoc2021 by Omar Miatello</title>
 </head>
-<!-- Google Fonts -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+<body>
+<main class="container">
+    <h1>Advent of Code 2021 - by Omar Miatello</h1>
+    <p>
+        Read only: <a href="https://github.com/omarmiatello/aoc-2021-in-kotlin/tree/main/src">https://github.com/omarmiatello/aoc-2021-in-kotlin/tree/main/src</a><br />
+        Editable in Kotlin Playground: <a href="https://omarmiatello.github.io/aoc-2021-in-kotlin">https://omarmiatello.github.io/aoc-2021-in-kotlin</a>
+    </p>
 
-<!-- CSS Reset -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <p>Click ▶ Run to show the result</p>
 
-<!-- Milligram CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+<h2 id="day1"><a href="#day1">Day 1</a> (<a href="https://adventofcode.com/2021/day/1">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/1
+object Day01 : AdventOfCode, Solution by Omar_Miatello(
+    day = 1,
+    parser = { lines -&gt; lines.map { it.toInt() } },
+    part1 = { input -&gt;
+        input
+            .windowed(2)
+            .count { it[1] &gt; it[0] }
+    },
+    expectedTestPart1 = 7,
+    part2 = { input -&gt;
+        input
+            .windowed(3)
+            .map { it.sum() }
+            .windowed(2)
+            .count { it[1] &gt; it[0] }
+    },
+    expectedTestPart2 = 5,
+)
+//sampleEnd
+
+fun main() {
+    Day01.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;199
+200
+208
+210
+200
+207
+240
+269
+260
+263&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;148
+167
+168
+169
+182
+188
+193
+209
+195
+206
+214
+219
+225
+219
+211
+215
+216
+195
+200
+197
+226
+231
+234
+248
+249
+265
+262
+275
+271
+283
+297
+302
+306
+307
+309
+313
+306
+307
+310
+307
+306
+284
+291
+296
+297
+298
+302
+297
+295
+296
+297
+293
+294
+295
+303
+302
+304
+305
+303
+288
+289
+290
+291
+290
+288
+302
+304
+282
+283
+290
+301
+304
+301
+330
+337
+341
+340
+337
+341
+342
+343
+301
+311
+312
+302
+317
+318
+319
+345
+347
+354
+358
+356
+357
+362
+361
+357
+375
+376
+383
+384
+382
+383
+384
+391
+400
+410
+413
+419
+421
+424
+426
+425
+427
+429
+432
+433
+434
+440
+446
+444
+453
+461
+463
+461
+464
+463
+489
+486
+485
+486
+499
+498
+493
+494
+485
+490
+499
+498
+506
+510
+519
+524
+520
+521
+543
+550
+551
+553
+564
+567
+568
+572
+597
+579
+592
+597
+618
+620
+628
+651
+674
+671
+684
+719
+718
+730
+727
+729
+724
+720
+737
+740
+753
+763
+764
+762
+772
+774
+773
+771
+777
+774
+783
+791
+792
+791
+801
+822
+821
+814
+811
+812
+817
+835
+844
+837
+839
+841
+855
+872
+881
+895
+910
+900
+902
+913
+914
+911
+917
+918
+923
+933
+932
+931
+915
+912
+923
+939
+940
+941
+943
+947
+948
+931
+933
+944
+933
+947
+948
+949
+956
+949
+948
+969
+973
+989
+993
+994
+993
+1007
+1010
+1020
+1024
+1026
+1031
+1032
+1028
+1045
+1015
+1018
+1024
+998
+1000
+1006
+994
+995
+993
+1010
+1011
+1010
+1015
+1021
+1039
+1045
+1041
+1049
+1044
+1050
+1063
+1066
+1051
+1056
+1059
+1060
+1059
+1064
+1067
+1066
+1067
+1069
+1072
+1074
+1077
+1078
+1080
+1086
+1079
+1089
+1093
+1099
+1102
+1103
+1108
+1119
+1138
+1139
+1144
+1148
+1151
+1152
+1151
+1155
+1154
+1153
+1157
+1159
+1164
+1168
+1172
+1171
+1182
+1189
+1190
+1192
+1194
+1196
+1197
+1222
+1216
+1220
+1206
+1205
+1196
+1200
+1210
+1203
+1200
+1212
+1218
+1219
+1205
+1211
+1212
+1213
+1176
+1187
+1174
+1175
+1180
+1181
+1187
+1185
+1211
+1212
+1199
+1231
+1234
+1249
+1250
+1247
+1235
+1234
+1236
+1237
+1266
+1265
+1286
+1289
+1282
+1283
+1273
+1282
+1267
+1271
+1278
+1291
+1307
+1294
+1292
+1320
+1323
+1314
+1317
+1342
+1344
+1319
+1326
+1330
+1329
+1331
+1335
+1338
+1360
+1364
+1381
+1389
+1386
+1387
+1388
+1389
+1391
+1395
+1398
+1404
+1405
+1408
+1412
+1427
+1410
+1425
+1409
+1410
+1412
+1411
+1394
+1406
+1407
+1404
+1413
+1418
+1417
+1442
+1443
+1444
+1445
+1458
+1452
+1453
+1466
+1465
+1466
+1465
+1476
+1484
+1487
+1490
+1494
+1495
+1502
+1498
+1501
+1496
+1498
+1492
+1501
+1499
+1477
+1480
+1483
+1484
+1483
+1488
+1494
+1491
+1489
+1503
+1535
+1544
+1547
+1549
+1550
+1557
+1542
+1540
+1542
+1543
+1544
+1542
+1541
+1546
+1542
+1540
+1526
+1534
+1536
+1549
+1542
+1552
+1553
+1554
+1569
+1568
+1569
+1563
+1560
+1572
+1568
+1544
+1552
+1559
+1563
+1556
+1577
+1594
+1596
+1581
+1580
+1570
+1552
+1560
+1561
+1558
+1559
+1560
+1561
+1560
+1554
+1562
+1565
+1561
+1570
+1571
+1572
+1568
+1565
+1574
+1616
+1607
+1604
+1606
+1609
+1607
+1608
+1609
+1618
+1621
+1622
+1623
+1628
+1637
+1648
+1656
+1653
+1649
+1651
+1654
+1693
+1697
+1705
+1706
+1705
+1712
+1709
+1708
+1715
+1717
+1721
+1723
+1730
+1729
+1740
+1732
+1733
+1740
+1746
+1747
+1744
+1748
+1746
+1745
+1747
+1749
+1750
+1744
+1747
+1749
+1751
+1749
+1751
+1782
+1783
+1767
+1769
+1799
+1777
+1783
+1784
+1786
+1790
+1791
+1802
+1804
+1807
+1824
+1825
+1840
+1852
+1872
+1874
+1871
+1866
+1861
+1860
+1861
+1842
+1840
+1841
+1842
+1841
+1832
+1848
+1851
+1834
+1846
+1844
+1826
+1829
+1840
+1841
+1844
+1848
+1820
+1831
+1833
+1822
+1814
+1819
+1833
+1832
+1824
+1814
+1815
+1818
+1829
+1832
+1833
+1847
+1846
+1848
+1850
+1880
+1889
+1887
+1888
+1881
+1880
+1883
+1885
+1882
+1881
+1868
+1870
+1855
+1862
+1863
+1870
+1866
+1875
+1894
+1896
+1880
+1898
+1917
+1918
+1914
+1919
+1907
+1905
+1893
+1901
+1899
+1909
+1910
+1918
+1921
+1930
+1929
+1935
+1917
+1919
+1917
+1907
+1911
+1910
+1911
+1930
+1958
+1964
+1971
+1972
+1950
+1963
+1967
+1968
+1965
+1973
+1975
+1965
+1963
+1949
+1950
+1953
+1952
+1957
+1974
+1992
+2022
+2021
+2022
+2025
+2024
+2032
+2048
+2074
+2068
+2072
+2068
+2085
+2091
+2111
+2095
+2091
+2089
+2103
+2107
+2117
+2123
+2128
+2136
+2134
+2140
+2141
+2140
+2141
+2122
+2125
+2129
+2142
+2106
+2101
+2104
+2122
+2131
+2156
+2178
+2187
+2182
+2180
+2177
+2178
+2179
+2197
+2198
+2197
+2198
+2202
+2204
+2210
+2211
+2212
+2207
+2206
+2211
+2216
+2209
+2210
+2202
+2207
+2206
+2207
+2210
+2213
+2185
+2187
+2188
+2203
+2206
+2213
+2233
+2238
+2249
+2250
+2252
+2253
+2240
+2246
+2248
+2235
+2237
+2255
+2257
+2235
+2245
+2240
+2246
+2237
+2255
+2282
+2283
+2291
+2304
+2305
+2306
+2309
+2319
+2321
+2323
+2318
+2317
+2316
+2317
+2323
+2314
+2326
+2313
+2314
+2316
+2317
+2320
+2317
+2326
+2322
+2348
+2349
+2335
+2331
+2338
+2343
+2344
+2345
+2335
+2332
+2339
+2340
+2335
+2346
+2347
+2343
+2342
+2344
+2333
+2326
+2351
+2355
+2363
+2366
+2364
+2393
+2410
+2411
+2433
+2440
+2413
+2407
+2403
+2404
+2407
+2427
+2425
+2430
+2446
+2449
+2450
+2448
+2453
+2454
+2456
+2455
+2456
+2455
+2460
+2451
+2464
+2463
+2468
+2471
+2472
+2456
+2467
+2471
+2481
+2505
+2524
+2534
+2533
+2531
+2526
+2527
+2522
+2534
+2535
+2538
+2537
+2538
+2541
+2542
+2544
+2543
+2529
+2519
+2508
+2522
+2526
+2554
+2560
+2554
+2558
+2562
+2576
+2580
+2581
+2589
+2573
+2596
+2600
+2601
+2606
+2607
+2611
+2606
+2624
+2631
+2634
+2663
+2661
+2663
+2676
+2680
+2678
+2680
+2677
+2672
+2685
+2716
+2713
+2690
+2698
+2699
+2716
+2720
+2719
+2720
+2724
+2722
+2724
+2725
+2727
+2733
+2736
+2739
+2740
+2753
+2762
+2763
+2793
+2808
+2787
+2778
+2782
+2771
+2783
+2795
+2803
+2808
+2832
+2833
+2842
+2843
+2839
+2840
+2807
+2808
+2806
+2825
+2836
+2838
+2842
+2848
+2817
+2818
+2821
+2820
+2844
+2859
+2830
+2824
+2825
+2850
+2853
+2852
+2830
+2835
+2839
+2828
+2827
+2828
+2826
+2827
+2815
+2816
+2819
+2818
+2792
+2789
+2793
+2801
+2778
+2779
+2780
+2783
+2808
+2824
+2792
+2811
+2810
+2777
+2774
+2773
+2782
+2781
+2790
+2785
+2789
+2785
+2786
+2785
+2782
+2783
+2785
+2788
+2785
+2790
+2816
+2834
+2835
+2836
+2842
+2846
+2839
+2861
+2863
+2868
+2867
+2864
+2849
+2850
+2851
+2852
+2826
+2815
+2814
+2820
+2821
+2837
+2865
+2866
+2851
+2856
+2861
+2867
+2874
+2871
+2872
+2861
+2842
+2843
+2840
+2872
+2879
+2873
+2881
+2877
+2880
+2873
+2872
+2902
+2906
+2900
+2899
+2911
+2914
+2924
+2925
+2920
+2909
+2901
+2924
+2936
+2938
+2947
+2950
+2962
+2963
+2955
+2953
+2970
+2967
+2947
+2958
+2961
+2962
+2952
+2953
+2951
+2947
+2945
+2952
+2956
+2959
+2961
+2960
+2965
+2966
+2962
+2964
+2972
+2975
+2985
+2982
+2996
+2997
+2991
+2994
+2995
+2994
+2978
+2987
+2994
+3003
+2994
+2993
+2998
+3000
+3004
+3005
+3006
+3024
+3046
+3049
+3053
+3052
+3064
+3067
+3065
+3067
+3068
+3063
+3065
+3067
+3063
+3066
+3068
+3079
+3085
+3086
+3088
+3090
+3093
+3119
+3144
+3143
+3144
+3146
+3159
+3160
+3162
+3164
+3160
+3158
+3143
+3138
+3135
+3140
+3145
+3137
+3134
+3140
+3141
+3135
+3134
+3133
+3123
+3124
+3123
+3124
+3126
+3125
+3109
+3105
+3106
+3120
+3100
+3112
+3114
+3122
+3121
+3120
+3131
+3140
+3141
+3152
+3153
+3154
+3155
+3162
+3160
+3161
+3177
+3190
+3191
+3192
+3194
+3196
+3190
+3187
+3199
+3193
+3200
+3199
+3214
+3212
+3175
+3150
+3153
+3177
+3181
+3165
+3183
+3185
+3187
+3188
+3187
+3201
+3203
+3202
+3200
+3209
+3218
+3217
+3216
+3208
+3204
+3203
+3179
+3185
+3188
+3195
+3196
+3193
+3194
+3211
+3216
+3208
+3210
+3211
+3212
+3204
+3205
+3209
+3232
+3234
+3255
+3254
+3264
+3267
+3269
+3274
+3278
+3290
+3301
+3303
+3305
+3306
+3304
+3305
+3302
+3307
+3308
+3297
+3302
+3307
+3306
+3307
+3306
+3274
+3275
+3276
+3278
+3281
+3280
+3274
+3299
+3298
+3276
+3275
+3278
+3281
+3284
+3285
+3281
+3282
+3244
+3239
+3240
+3217
+3236
+3238
+3240
+3245
+3248
+3255
+3256
+3260
+3261
+3271
+3289
+3302
+3303
+3304
+3305
+3304
+3306
+3307
+3334
+3338
+3341
+3340
+3360
+3354
+3353
+3366
+3369
+3374
+3377
+3368
+3361
+3378
+3385
+3384
+3382
+3386
+3384
+3388
+3381
+3358
+3359
+3363
+3364
+3365
+3366
+3368
+3392
+3419
+3436
+3438
+3452
+3479
+3480
+3483
+3494
+3500
+3511
+3524
+3535
+3560
+3571
+3584
+3600
+3598
+3591
+3593
+3598
+3599
+3598
+3599
+3610
+3608
+3610
+3611
+3615
+3616
+3620
+3606
+3622
+3625
+3629
+3636
+3635
+3640
+3635
+3636
+3634
+3635
+3652
+3654
+3655
+3657
+3642
+3647
+3654
+3661
+3621
+3620
+3621
+3628
+3604
+3597
+3598
+3587
+3588
+3591
+3595
+3594
+3596
+3597
+3598
+3603
+3604
+3605
+3632
+3627
+3630
+3631
+3632
+3642
+3643
+3644
+3649
+3653
+3652
+3653
+3654
+3653
+3669
+3688
+3696
+3697
+3704
+3707
+3710
+3704
+3718
+3721
+3725
+3751
+3757
+3760
+3776
+3775
+3782
+3778
+3792
+3804
+3818
+3819
+3806
+3810
+3795
+3806
+3821
+3823
+3858
+3860
+3858
+3865
+3868
+3875
+3876
+3878
+3888
+3891
+3893
+3884
+3889
+3897
+3891
+3894
+3896
+3924
+3925
+3926
+3927
+3934
+3938
+3966
+3972
+3973
+3977
+3976
+4003
+4017
+4023
+4019
+4017
+3988
+3997
+4010
+4017
+4018
+3994
+3995
+3985
+3987
+3997
+4004
+4003
+4005
+4009
+4007
+4021
+4023
+3998
+3991
+4021
+4020
+4027
+4026
+4030
+4043
+4047
+4048
+4046
+4045
+4046
+4059
+4050
+4064
+4065
+4077
+4083
+4087
+4079
+4087
+4082
+4083
+4111
+4112
+4122
+4123
+4126
+4129
+4138
+4139
+4172
+4160
+4135
+4136
+4147
+4182
+4181
+4180
+4184
+4188
+4191
+4194
+4195
+4176
+4185
+4180
+4187
+4188
+4189
+4190
+4211
+4205
+4208
+4220
+4236
+4239
+4240
+4243
+4240
+4269
+4275
+4274
+4272
+4282
+4281
+4286
+4285
+4248
+4247
+4250
+4249
+4244
+4272
+4265
+4269
+4295
+4280
+4279
+4273
+4256
+4245
+4247
+4248
+4228
+4229
+4231
+4245
+4259
+4261
+4268
+4270
+4272
+4276
+4305
+4322
+4325
+4333
+4329
+4330
+4331
+4328
+4332
+4340
+4367
+4363
+4375
+4399
+4408
+4434
+4412
+4420
+4421
+4422
+4433
+4416
+4430
+4434
+4437
+4438
+4445
+4446
+4448
+4450
+4465
+4468
+4482
+4484
+4461
+4462
+4461
+4462
+4464
+4461
+4464
+4465
+4470
+4478
+4480
+4461
+4471
+4464
+4462
+4463
+4464
+4465
+4454
+4457
+4455
+4456
+4467
+4480
+4490
+4491
+4499
+4500
+4517
+4524
+4540
+4551
+4552
+4559
+4560
+4559
+4565
+4558
+4557
+4562
+4568
+4573
+4578
+4557
+4573
+4574
+4572
+4588
+4613
+4614
+4600
+4602
+4601
+4598
+4597
+4601
+4611
+4612
+4613
+4621
+4622
+4645
+4651
+4650
+4663
+4660
+4657
+4660
+4667
+4666
+4669
+4666
+4654
+4657
+4669
+4672
+4651
+4652
+4655
+4653
+4654
+4669
+4670
+4671
+4672
+4673
+4675
+4681
+4682
+4687
+4691
+4692
+4688
+4687
+4713
+4725
+4719
+4720
+4730
+4728
+4725
+4720
+4721
+4722
+4714
+4716
+4724
+4707
+4716
+4707
+4706
+4707
+4708
+4709
+4710
+4711
+4726
+4694
+4701
+4697
+4698
+4678
+4679
+4680
+4670
+4661
+4677
+4678
+4660
+4649
+4650
+4653
+4655
+4650
+4657
+4658
+4660
+4663
+4686
+4691
+4686
+4676
+4658
+4656
+4655
+4657
+4656
+4655
+4670
+4661
+4658
+4659
+4663
+4664
+4673
+4691
+4694
+4696
+4698
+4702
+4706
+4714
+4709
+4707
+4708
+4719
+4725
+4744
+4754
+4782
+4778
+4808
+4826
+4830
+4838
+4841
+4848
+4855
+4866
+4862
+4865
+4852
+4881
+4873
+4875
+4874
+4876
+4869
+4866
+4870
+4867
+4866
+4883
+4912
+4918
+4938
+4960
+4948
+4956
+4961
+4978
+4993
+4994
+4998
+5000
+5001
+5007
+5009
+5015
+5002
+5005
+5039
+5037
+5043
+5044
+5051
+5053
+5057
+5058
+5059
+5058
+5065
+5067
+5066
+5069
+5070
+5077
+5076
+5077
+5078
+5079
+5085
+5081
+5087
+5107
+5122
+5123
+5099
+5066
+5083
+5109
+5105
+5106
+5090
+5112
+5102
+5109
+5108
+5109
+5108
+5109
+5118
+5114
+5117
+5119
+5139
+5144
+5142
+5148
+5151
+5147
+5148
+5160
+5172
+5154
+5156
+5155
+5164
+5155
+5143
+5122
+5147
+5162
+5163
+5151
+5152
+5157
+5163
+5203
+5211
+5222
+5224
+5241
+5239
+5250
+5254
+5250
+5251
+5252
+5256
+5276
+5274
+5246
+5248
+5251
+5250
+5254
+5267
+5285
+5286
+5292
+5290
+5289
+5293
+5294
+5299
+5303
+5305
+5306
+5316
+5317
+5319
+5320
+5326
+5325
+5330
+5329
+5332
+5336
+5338
+5339
+5349
+5353
+5354
+5346
+5348
+5349
+5358
+5359
+5360
+5361
+5377
+5380
+5390
+5391
+5403
+5402
+5405
+5404
+5406
+5405
+5406
+5405
+5406
+5434
+5443
+5444
+5458
+5478
+5484
+5491
+5492
+5504
+5507
+5508
+5514
+5512
+5523
+5529
+5534
+5535
+5558
+5560
+5561
+5534
+5543
+5538
+5537
+5533
+5554
+5558
+5557
+5554
+5590
+5601
+5604
+5623
+5626
+5625&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day2"><a href="#day2">Day 2</a> (<a href="https://adventofcode.com/2021/day/2">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/2
+object Day02 : AdventOfCode, Solution by Omar_Miatello(
+    day = 2,
+    parser = { lines -&gt; lines.map { line -&gt; line.split(&quot; &quot;).let { it[0] to it[1].toInt() } } },
+    part1 = { input: List&lt;Pair&lt;String, Int&gt;&gt; -&gt;
+        input
+            .map { (direction, steps) -&gt;
+                when (direction) {
+                    &quot;forward&quot; -&gt; steps to 0
+                    &quot;up&quot; -&gt; 0 to -steps
+                    &quot;down&quot; -&gt; 0 to steps
+                    else -&gt; error(&quot;Unknown direction: $direction&quot;)
+                }
+            }
+            .reduce { acc, pair -&gt; acc.first + pair.first to acc.second + pair.second }
+            .let { (x, y) -&gt; x * y }
+    },
+    expectedTestPart1 = 150,
+    part2 = { parsed -&gt;
+        var aim = 0
+        var res = 0 to 0
+        parsed.forEach { (direction, steps) -&gt;
+            when (direction) {
+                &quot;forward&quot; -&gt; res = res.first + steps to res.second + aim * steps
+                &quot;up&quot; -&gt; aim += -steps
+                &quot;down&quot; -&gt; aim += steps
+                else -&gt; error(&quot;Unknown direction: $direction&quot;)
+            }
+        }
+        res.first * res.second
+    },
+    expectedTestPart2 = 900,
+)
+//sampleEnd
+
+fun main() {
+    Day02.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;forward 2
+forward 6
+forward 8
+forward 7
+down 5
+forward 8
+forward 9
+down 2
+forward 6
+down 9
+forward 1
+forward 8
+forward 6
+forward 7
+down 4
+down 5
+forward 1
+up 5
+down 7
+down 7
+down 1
+up 2
+forward 3
+forward 2
+forward 2
+forward 5
+up 5
+forward 4
+forward 9
+forward 6
+down 4
+down 9
+down 2
+up 6
+forward 9
+up 7
+forward 7
+forward 5
+up 3
+forward 4
+forward 9
+up 5
+down 3
+up 6
+down 5
+down 4
+up 6
+forward 9
+forward 6
+down 9
+up 3
+down 7
+up 1
+forward 8
+forward 3
+forward 8
+up 6
+forward 7
+forward 5
+forward 8
+up 2
+forward 2
+forward 7
+forward 7
+down 1
+forward 7
+up 7
+down 3
+forward 9
+down 5
+down 2
+forward 5
+forward 1
+forward 4
+forward 6
+up 2
+up 7
+forward 2
+forward 6
+forward 7
+down 9
+up 8
+down 9
+down 3
+up 8
+down 3
+down 2
+up 6
+forward 3
+forward 9
+down 4
+forward 5
+down 6
+up 8
+forward 1
+down 6
+down 6
+forward 5
+down 6
+forward 8
+up 7
+down 3
+forward 7
+forward 3
+forward 1
+forward 4
+forward 4
+down 3
+up 9
+up 5
+forward 1
+down 2
+up 4
+forward 7
+up 4
+down 3
+down 5
+down 8
+forward 4
+up 8
+forward 7
+up 3
+up 4
+up 9
+forward 1
+forward 1
+down 6
+forward 1
+down 8
+up 4
+forward 9
+forward 9
+down 6
+forward 9
+forward 8
+down 2
+up 3
+up 3
+down 9
+forward 7
+forward 8
+down 4
+forward 1
+up 3
+forward 3
+down 3
+down 9
+down 5
+up 7
+up 2
+forward 7
+forward 2
+forward 5
+forward 4
+down 7
+forward 7
+up 1
+up 3
+down 6
+down 4
+forward 9
+forward 8
+down 5
+down 4
+down 1
+down 5
+forward 9
+forward 8
+down 3
+forward 5
+forward 3
+forward 6
+down 6
+forward 3
+up 9
+forward 4
+down 7
+forward 3
+forward 7
+forward 1
+forward 5
+down 1
+forward 1
+down 6
+up 7
+down 3
+forward 2
+down 4
+forward 6
+up 6
+forward 8
+forward 8
+down 5
+up 4
+forward 7
+forward 6
+up 4
+forward 6
+down 1
+forward 6
+forward 2
+up 4
+down 6
+down 7
+forward 4
+down 4
+forward 1
+down 3
+forward 5
+forward 5
+forward 9
+forward 3
+up 7
+down 7
+forward 7
+forward 5
+down 1
+down 1
+forward 3
+down 8
+forward 1
+forward 2
+forward 9
+forward 1
+forward 3
+down 3
+up 4
+forward 5
+down 1
+forward 3
+up 7
+forward 3
+forward 6
+up 6
+up 3
+forward 9
+forward 5
+down 2
+up 4
+up 3
+forward 3
+forward 7
+down 1
+forward 5
+forward 5
+down 1
+forward 4
+forward 2
+down 1
+down 9
+down 7
+up 1
+forward 2
+down 2
+forward 3
+forward 8
+forward 4
+forward 6
+down 4
+down 1
+forward 5
+forward 1
+forward 7
+down 8
+forward 9
+down 6
+forward 3
+up 5
+up 1
+up 7
+down 5
+forward 7
+forward 5
+forward 5
+up 1
+forward 8
+down 8
+down 7
+forward 9
+forward 9
+down 3
+forward 7
+forward 2
+down 1
+down 6
+down 1
+forward 7
+down 3
+forward 1
+forward 1
+forward 6
+forward 6
+up 9
+down 3
+forward 9
+down 8
+forward 4
+up 6
+down 4
+down 7
+forward 5
+up 3
+forward 1
+forward 8
+up 6
+up 3
+down 2
+forward 2
+forward 5
+forward 1
+down 8
+down 8
+down 3
+forward 5
+forward 4
+forward 4
+forward 5
+up 5
+forward 2
+forward 5
+up 5
+forward 6
+forward 6
+forward 9
+up 5
+forward 4
+up 4
+forward 8
+down 8
+forward 5
+forward 2
+forward 4
+forward 3
+forward 1
+down 1
+down 9
+down 2
+forward 4
+down 3
+down 6
+forward 2
+up 7
+forward 6
+down 4
+up 9
+down 1
+forward 8
+forward 1
+forward 1
+down 9
+down 3
+down 2
+down 7
+up 5
+down 7
+up 9
+down 8
+down 7
+forward 9
+forward 7
+up 4
+forward 5
+up 9
+down 4
+forward 1
+forward 9
+down 7
+up 9
+forward 6
+forward 4
+up 8
+down 2
+forward 1
+up 6
+up 5
+down 4
+forward 8
+down 3
+down 5
+down 6
+up 1
+up 9
+up 7
+up 5
+forward 1
+forward 3
+down 7
+forward 9
+forward 2
+forward 6
+down 4
+down 7
+forward 3
+down 1
+up 5
+forward 3
+down 3
+down 1
+forward 1
+forward 4
+forward 8
+down 4
+down 1
+forward 3
+down 7
+up 9
+down 8
+down 1
+forward 2
+down 6
+down 9
+down 9
+forward 2
+forward 8
+up 2
+down 5
+down 9
+forward 1
+up 9
+down 7
+forward 8
+down 7
+up 4
+forward 8
+down 8
+down 7
+forward 6
+up 7
+down 4
+down 9
+forward 9
+up 8
+down 8
+down 8
+down 8
+down 5
+forward 2
+up 9
+down 2
+up 7
+down 7
+down 3
+down 6
+forward 9
+forward 1
+down 1
+down 5
+up 4
+down 5
+forward 5
+up 2
+forward 5
+down 5
+forward 1
+forward 9
+down 9
+forward 3
+forward 3
+down 8
+down 2
+down 8
+forward 8
+forward 7
+up 6
+down 4
+down 5
+forward 8
+forward 4
+forward 7
+forward 1
+down 9
+down 4
+down 2
+forward 5
+down 3
+down 7
+down 5
+forward 8
+up 1
+down 4
+down 7
+down 7
+forward 2
+up 5
+forward 5
+up 2
+up 4
+down 9
+forward 7
+forward 6
+forward 6
+down 2
+forward 7
+forward 7
+down 7
+forward 8
+down 2
+up 9
+down 1
+forward 9
+down 9
+forward 3
+down 9
+down 2
+forward 9
+forward 8
+down 7
+up 2
+forward 8
+forward 1
+up 2
+down 7
+up 7
+down 8
+up 1
+up 4
+up 2
+up 3
+down 7
+forward 1
+down 8
+down 4
+down 2
+down 4
+up 8
+forward 8
+down 2
+up 5
+up 4
+forward 7
+up 1
+forward 3
+down 8
+down 4
+forward 4
+down 8
+forward 2
+down 1
+up 9
+forward 9
+down 4
+up 2
+down 8
+up 9
+forward 6
+down 7
+up 7
+forward 9
+forward 1
+down 8
+forward 5
+down 9
+forward 6
+down 9
+forward 9
+forward 1
+down 8
+up 4
+forward 9
+forward 3
+down 9
+up 8
+forward 4
+up 8
+forward 7
+down 7
+up 6
+down 7
+down 2
+down 7
+forward 3
+forward 2
+down 6
+down 2
+down 7
+up 4
+forward 5
+down 5
+forward 2
+up 3
+up 8
+forward 8
+forward 1
+forward 7
+down 7
+down 2
+forward 1
+down 7
+down 7
+up 2
+up 7
+up 7
+forward 4
+down 5
+forward 5
+forward 7
+forward 7
+down 7
+down 8
+forward 8
+forward 8
+up 3
+up 9
+forward 2
+down 7
+up 3
+up 1
+up 1
+down 9
+up 5
+down 6
+up 8
+up 3
+up 5
+forward 7
+forward 3
+forward 8
+forward 4
+up 1
+forward 2
+forward 1
+up 5
+forward 9
+forward 8
+down 7
+up 1
+forward 7
+down 8
+forward 1
+forward 9
+forward 9
+forward 9
+forward 8
+down 1
+forward 8
+forward 7
+up 9
+up 3
+forward 8
+forward 2
+up 2
+down 7
+down 6
+forward 4
+forward 3
+forward 6
+up 7
+down 9
+forward 1
+forward 4
+down 1
+forward 4
+up 3
+down 8
+forward 1
+up 6
+forward 8
+forward 2
+forward 1
+forward 8
+forward 4
+down 7
+forward 4
+forward 6
+down 2
+up 4
+forward 4
+forward 3
+down 5
+forward 8
+forward 4
+forward 5
+forward 7
+forward 6
+forward 5
+forward 9
+down 4
+down 9
+forward 6
+up 7
+down 6
+down 3
+down 2
+up 9
+forward 7
+down 4
+down 5
+forward 2
+forward 3
+forward 2
+forward 9
+forward 7
+forward 8
+down 9
+down 7
+down 9
+down 7
+forward 5
+forward 2
+down 5
+forward 6
+down 1
+down 2
+down 6
+forward 9
+down 3
+up 6
+down 4
+down 5
+forward 3
+forward 7
+down 8
+forward 2
+forward 5
+down 9
+down 3
+up 5
+down 6
+forward 6
+up 3
+down 6
+down 1
+down 8
+down 5
+down 3
+forward 3
+up 6
+up 7
+forward 8
+forward 9
+forward 2
+forward 6
+forward 2
+forward 3
+down 7
+down 3
+down 3
+down 6
+down 2
+forward 4
+forward 3
+forward 8
+up 1
+down 9
+forward 5
+up 3
+down 7
+down 6
+forward 8
+forward 1
+up 6
+forward 3
+forward 1
+up 9
+forward 6
+forward 3
+down 9
+down 4
+down 9
+forward 5
+down 8
+down 3
+forward 1
+forward 1
+down 9
+down 6
+down 3
+up 7
+down 3
+forward 5
+down 2
+forward 7
+forward 2
+forward 5
+up 7
+forward 4
+forward 4
+up 3
+down 6
+down 7
+up 1
+down 6
+forward 1
+forward 9
+down 7
+down 8
+forward 5
+down 1
+down 9
+up 5
+up 4
+up 3
+forward 6
+down 6
+forward 4
+forward 8
+up 6
+up 2
+down 9
+forward 2
+forward 5
+forward 1
+forward 3
+forward 9
+up 3
+forward 2
+forward 1
+forward 3
+forward 3
+up 9
+forward 3
+forward 7
+down 6
+forward 2
+down 8
+up 9
+forward 8
+forward 5
+forward 2
+up 8
+down 9
+up 5
+forward 3
+down 4
+forward 1
+up 9
+down 4
+down 5
+up 4
+down 6
+down 4
+down 6
+down 4
+forward 4
+down 2
+down 1
+down 6
+forward 2
+down 1
+down 3
+forward 4
+down 3
+down 5
+down 5
+up 1
+up 4
+down 4
+down 4
+down 5
+down 4
+down 5
+forward 5
+down 8
+down 5
+down 5
+down 9
+up 1
+up 5
+forward 5
+down 1
+down 9
+down 4
+down 3
+forward 3
+down 2
+forward 9
+down 3
+forward 1
+down 9
+down 5
+up 7
+forward 3
+forward 1
+forward 2
+down 5
+forward 8
+down 3
+down 3
+forward 6
+down 8
+down 3
+down 8
+up 9
+forward 3
+down 6
+forward 4
+down 6
+down 4
+up 5
+forward 1
+up 6
+up 2
+forward 2
+down 8
+forward 7
+forward 8
+down 6
+down 7
+forward 7
+up 3
+forward 3
+up 6
+forward 3
+down 1
+down 7
+forward 9
+forward 5
+up 1
+forward 7
+forward 1
+down 3
+forward 1
+up 4
+up 2
+up 1
+down 8
+forward 9
+forward 3
+forward 4
+up 7
+forward 5
+down 1
+down 8
+down 3
+down 4
+down 6
+down 5
+forward 4
+down 4
+down 2
+down 4
+down 3
+down 3
+forward 4
+up 3
+forward 6
+down 7
+forward 4
+up 2
+down 7
+forward 8
+up 9
+forward 6
+forward 8
+down 1
+down 6
+forward 6
+down 6
+down 9
+up 8
+forward 8
+up 5
+forward 6
+forward 9
+forward 4
+up 2
+forward 3
+down 7
+down 8
+down 4
+up 8
+forward 8
+forward 1
+up 5
+up 4
+up 1
+down 9
+down 9
+up 2
+forward 9
+down 7
+down 2
+up 2
+down 1
+forward 6
+forward 2
+down 5
+down 8
+forward 6
+down 2
+down 3
+forward 6
+forward 7
+up 8
+down 4
+forward 5
+down 9
+down 2
+down 7
+down 9
+down 5
+forward 9
+forward 2
+down 6
+forward 7
+up 6
+forward 3
+up 2
+forward 9
+forward 2&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day3"><a href="#day3">Day 3</a> (<a href="https://adventofcode.com/2021/day/3">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/3
+object Day03 : AdventOfCode, Solution by Omar_Miatello(
+    day = 3,
+    parser = { lines -&gt; lines.map { line -&gt; line.map { it == '1' } } },
+    part1 = { input -&gt;
+        val gamma = input.commonsByIndex.toInt(valueFor1 = true)
+        val epsilon = input.commonsByIndex.toInt(valueFor1 = false)
+        gamma * epsilon
+    },
+    expectedTestPart1 = 198,
+    part2 = { input -&gt;
+        fun findBest(
+            initial: List&lt;List&lt;Boolean&gt;&gt;,
+            condition: (current: Boolean, common: Boolean) -&gt; Boolean,
+        ): Int {
+            var res = initial
+            var pos = 0
+            while (res.size &gt; 1) {
+                val common = res.commonsByIndex[pos]
+                res = res.filter { condition(it[pos], common) }
+                pos++
+            }
+            return res.first().toInt(valueFor1 = true)
+        }
+
+        val oxygen = findBest(
+            initial = input,
+            condition = { current, common -&gt; current == common },
+        )
+        val co2 = findBest(
+            initial = input,
+            condition = { current, common -&gt; current != common },
+        )
+        oxygen * co2
+    },
+    expectedTestPart2 = 230,
+)
+
+private val List&lt;List&lt;Boolean&gt;&gt;.commonsByIndex: List&lt;Boolean&gt;
+    get() = first().indices.map { idx -&gt; count { it[idx] } &gt;= size / 2f }
+
+private fun &lt;T&gt; List&lt;T&gt;.toInt(valueFor1: T): Int =
+    joinToString(&quot;&quot;) { if (it == valueFor1) &quot;1&quot; else &quot;0&quot; }.toInt(2)
+//sampleEnd
+
+fun main() {
+    Day03.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;000011110010
+010000100100
+010011111111
+000101001111
+010100011111
+111100111011
+100111011010
+111001000001
+100000100110
+100110011000
+010101010111
+001100100001
+111100111111
+111010001000
+101011101110
+111101001000
+000000111101
+001010111011
+111101100010
+110001100111
+110011011011
+010000000110
+010111100111
+111001111000
+110001101111
+100010011011
+100100110001
+000001100111
+110001110000
+010011011010
+010111110010
+111100101111
+000110111101
+101101101001
+111110000100
+001110100100
+000000110011
+000001010000
+010110000011
+000101010100
+110010010100
+001110011011
+001011110011
+001011000100
+111011100101
+001000011101
+011110001010
+100110100111
+100100101100
+000101101011
+001100000110
+010101000010
+000111001011
+100001110100
+110000110110
+101001110011
+010001111001
+111110111000
+000110011010
+101110000001
+110000100001
+111001000011
+000000101001
+000001100101
+001101110111
+001100000001
+100111100100
+000111000001
+000100111011
+000000110100
+111100100100
+001001000000
+111001100111
+100101110010
+011000110101
+110100110111
+001001110101
+110010011100
+011001011111
+001010110111
+110101000111
+010010011001
+100010110001
+101110101011
+010010011000
+111001000110
+001001100001
+000001110111
+011100011011
+101101011001
+111000011111
+101001110101
+100100110000
+101000001111
+011001110100
+001000100101
+011100111011
+001100101110
+111000111111
+000001100100
+101010010001
+101100110001
+110011001100
+111000100111
+000011000111
+010001000011
+010111100000
+111001000101
+011000001011
+001111100110
+101111110011
+110011000001
+011011011100
+011101000011
+001111100100
+110010110010
+110100110110
+110000001000
+110010001000
+101111101010
+010000001100
+110010010011
+110000011000
+101100011110
+001010010000
+011010011101
+101110100100
+100010011010
+011010011000
+101110000111
+001010100110
+100000000101
+101100100101
+101001111010
+011110010111
+101000111000
+111111010110
+000001111000
+101010111110
+001101100011
+001010111100
+001001100111
+111010100001
+100101101100
+111101110110
+011010111000
+110100000001
+110101000110
+100000010000
+111010100011
+111110001100
+000001101100
+000011011000
+011101000000
+111011111010
+110011100001
+100000111101
+000101010101
+000001110100
+010010000100
+010110110001
+101000100110
+111110010000
+010100111100
+101101000100
+011100001111
+111000001111
+111011111100
+111011001011
+101000010110
+100000011111
+000100010111
+100010111111
+010111000111
+010100111001
+000000000001
+110011111000
+001010001010
+111100011110
+011001001011
+011101101110
+100100110111
+011010010101
+100001111100
+010010111001
+101100000100
+100001000110
+110101101000
+001010000100
+011100111100
+001110010100
+001100001100
+110100100011
+000111010101
+100010011111
+010110110111
+100111010000
+001101111100
+000110011110
+000100101010
+101011001010
+101111010101
+000001000011
+111001000010
+100011100010
+101000000111
+111000010111
+111001110110
+110000100110
+111010011001
+010101110101
+000111010000
+011110100110
+100100010111
+000110001100
+001110111110
+010001001111
+011011110111
+110000111011
+101010110001
+101101010011
+100110101001
+100010010101
+000011111111
+010110110110
+000100110111
+110101011101
+111001100001
+001100110100
+011001010101
+100010101110
+110001011110
+000100101011
+101110100010
+001101000000
+110111110101
+110100010110
+100111000000
+100001000101
+001100111011
+000010001001
+001101001010
+101010001101
+110101101111
+001101011001
+110001000001
+001110100000
+001010010011
+100000010010
+111001101011
+101011000111
+001000010011
+010111111101
+101111000111
+010100100101
+000100000110
+000010110011
+000111011110
+100011110111
+101010110011
+011111001110
+111011110100
+010011000001
+000011101110
+000101010011
+100011110101
+001101001111
+011000010001
+011010010000
+001101011110
+110010010001
+110111111100
+010111001100
+000000111000
+101100110100
+110001111000
+010101110110
+111000101001
+110110010011
+100000101010
+111101100011
+000110100110
+000110100111
+001111111101
+001101110010
+101101100010
+001110001011
+101101001111
+000110100101
+110010011101
+001100011100
+111010101001
+001111001001
+010001100101
+110001101001
+010110011011
+110111110110
+100110001110
+000011010100
+110000001011
+110101110100
+111110101100
+111100100110
+100000100101
+011011010010
+011000000000
+001110001010
+001011110110
+111111010101
+101000011011
+110001110110
+001110010011
+100111111010
+110110011110
+000011101010
+100010011000
+100100001111
+111110001101
+111011111001
+101010011100
+001100000000
+100010000010
+000001110110
+010100110111
+100010100000
+101001101010
+100000011010
+100110111011
+011100010111
+100110101101
+110011010101
+001011110101
+001110010000
+000010101010
+101110001011
+011000010011
+101001011000
+010101101001
+000111110010
+101101111111
+010000011000
+110011101011
+001011101001
+111000001100
+101110100110
+011100101001
+001101011011
+011110101001
+010111101011
+110010000100
+001101010000
+010011011100
+100000110000
+111101100110
+111110110100
+011101111100
+110111110100
+110100010101
+011110110111
+011011011000
+000000100101
+001001010011
+101100001101
+001010101011
+111100011101
+100101101110
+111000001010
+101010011010
+010001111101
+110011001101
+011000111011
+000111101001
+100101100111
+110111111000
+110000000010
+101010111011
+111001110010
+011100110101
+100010111001
+000110110101
+010110101110
+000001101111
+010110110010
+100000110001
+010000001110
+111100110011
+011101101111
+100111000001
+110000000101
+100011010111
+110001001011
+101111001011
+111110010011
+110111111101
+111111111101
+011111001010
+011011001101
+101111000100
+111000101111
+110010000000
+010010111110
+110110110110
+000100001101
+001010001011
+001000010100
+110100001111
+000101000101
+111101101111
+110011111111
+011010011011
+100101110111
+000110000111
+000100110100
+110110101010
+110001110100
+000001111111
+011000000111
+111000100010
+101000010001
+011111000010
+001010001101
+110010100001
+100111101000
+011001101110
+111100111001
+111101110011
+110101110010
+100100010100
+011001111111
+111001011110
+000010100111
+100010101000
+011100111101
+110111011000
+010001111110
+011001001001
+010000011111
+011000001001
+101100000111
+111110000000
+110100101111
+001000100011
+000011100010
+011100110001
+011010000100
+110110000001
+100001010101
+111111111011
+000001010110
+010001110111
+100100111110
+111111011011
+101000111110
+001010011010
+101010011111
+111010000011
+111011011111
+010100111000
+010010110111
+010010100101
+101100101100
+010110110100
+001111001101
+001101101001
+110011010100
+100010100101
+001001010010
+000011000010
+111110000111
+001011010100
+100001000100
+001110001100
+101001110010
+100010000100
+010001010001
+010100110001
+111101001011
+010111000110
+001110101011
+000101011100
+010100101110
+101111111000
+011100111110
+010110111001
+101101001110
+001000011000
+001101100100
+010111011101
+101101101111
+110100110100
+101110111100
+110111110001
+110000100101
+101111110010
+010101111100
+101000100111
+001010101101
+100000010011
+010101010011
+000011101000
+011001000000
+101010110100
+100101101010
+100100011000
+011100110011
+001010100001
+010000111000
+000101100111
+010001111111
+000011000110
+001011011010
+011101110011
+101101010100
+000100000000
+111101100000
+001111110000
+001101111010
+010110100110
+111001001111
+001101110001
+110110000010
+001101101000
+001100100101
+111101110100
+000101110001
+010010111011
+101000110100
+100110111001
+111001010000
+000011001111
+101000011101
+100111111100
+010111100100
+101001101011
+101000101001
+001010001110
+111001111101
+100011001011
+111101101011
+110111001100
+110100111010
+111101111010
+100111110011
+111100010000
+101110000010
+001000111000
+011001110110
+011001101011
+110100110001
+010100110010
+101000111001
+010110010110
+000010000000
+111100011100
+001110111111
+010010100110
+110001010010
+110101101010
+010011111000
+011101010110
+100001101100
+000101100011
+111100011111
+010111111111
+110000101111
+101110111101
+110011000100
+010010000000
+010100110100
+101011111101
+001011001110
+111000011100
+010110000100
+011110001000
+101010001110
+111001010111
+000001101011
+001010011001
+110001000000
+110011100101
+101000011100
+001000101001
+100100100101
+101010000110
+110001011111
+001000110100
+001000100111
+110010011001
+001001111011
+010101100100
+010110101101
+101101000110
+010011111101
+000000111111
+100111111110
+100101111100
+110010000001
+010100010111
+011110110000
+111100110001
+000010101101
+111111010011
+110110100000
+000000010100
+110000110100
+111101111111
+001001100100
+100000001110
+011101001000
+010001101111
+100101110110
+101011101101
+111011110111
+101110011010
+000001101110
+000100011111
+111111101010
+000101011101
+010110001001
+110001000110
+110101011110
+100110100011
+101100111000
+011011001110
+111000110000
+000110001110
+100110011110
+110011101101
+101100011111
+011111000101
+011101000100
+000111110001
+011111110011
+011001100101
+000100001100
+100100011101
+110011101110
+101000000110
+000100001111
+110010101000
+010110000101
+110000010010
+111010111001
+001001000110
+001000011010
+110110001011
+001101001110
+111010011100
+000101010110
+111111001000
+001001110000
+101011100111
+110101101001
+101111110110
+111010001011
+010100101100
+010110110000
+110011010010
+101010111010
+010011001101
+011101000101
+101111111101
+110000000100
+011011011101
+010101011000
+000011001101
+011101110000
+100111011101
+001100101001
+100101100000
+110010011010
+101111011001
+110010111010
+110001100000
+100100010110
+100101010111
+100110111110
+010111011000
+100100101011
+101010011110
+110011001011
+100011101110
+111000000110
+010011000100
+111011100011
+000000011100
+101011011000
+100110001011
+001011101101
+000000000010
+010011001111
+001001110010
+111011100100
+100100010101
+111110000001
+011110100101
+100110000100
+001011101110
+100010011110
+001000110000
+001100001010
+011001001110
+011010011001
+111110011010
+001010011111
+100001100001
+101011110111
+111111001110
+010000000001
+001011110010
+111010011111
+101000110001
+010011010100
+000111000011
+010101001110
+101000110111
+011010110001
+011010100001
+011010011110
+000101101101
+101101100101
+011101101011
+000011001001
+111000111001
+111100111000
+000111100111
+111101111101
+000101011011
+011111000100
+110101000001
+101000111011
+110011010001
+010011110101
+101000000010
+010111110101
+101101101000
+110111010011
+000111111110
+100001110110
+100110001000
+110110000101
+111101100100
+010001101010
+111001000100
+111001010100
+101110001000
+010000010110
+100001100110
+000110100010
+111101010010
+110000001111
+010001100111
+001000001010
+110000011010
+001011100110
+100101101101
+011001011100
+001100101101
+011110111001
+001010001100
+111011000011
+100100000111
+000100001010
+011100101100
+001101110100
+001100011110
+101010001111
+000011001011
+111001010010
+110000101110
+000101000011
+010010000011
+110010101101
+010101011011
+101011110001
+110111100100
+111010011010
+011101010101
+100001011100
+011011100010
+111000010100
+101011011001
+101110101100
+000010011011
+111110101101
+100000101100
+010000101010
+010011111100
+110110100001
+100011001000
+000001000010
+101110010110
+110101111000
+101001101000
+000001100000
+110010011110
+010111010110
+111101010101
+000010111011
+011110111000
+010101111010
+001000000011
+110001101010
+111001011010
+111010110011
+100001010010
+001011101111
+000011101111
+111011110010
+000011011001
+011110101100
+011001111101
+011010010111
+000100100101
+111100111100
+010000001001
+110011110000
+010010010001
+000111101000
+100011001001
+100111001010
+011101111011
+100110011011
+101011111001
+111111100011
+010010111000
+000001111001
+010110011001
+011100001011
+110001110111
+001010100111
+110110100010
+010111000101
+100100001100
+011110101110
+111110111010
+000000010011
+110000101011
+111010100100
+011110011000
+111010110001
+000010001110
+000001000111
+110010101111
+100001011111
+111001100100
+110000000110
+100011101100
+101011001001
+000100101101
+101101101011
+001001110100
+100100111100
+010010101011
+011110100000
+110101100011
+101101101010
+100101010110
+011000100000
+111000101000
+011110010110
+001000010111
+111010010111
+111100000111
+011000100011
+010000111111
+011001010111
+011110011010
+111111011100
+011111101101
+101111011101
+101100100000
+111111000000
+111111111111
+101011011101
+000010101100
+100101001101
+111111001010
+010100000000
+010111001011
+101110010101
+000011011100
+110101011000
+111001101101
+000001011101
+000101011010
+100110000110
+111111001111
+001011111110
+111010011110
+000011010110
+011010111110
+111110001001
+100011001110
+110111001101
+110100100101
+101011100110
+110100000110
+010011100101
+001000010110
+101001100101
+111111110001
+100110111000
+111101001100
+010001101000
+011100100101
+111101010011
+000110011001
+010100010100
+110100100010
+100101100100
+100011001101
+001000100001
+110100100111
+111010011011
+011000010010
+111001100011
+001111101011
+010110111101
+000001011010
+100000010110
+010100011011
+110000110011
+111111111010
+111000100100
+100100011011
+000111110110
+010000000010
+010111110111
+100011100001
+001101000100
+011111011111
+000010011111
+000101011110
+001100100111
+101001000100
+000011011010
+101101001101
+010010010110
+001100001110
+100101000001
+111100000101
+100000111111
+010111111011
+101101110110
+001000010001
+110111101000
+110101001111
+101110000100
+110001110011
+010010011010
+011010101111
+111110001010
+110010110000
+101001000110
+000010000001
+001100011111
+100101000110
+010101100011
+000100111100
+101011010101
+010001110001
+001010011110
+101100001110
+101111010001
+000000010000
+011111001111
+100011101111
+001000111100
+101001011111
+111111010111
+001010110110
+111101101110
+011000101011
+111011100110
+010001001000
+001010111001
+111010111011
+111111110110
+110110001000
+001000100010
+101010101110
+101010100011
+100100111101
+000110010001
+111110010110
+000101100001
+010100100111
+001101100010
+110011110111
+011100110110
+100101011000
+011101011111
+110110000011
+100010110100
+011011001000
+111000101101
+110100000101
+011001000001
+001011000111&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day4"><a href="#day4">Day 4</a> (<a href="https://adventofcode.com/2021/day/4">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/4
+object Day04 : AdventOfCode, Solution by Omar_Miatello(
+    day = 4,
+    parser = { lines -&gt;
+        SquidGame(
+            random = lines.first().toIntList(&quot;,&quot;).filterNotNull(),
+            boards = lines.drop(2)
+                .windowed(5, 6)
+                .map { Board(it.map { it.toIntList(&quot; &quot;) }) }
+                .toMutableList(),
+        )
+    },
+    part1 = { (random, boards) -&gt;
+        var winner: Board? = null
+        var n = 0
+        var res = 0
+        while (winner == null) {
+            val r = random[n++]
+            boards.forEach { it.remove(r) }
+            winner = boards.firstOrNull { it.win() }
+            if (winner != null) res = winner!!.points() * r
+        }
+        res
+    },
+    expectedTestPart1 = 4512,
+    part2 = { (random, boards) -&gt;
+        var res = 0
+        random.forEach { r -&gt;
+            boards.forEach { it.remove(r) }
+            val winner = boards.firstOrNull { it.win() }
+            if (winner != null) {
+                res = winner.points() * r
+                boards.removeIf { it.win() }
+            }
+        }
+        res
+    },
+    expectedTestPart2 = 1924,
+)
+
+private data class SquidGame(
+    val random: List&lt;Int&gt;,
+    val boards: MutableList&lt;Board&gt;,
+)
+
+private fun String.toIntList(delimiters: String): MutableList&lt;Int?&gt; = split(delimiters)
+    .filter { it.isNotEmpty() }
+    .map { it.toInt() }
+    .toMutableList()
+
+class Board(private val items: List&lt;MutableList&lt;Int?&gt;&gt;) {
+    fun win() = items.any { item -&gt; item.all { it == null } }
+            || items.first().indices.any { idx -&gt; items.all { it[idx] == null } }
+
+    fun remove(n: Int) = items.forEach { item -&gt; item.replaceAll { if (it == n) null else it } }
+
+    fun points() = items.sumOf { item -&gt; item.filterNotNull().sumOf { it } }
+}
+//sampleEnd
+
+fun main() {
+    Day04.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
+
+22 13 17 11  0
+ 8  2 23  4 24
+21  9 14 16  7
+ 6 10  3 18  5
+ 1 12 20 15 19
+
+ 3 15  0  2 22
+ 9 18 13 17  5
+19  8  7 25 23
+20 11 10 24  4
+14 21 16 12  6
+
+14 21 17 24  4
+10 16 15  9 19
+18  8 23 26 20
+22 11 13  6  5
+ 2  0 12  3  7&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;28,82,77,88,95,55,62,21,99,14,30,9,97,92,94,3,60,22,18,86,78,71,61,43,79,33,65,81,26,49,47,51,0,89,57,75,42,35,80,1,46,83,39,53,40,36,54,70,76,38,50,23,67,2,20,87,37,66,84,24,98,4,7,12,44,10,29,5,48,59,32,41,90,17,56,85,96,93,27,74,45,25,15,6,69,16,19,8,31,13,64,63,34,73,58,91,11,68,72,52
+
+31 88 71 23 61
+ 4  9 14 93 51
+52 50  6 34 55
+70 64 78 65 95
+12 22 41 60 57
+
+44 54 26 63 18
+32 74 99 52  2
+ 5 29 13 28 41
+60 69 53 61 25
+49 59 70 46 48
+
+26 91  1 23  6
+51 58 79 57 33
+67 50 14 81 48
+64 66 49 46  9
+16 73 39 74 68
+
+41 31 12 14 82
+ 4 97 76 49 15
+50 43 72 22 24
+53 56 78 33 52
+65 68 26  0 94
+
+73 21 23 33 57
+53 10 40 35  0
+41 12 71 19 47
+49 25 76 78 13
+80 92 22 26 29
+
+97 11 43 46 52
+51 58 36 47 84
+75 69 88 85 57
+67 94 61  0 70
+65 42 16 44  1
+
+64 70 99 58 56
+18 81 34 59 45
+26 71 67 47 68
+78 17 87 91  0
+49 98 53 35  9
+
+76 75  5 27 25
+17 92 42 49 28
+34 78 26 71 30
+11 31 41 14  8
+50 59 62 93 80
+
+ 3 27 23 11 49
+56 93 22 70 94
+24 74 43 21  7
+33 28 41 96  9
+42 10 80 78  5
+
+51 64 12 79 31
+73 66 43 70 84
+86 44 81 60 85
+16 48  6 83 34
+25 98 36 50 19
+
+28 15 30 79 59
+40 76 39 98 12
+ 4 96 93 91 47
+19 75 89 73 17
+72 64 92 58 74
+
+24 32 84 57 55
+91 33 92 71  8
+30 40 78 61 70
+79 35 34 75 23
+38  7 81 27 76
+
+ 8 93 11 94 39
+21 13 98 83 10
+38 59 46 24 75
+74 60 34 89 42
+36 69  0 40 67
+
+21 69 28 98 13
+44 79  7  3 20
+19 36 82  9 43
+45 11 99 97 76
+ 2 17 16 46 66
+
+73 20  2 63 47
+ 6 96 16 46 17
+66 82 14 29 41
+49 30 71  8 68
+44 18 56 26 74
+
+42 32 40  2  9
+20 10 95 31 67
+98 96 15 39 58
+13 52 99 82 89
+23 18 87 60  5
+
+92 32 45 26 80
+59 22 23 98 24
+79 65 99 15 58
+83 86 70 17 63
+51 46 82 78 52
+
+ 3 73 20 53 63
+26 97 39 94 55
+ 1 27 98 62 15
+75 78 99 87 43
+90 96  0 89 67
+
+85 76 48 16 49
+51 67 79 68 18
+20 38 44 57 46
+19 29 39 60 23
+26 47 78 17 83
+
+32 11 47 56 84
+54 66 38 77 74
+72  0 30 71 80
+10 86 94 23 65
+81 99 60 43 83
+
+ 7 78 69 75 41
+ 0 70 21 45 29
+40 51 88 28 35
+97 46 44 98 37
+93 36 89 81 18
+
+33 13 84 68 72
+92 76  1 40 19
+86 75 34 98 82
+ 8  3  4 28  0
+91 60 27 81 39
+
+76 32 92 65 70
+88 45 37 44 99
+38 95 72  6 19
+34 71 54 41 33
+47 20 84 98 73
+
+85 46  4 89 69
+50 62 30 64 59
+ 9 21 54 55 13
+66 29 17 96  6
+22 97 44 87 90
+
+72 53 96 87 35
+81 14 77 17 12
+82 47  2 95 59
+24 92 54 90 48
+70  4 85 99 13
+
+32 22  3 54 18
+ 4  2 94 38 77
+46 59 11 67 37
+61 80 45 51 95
+13 81 42 15 64
+
+24 51 56 36 55
+84 81 78  1 98
+33 14  3 97 64
+34 39 11 18 59
+44 62 99 83 82
+
+73 21 47 83 10
+11  5 16 20 54
+36 98  4 89 38
+56 72  6 32 80
+29 91 61 40 69
+
+19 22 53 67 34
+59 94  5 47 61
+77 55 91 69 63
+92 68 65 40 97
+64 20 18 39 49
+
+ 0 36 23 26 30
+76 21 81 64  7
+ 3 61 93 79 70
+96  8 47 48 54
+51 55 44 62 59
+
+70 69 89 91 55
+19  8 29 59 54
+64 56 51 34 60
+32 16 37 44 83
+40 21 50 66 76
+
+54  1 83 64 26
+27  9 52  6 50
+68  4 45 30  2
+93 42 89 70 99
+67 19  7 59  0
+
+75 28 98 83 18
+82 71 96 40 24
+47 52 73 69 34
+ 4 78 89 32 11
+53 39 37 93 67
+
+96 54  5 26 74
+91 65 70 21  6
+ 4 80 89 30 51
+63 99 73 11 49
+10 29 18 98 34
+
+ 0 98 16 32 66
+82 44 22 25 42
+62 45 90 36 47
+10 43 15 12  6
+ 1 86 20 27 28
+
+83 68 61 16 60
+ 7 22 14 56 72
+41 24 43 20 51
+13 15 53 87 84
+66 91  1 42 80
+
+19  9 73 51 13
+ 0 52 43 26 59
+20  2 12 78 56
+42 64  6 65 85
+61 11 35 44 84
+
+28 30 96 67 38
+89 50 20 92 40
+ 0 57  9 49 95
+26 39 66  7 25
+74 72 76 54 16
+
+57 50 29 88 80
+27 23  3 83 52
+33 45  5  4 58
+67 48 16 82 55
+75 92 63 40 30
+
+59 66 39 36 68
+34 95 88 70 60
+44  6 81  2 13
+ 5 83 33  0 37
+17 97 46 82 84
+
+98 87 20 49 22
+ 9 37 81 11 71
+24 64 13 25 82
+ 8 34  3 94 36
+16 45 73 85 23
+
+ 3 12 28 54 16
+86 92 10 74 75
+43  5 98 24 34
+52 32 48 18 17
+33 26 99 25 63
+
+67  1 27 91  6
+98 94 18 21 65
+ 9 17 80 82 70
+84 47 26 96 46
+38 89 57 78 22
+
+89 86 51 84 27
+47 61 35 26 18
+22 79 28 78 21
+15 77 65 46 64
+ 1 99 16 80 95
+
+24 84  3 23 81
+ 1 57 25 30 48
+67 91 68 15  2
+31 73 50  4 16
+61 99 47 96 34
+
+41 86 47 15 93
+31 88 80  6 16
+54 55 24 81 77
+84 97 91 42 37
+48  7 94 98 34
+
+35 51 30 68 59
+16 27 34  0 84
+90 47 28 96 72
+33 76 74 64 52
+32 46  3 26 83
+
+ 7 83 88 17 46
+14 64 80 27 57
+58 44 55 86 61
+38  3 96 32 71
+26 78 22 70 33
+
+29 36 59 90 95
+87 42 75 89  9
+96  1 58 48 10
+16  6 35 85  4
+66 62 22 30 91
+
+23 46 36 53 63
+17 98 72 33 50
+39 96 95 67 19
+56 84 73 88 79
+86 58 28 91 15
+
+67 48 31 82 57
+65 32 41 84 30
+ 3 87 94 68 35
+56  9 28 50 27
+36 21 72 81 55
+
+21  8 99 15 75
+85  5 12  0 53
+82 45  4 11 43
+88 95 69 44 81
+ 1 56 22 83 73
+
+68 84 83 27 64
+94 70 90 97 79
+12 35 45 76 22
+18 14 41  1 10
+15  9 87 32 17
+
+53 69 77 19 96
+ 5 47 64 57 23
+26 28 88  6 41
+16 52 51 93 30
+95 33 98 46 42
+
+34 85 39 82  0
+17 60 40 12 93
+56 72 58 31  3
+78 47 63 20  1
+80 54  8 94 24
+
+12 90 86 33 56
+55 16 24 65 72
+82 28 53  1 93
+14 69 11 41 29
+92 37 48 57 15
+
+ 8 45 89 90 41
+52 86 60 62 72
+47 80 82 13 56
+22 46 91 57 50
+ 9 67 43  6 16
+
+ 6 51 99 17 20
+84 75 73 97 13
+89 31 80  1 61
+88 82 50 96 83
+32 35 53 68 26
+
+21  9 63 62 82
+55 45 86 75 14
+19 15 88 43 53
+79 36 97 71 33
+ 4 85 52 47 12
+
+81 77 12  1 28
+32 38 16 41 91
+64  8 63 78 54
+87 24 23  0 22
+99 75 18 15 65
+
+22 82 41 54 89
+68  5 70 11 81
+17 94 73 24 77
+99 56 21 75 14
+48 67 76 64 95
+
+85  5 54 31 37
+38 74 69 52 53
+86 89  6 81 40
+26 84 56 72 65
+67  7 32 87 95
+
+45 49 86 53 94
+20 40 28 26 98
+36  4 67 29 87
+70  1 96 55 48
+37 92 23 85 91
+
+77 85 32 21 62
+46 69 16 98 71
+ 3 88 38 36  8
+79 12 74 76 84
+72 41 92 39 67
+
+50 69  2 38 15
+67 28 78 30 40
+33 92 88 85 24
+18  6 34 16 61
+36 29 56 63 90
+
+90 92 13 32 56
+72 89 51 43 40
+18  4 81 23 77
+57 62 85 55 86
+27 65 31 94 91
+
+80 45 14 90 32
+74 53 34  9 83
+51 97 56 30 69
+11 15 17 41  4
+54 24 85 67 66
+
+52 10 39 61 97
+ 4 49 73 58 74
+19 45 92 27 32
+41 11 75 37 70
+95 53 88 86 82
+
+19 35 77 73 11
+97 54 24 50 39
+68 59 56 80 75
+72 85 38 67 40
+49 25 98 94 26
+
+63 37 58  7 81
+69 65 44 86 22
+38 66 82 93 64
+36 15 61 88 45
+25 91  6 60 87
+
+ 6  4 90 10 89
+12  2 30 94 59
+41 13 51 63  0
+34 73 87 79 61
+38 77 88 53 72
+
+49 57 27 50 74
+60 99 90 34  0
+ 7 80 43 24 65
+82 67  2 69 20
+72 75 47 18 91
+
+12 55 65 36 92
+40 99 15  7 82
+ 9 46 32 52 83
+73 20 61 18 69
+78 34 41 98 96
+
+60 53 76 19 57
+82 13 30 51 41
+45 87 95 25 39
+96 66 72 62 59
+71  5 17 77 75
+
+60 14  5 38 62
+85 68 69 83 92
+24 82 93 61 11
+65 19 75 47 94
+45 21 13 76 59
+
+50 43 83 15 18
+35 37 47 96 51
+91  7 19 38  9
+87 76 46 61 82
+85 20 59 39 31
+
+91 42 83 63 54
+35 89 33 37 88
+19 67 71 49 48
+34 65  7  1 80
+70  9 98 10 44
+
+65 89  1 76 86
+81 35 93 69 26
+15 17 16 67  0
+97 38 23 50 78
+96 54 70 45 42
+
+20 50 64 29 75
+87 69 27 92 52
+32 88 93 67  9
+35 15 17 89 40
+37 11 21  3 86
+
+20  8 68 75 65
+47 56  2 23 49
+88 26  5 18  7
+29 57 19 92 84
+87 67 53 90 96
+
+68 59 97 34 56
+82 83 90 94 69
+37 60 76 35  1
+29 95 58 40 53
+22 84 12 21 99
+
+63 32 79 62 17
+ 8 18 40 74 57
+71 91 70 30  3
+46 33 39 61 76
+27 54 12 98 77
+
+73 66 24 65 76
+88 42 52 11 32
+41 15 81 89 33
+74  3 25 75 83
+29 14 96 35 27
+
+23 36 57 53 93
+43 50 83 97 91
+63 69 55 90 11
+18 94 59 85 73
+81 60 30 46 80
+
+32 13 51 86 39
+74 46 11 25  9
+44 89 26 54 71
+93 98 29 75 85
+38 70 79  0 30
+
+68  4 55  3 96
+41  7 64 21 86
+27 69 93 80 90
+73 75 26 25 50
+49 32 45 24 61
+
+90 14 43  4 87
+11 16 33 79 28
+36 31  2 34 50
+67 10 24 92 99
+26 80  1 12 51
+
+56 21 79 36 93
+26 63 35  5 76
+85 94 69 18 28
+52 55 90 83 12
+10 23 95 15 19
+
+34 85 32 89 16
+ 7 12 40 23 47
+79 10 93 59 29
+99 22 21 38  9
+76  4 70 53 35
+
+51 33 22 56 97
+88 26 47 19 40
+45  0  3 25 76
+ 8 42 61 57  5
+83 20 53 29 70
+
+ 2 41 94 98 33
+61 77 84 34  0
+49 40 86 74 43
+35 27 38 25  8
+90 80 57 97 46
+
+60  1 83 31 77
+94 49 64  6 24
+51 95 36 72 76
+ 8  7 59 45 34
+26 87 41 97 82
+
+13  7 69 28 78
+39 62 45 77 53
+90 85 23 17 38
+60 33 19 89 24
+97 30 16 64 42
+
+23 73 59 52 70
+20 38 81 78 47
+58  0 79 19 95
+39 42  8 17 53
+24 57 37 13 10
+
+36 60  3 98 41
+30 27  0 74 81
+49 23 48 69  4
+22 86 73 96 95
+80 14 92 83 91
+
+86 61 22 77 57
+34  4 71 55 27
+25 24  7  6 16
+81 75 38 96 35
+64 15 29 98 79
+
+82 85 80 52 56
+72 58 89  8 92
+43  5 77  2 83
+53 12 39 21  6
+16 31 47 10 74
+
+43 17 37 53 48
+60 77 80 36 25
+58 20 91 95 71
+90  4  9 83 66
+28 15 62  6 11
+
+51 46  2 26 79
+83 52 11 64 22
+66 49 61 78 69
+70 67 91 10 24
+68 63 23 93 35
+
+42  9 63 56 93
+79 59 38 36  7
+ 6 23 48  0 55
+82 45 13 27 83
+ 1 32  8 40 46&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day5"><a href="#day5">Day 5</a> (<a href="https://adventofcode.com/2021/day/5">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+import kotlin.math.abs
+import kotlin.math.sign
+
+// https://adventofcode.com/2021/day/5
+object Day05 : AdventOfCode, Solution by Omar_Miatello(
+    day = 5,
+    parser = { lines -&gt;
+        lines.map { it.split(&quot; -&gt; &quot;).map { it.split(&quot;,&quot;).map { it.toInt() } } }
+            .map { Line(start = Dot(it[0][0], it[0][1]), end = Dot(it[1][0], it[1][1])) }
+    },
+    part1 = { input -&gt;
+        input
+            .filter { it.start.x == it.end.x || it.start.y == it.end.y }
+            .findDoublePoints()
+            .size
+    },
+    expectedTestPart1 = 5,
+    part2 = { input -&gt;
+        input
+            .filter {
+                it.start.x == it.end.x
+                        || it.start.y == it.end.y
+                        || abs(it.start.x - it.end.x) == abs(it.start.y - it.end.y)
+            }
+            .findDoublePoints()
+            .size
+    },
+    expectedTestPart2 = 12,
+)
+
+private fun List&lt;Line&gt;.findDoublePoints(): Set&lt;Pair&lt;Int, Int&gt;&gt; {
+    val allPoints = mutableSetOf&lt;Pair&lt;Int, Int&gt;&gt;()
+    val doublePoints = mutableSetOf&lt;Pair&lt;Int, Int&gt;&gt;()
+    forEach { it.points.forEach { p -&gt; if (!allPoints.add(p)) doublePoints.add(p) } }
+    return doublePoints
+}
+
+class Line(
+    val start: Dot,
+    val end: Dot,
+) {
+    private val signs = Dot(sign(end.x - start.x), sign(end.y - start.y))
+    private val distance = abs(if (start.x != end.x) end.x - start.x else end.y - start.y)
+    val points = (0..distance).map { d -&gt; start.x + (d * signs.x) to start.y + (d * signs.y) }
+}
+
+class Dot(val x: Int, val y: Int)
+
+fun sign(x: Int) = sign(x.toDouble()).toInt()
+//sampleEnd
+
+fun main() {
+    Day05.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;0,9 -&gt; 5,9
+8,0 -&gt; 0,8
+9,4 -&gt; 3,4
+2,2 -&gt; 2,1
+7,0 -&gt; 7,4
+6,4 -&gt; 2,0
+0,9 -&gt; 2,9
+3,4 -&gt; 1,4
+0,0 -&gt; 8,8
+5,5 -&gt; 8,2&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;242,601 -&gt; 242,18
+938,357 -&gt; 938,128
+920,574 -&gt; 750,574
+804,978 -&gt; 804,813
+955,932 -&gt; 68,45
+232,604 -&gt; 232,843
+69,570 -&gt; 467,968
+355,432 -&gt; 611,688
+945,19 -&gt; 700,19
+904,932 -&gt; 904,918
+455,65 -&gt; 516,65
+571,485 -&gt; 588,485
+717,142 -&gt; 217,142
+377,344 -&gt; 66,344
+510,818 -&gt; 132,818
+848,709 -&gt; 848,950
+785,50 -&gt; 785,857
+23,981 -&gt; 971,33
+938,45 -&gt; 938,327
+212,402 -&gt; 601,13
+749,142 -&gt; 651,240
+94,930 -&gt; 22,930
+436,467 -&gt; 820,851
+544,265 -&gt; 458,265
+517,708 -&gt; 517,785
+957,893 -&gt; 957,22
+684,610 -&gt; 526,452
+713,687 -&gt; 526,687
+220,781 -&gt; 988,13
+12,45 -&gt; 912,945
+854,677 -&gt; 646,677
+382,498 -&gt; 382,64
+676,879 -&gt; 148,351
+809,52 -&gt; 336,525
+959,951 -&gt; 41,33
+943,162 -&gt; 132,973
+897,732 -&gt; 897,308
+21,196 -&gt; 702,877
+938,972 -&gt; 656,972
+798,139 -&gt; 90,847
+213,597 -&gt; 582,966
+248,955 -&gt; 973,230
+985,606 -&gt; 985,885
+166,693 -&gt; 804,693
+807,897 -&gt; 28,118
+433,306 -&gt; 433,447
+899,61 -&gt; 60,900
+984,582 -&gt; 691,582
+803,583 -&gt; 910,583
+348,142 -&gt; 348,244
+352,775 -&gt; 352,430
+240,285 -&gt; 240,406
+394,541 -&gt; 394,655
+887,622 -&gt; 298,33
+62,37 -&gt; 861,836
+819,136 -&gt; 29,926
+717,332 -&gt; 717,408
+709,63 -&gt; 276,496
+384,441 -&gt; 150,441
+292,251 -&gt; 557,516
+518,311 -&gt; 52,777
+50,735 -&gt; 479,306
+932,865 -&gt; 139,72
+43,21 -&gt; 982,960
+63,927 -&gt; 796,194
+958,351 -&gt; 958,623
+643,451 -&gt; 35,451
+534,14 -&gt; 459,14
+20,649 -&gt; 924,649
+983,18 -&gt; 35,966
+84,668 -&gt; 203,668
+40,654 -&gt; 748,654
+474,760 -&gt; 85,371
+512,431 -&gt; 272,431
+588,93 -&gt; 112,569
+648,687 -&gt; 832,687
+988,867 -&gt; 116,867
+979,46 -&gt; 94,931
+242,307 -&gt; 800,865
+100,204 -&gt; 807,911
+890,962 -&gt; 88,962
+273,510 -&gt; 273,201
+184,748 -&gt; 813,119
+214,915 -&gt; 950,179
+960,975 -&gt; 89,104
+853,347 -&gt; 853,79
+853,308 -&gt; 884,308
+245,394 -&gt; 245,640
+850,554 -&gt; 604,800
+141,159 -&gt; 141,378
+635,632 -&gt; 897,894
+352,182 -&gt; 550,182
+748,613 -&gt; 748,887
+531,664 -&gt; 255,388
+785,414 -&gt; 432,767
+374,457 -&gt; 653,736
+451,535 -&gt; 444,535
+600,179 -&gt; 434,13
+489,605 -&gt; 845,961
+658,786 -&gt; 658,196
+305,556 -&gt; 305,914
+820,368 -&gt; 204,984
+903,70 -&gt; 548,425
+840,450 -&gt; 796,494
+289,183 -&gt; 768,662
+21,54 -&gt; 950,983
+765,294 -&gt; 209,850
+467,511 -&gt; 703,747
+354,645 -&gt; 730,645
+176,30 -&gt; 964,818
+290,259 -&gt; 345,259
+868,945 -&gt; 96,173
+536,884 -&gt; 536,94
+415,177 -&gt; 415,99
+250,140 -&gt; 466,140
+900,107 -&gt; 900,249
+74,394 -&gt; 137,394
+364,957 -&gt; 364,81
+718,477 -&gt; 718,227
+27,14 -&gt; 988,975
+491,956 -&gt; 154,956
+289,283 -&gt; 289,225
+479,583 -&gt; 604,583
+581,406 -&gt; 23,964
+837,526 -&gt; 732,526
+417,435 -&gt; 417,206
+502,184 -&gt; 20,666
+903,754 -&gt; 817,668
+381,284 -&gt; 967,870
+31,17 -&gt; 176,17
+225,377 -&gt; 179,377
+316,932 -&gt; 358,890
+605,841 -&gt; 559,841
+865,193 -&gt; 865,827
+836,834 -&gt; 142,140
+229,610 -&gt; 232,610
+26,13 -&gt; 872,859
+26,444 -&gt; 26,79
+272,690 -&gt; 531,949
+964,954 -&gt; 331,954
+545,91 -&gt; 335,91
+906,942 -&gt; 906,301
+608,778 -&gt; 608,364
+475,723 -&gt; 475,710
+454,207 -&gt; 614,207
+200,180 -&gt; 917,897
+966,44 -&gt; 71,939
+288,252 -&gt; 288,413
+795,791 -&gt; 66,62
+81,39 -&gt; 588,546
+249,244 -&gt; 892,244
+483,579 -&gt; 853,579
+220,921 -&gt; 220,286
+917,834 -&gt; 675,834
+569,692 -&gt; 569,521
+344,586 -&gt; 835,95
+116,153 -&gt; 888,925
+681,52 -&gt; 871,242
+980,976 -&gt; 27,23
+828,567 -&gt; 482,567
+660,432 -&gt; 660,441
+826,379 -&gt; 280,379
+42,839 -&gt; 259,622
+743,23 -&gt; 91,23
+318,400 -&gt; 318,528
+539,745 -&gt; 734,940
+831,194 -&gt; 831,210
+582,630 -&gt; 361,851
+284,900 -&gt; 213,829
+52,855 -&gt; 763,855
+215,753 -&gt; 452,753
+290,187 -&gt; 417,187
+69,48 -&gt; 69,126
+76,628 -&gt; 76,365
+257,694 -&gt; 54,694
+755,713 -&gt; 556,912
+519,265 -&gt; 342,265
+193,319 -&gt; 193,651
+496,231 -&gt; 900,231
+83,942 -&gt; 83,524
+524,59 -&gt; 989,524
+288,800 -&gt; 907,181
+458,138 -&gt; 586,138
+338,244 -&gt; 934,840
+843,728 -&gt; 843,476
+42,634 -&gt; 657,19
+827,634 -&gt; 369,176
+779,900 -&gt; 779,503
+20,20 -&gt; 870,870
+467,241 -&gt; 467,142
+677,483 -&gt; 501,483
+10,989 -&gt; 989,10
+11,989 -&gt; 989,11
+244,750 -&gt; 244,607
+479,497 -&gt; 48,928
+372,341 -&gt; 615,341
+817,941 -&gt; 339,941
+352,67 -&gt; 352,581
+590,747 -&gt; 590,405
+524,26 -&gt; 524,37
+501,300 -&gt; 117,300
+265,194 -&gt; 491,420
+397,891 -&gt; 983,305
+423,717 -&gt; 423,922
+197,863 -&gt; 197,217
+12,91 -&gt; 379,91
+364,426 -&gt; 364,185
+649,835 -&gt; 649,309
+517,380 -&gt; 485,380
+328,469 -&gt; 568,469
+781,298 -&gt; 781,264
+25,794 -&gt; 25,197
+570,744 -&gt; 570,544
+664,352 -&gt; 632,320
+528,944 -&gt; 528,696
+242,44 -&gt; 900,702
+486,775 -&gt; 486,556
+608,245 -&gt; 788,245
+114,11 -&gt; 114,508
+751,560 -&gt; 751,884
+211,513 -&gt; 448,513
+389,219 -&gt; 308,300
+638,200 -&gt; 105,200
+258,243 -&gt; 365,243
+120,558 -&gt; 556,122
+787,166 -&gt; 274,166
+617,666 -&gt; 185,234
+537,172 -&gt; 808,172
+633,980 -&gt; 282,980
+270,150 -&gt; 270,225
+925,32 -&gt; 48,909
+979,14 -&gt; 891,102
+98,278 -&gt; 98,485
+333,771 -&gt; 119,771
+132,673 -&gt; 132,189
+416,470 -&gt; 482,404
+762,151 -&gt; 925,151
+148,721 -&gt; 378,491
+255,576 -&gt; 255,474
+21,48 -&gt; 938,965
+876,615 -&gt; 777,615
+713,209 -&gt; 209,209
+250,474 -&gt; 271,453
+684,71 -&gt; 451,71
+406,614 -&gt; 519,501
+479,252 -&gt; 112,252
+721,768 -&gt; 284,331
+290,344 -&gt; 290,111
+359,934 -&gt; 544,934
+754,976 -&gt; 726,976
+358,544 -&gt; 358,904
+597,344 -&gt; 597,581
+915,222 -&gt; 915,255
+931,160 -&gt; 135,956
+160,657 -&gt; 348,657
+35,942 -&gt; 949,28
+298,837 -&gt; 298,356
+540,195 -&gt; 540,119
+29,140 -&gt; 29,955
+118,117 -&gt; 980,979
+240,384 -&gt; 464,608
+677,667 -&gt; 361,351
+982,987 -&gt; 11,16
+638,770 -&gt; 95,227
+135,285 -&gt; 135,349
+843,313 -&gt; 843,529
+208,220 -&gt; 945,957
+450,889 -&gt; 977,362
+876,69 -&gt; 283,69
+57,586 -&gt; 57,231
+602,78 -&gt; 602,564
+708,704 -&gt; 267,704
+697,336 -&gt; 697,264
+564,522 -&gt; 519,567
+195,217 -&gt; 274,138
+35,885 -&gt; 116,804
+680,28 -&gt; 148,28
+736,34 -&gt; 736,616
+918,454 -&gt; 52,454
+143,40 -&gt; 415,40
+985,469 -&gt; 985,282
+804,703 -&gt; 107,703
+707,59 -&gt; 296,470
+37,935 -&gt; 931,41
+45,723 -&gt; 45,531
+897,959 -&gt; 165,227
+691,948 -&gt; 523,948
+545,560 -&gt; 545,45
+251,24 -&gt; 748,521
+625,506 -&gt; 625,626
+302,702 -&gt; 989,15
+489,926 -&gt; 489,507
+405,830 -&gt; 405,871
+736,851 -&gt; 19,134
+712,848 -&gt; 48,184
+925,914 -&gt; 33,22
+593,254 -&gt; 369,478
+965,691 -&gt; 155,691
+758,931 -&gt; 349,522
+64,135 -&gt; 820,891
+79,933 -&gt; 79,683
+609,454 -&gt; 233,454
+617,853 -&gt; 309,545
+695,130 -&gt; 695,578
+508,198 -&gt; 363,198
+184,414 -&gt; 275,505
+627,901 -&gt; 519,901
+765,715 -&gt; 213,715
+445,134 -&gt; 669,134
+785,33 -&gt; 302,516
+563,218 -&gt; 470,125
+136,461 -&gt; 264,461
+523,643 -&gt; 674,643
+473,695 -&gt; 473,235
+616,835 -&gt; 757,976
+406,763 -&gt; 406,224
+483,111 -&gt; 203,111
+70,863 -&gt; 922,11
+738,141 -&gt; 738,54
+146,697 -&gt; 332,883
+939,16 -&gt; 23,932
+836,15 -&gt; 317,534
+853,586 -&gt; 853,596
+733,377 -&gt; 733,461
+378,597 -&gt; 378,640
+522,225 -&gt; 522,78
+875,886 -&gt; 875,130
+302,83 -&gt; 771,83
+969,588 -&gt; 419,38
+268,159 -&gt; 585,476
+658,955 -&gt; 33,330
+940,149 -&gt; 492,149
+157,254 -&gt; 962,254
+265,778 -&gt; 265,365
+414,494 -&gt; 608,494
+27,959 -&gt; 948,38
+220,160 -&gt; 220,891
+836,316 -&gt; 836,179
+843,727 -&gt; 163,47
+225,695 -&gt; 598,695
+678,249 -&gt; 892,249
+938,36 -&gt; 938,170
+190,486 -&gt; 40,336
+815,256 -&gt; 815,866
+961,200 -&gt; 961,89
+67,895 -&gt; 67,853
+480,727 -&gt; 852,727
+334,94 -&gt; 334,452
+67,622 -&gt; 987,622
+48,29 -&gt; 982,963
+90,29 -&gt; 963,902
+859,739 -&gt; 338,739
+869,254 -&gt; 474,649
+196,43 -&gt; 69,43
+336,439 -&gt; 336,837
+248,387 -&gt; 587,48
+378,729 -&gt; 162,513
+699,658 -&gt; 513,844
+447,410 -&gt; 670,410
+739,593 -&gt; 889,443
+83,970 -&gt; 964,89
+276,406 -&gt; 276,191
+860,75 -&gt; 247,688
+435,858 -&gt; 435,905
+691,893 -&gt; 691,757
+136,896 -&gt; 611,421
+693,211 -&gt; 477,427
+181,793 -&gt; 181,717
+674,326 -&gt; 664,336
+938,826 -&gt; 164,52
+833,380 -&gt; 833,753
+833,349 -&gt; 230,952
+662,870 -&gt; 662,23
+974,511 -&gt; 145,511
+38,579 -&gt; 57,579
+966,965 -&gt; 966,498
+641,217 -&gt; 240,618
+418,986 -&gt; 834,986
+971,716 -&gt; 971,263
+254,313 -&gt; 254,823
+61,790 -&gt; 61,834
+262,439 -&gt; 262,864
+345,856 -&gt; 894,307
+736,862 -&gt; 281,862
+814,636 -&gt; 814,240
+853,865 -&gt; 853,22
+792,106 -&gt; 207,106
+647,303 -&gt; 531,303
+506,706 -&gt; 337,706
+402,140 -&gt; 402,958
+899,796 -&gt; 669,796
+806,619 -&gt; 463,276
+340,347 -&gt; 340,363
+18,21 -&gt; 979,982
+395,214 -&gt; 395,862
+228,330 -&gt; 333,330
+723,950 -&gt; 723,150
+392,298 -&gt; 36,298
+916,118 -&gt; 114,920
+210,854 -&gt; 80,724
+212,206 -&gt; 513,507
+44,659 -&gt; 161,659
+771,44 -&gt; 198,617
+485,706 -&gt; 169,706
+385,455 -&gt; 308,455
+390,317 -&gt; 390,385
+492,532 -&gt; 56,968
+237,674 -&gt; 712,674
+988,909 -&gt; 254,175
+86,276 -&gt; 448,276
+688,418 -&gt; 927,179
+667,773 -&gt; 504,610
+968,974 -&gt; 109,115
+843,54 -&gt; 843,265
+19,249 -&gt; 19,437
+307,326 -&gt; 341,360
+531,891 -&gt; 531,202
+281,535 -&gt; 270,546
+503,305 -&gt; 164,644
+170,971 -&gt; 30,971
+763,247 -&gt; 946,247
+795,920 -&gt; 623,920
+673,16 -&gt; 899,16
+785,845 -&gt; 290,845
+68,614 -&gt; 68,711
+284,984 -&gt; 67,984
+787,942 -&gt; 120,942
+953,369 -&gt; 773,549
+927,727 -&gt; 315,115
+884,686 -&gt; 254,56
+432,276 -&gt; 432,287
+658,99 -&gt; 81,676
+622,917 -&gt; 679,917
+938,978 -&gt; 938,793
+945,15 -&gt; 369,15
+603,709 -&gt; 603,74
+670,422 -&gt; 222,870
+190,702 -&gt; 190,362
+354,349 -&gt; 369,334
+26,880 -&gt; 876,30
+636,31 -&gt; 636,731
+778,628 -&gt; 778,25
+23,483 -&gt; 170,483
+23,972 -&gt; 963,32
+725,308 -&gt; 384,308
+97,962 -&gt; 620,962
+136,929 -&gt; 136,768
+656,295 -&gt; 851,295
+125,801 -&gt; 755,171
+120,32 -&gt; 553,32
+698,196 -&gt; 286,608
+66,721 -&gt; 66,836
+931,680 -&gt; 931,499
+862,449 -&gt; 862,743
+71,143 -&gt; 180,252
+510,327 -&gt; 612,225
+932,874 -&gt; 352,874
+599,372 -&gt; 583,372
+821,770 -&gt; 126,75
+317,186 -&gt; 495,186
+557,710 -&gt; 56,209
+895,866 -&gt; 306,277
+571,948 -&gt; 571,738
+287,864 -&gt; 243,864
+802,728 -&gt; 802,198
+711,642 -&gt; 983,642
+969,922 -&gt; 969,645
+89,417 -&gt; 57,385
+567,967 -&gt; 567,781
+350,498 -&gt; 142,498
+92,931 -&gt; 988,35
+980,940 -&gt; 152,112
+55,944 -&gt; 679,320
+669,410 -&gt; 669,679
+151,431 -&gt; 241,431
+984,882 -&gt; 80,882
+431,374 -&gt; 431,39
+30,91 -&gt; 765,826
+730,228 -&gt; 80,878
+379,570 -&gt; 705,570
+67,398 -&gt; 67,136
+491,515 -&gt; 491,344
+396,453 -&gt; 749,453
+203,660 -&gt; 203,579
+912,900 -&gt; 912,280
+909,88 -&gt; 367,88
+41,942 -&gt; 825,158
+724,417 -&gt; 17,417
+463,536 -&gt; 170,536
+715,737 -&gt; 715,134
+627,453 -&gt; 805,453
+934,795 -&gt; 695,556
+404,729 -&gt; 738,729
+973,685 -&gt; 973,310
+563,348 -&gt; 771,556
+716,232 -&gt; 983,232
+975,183 -&gt; 975,759
+934,958 -&gt; 117,958
+538,806 -&gt; 538,84
+695,677 -&gt; 629,677&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day6"><a href="#day6">Day 6</a> (<a href="https://adventofcode.com/2021/day/6">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/6
+object Day06 : AdventOfCode, Solution by Omar_Miatello(
+    day = 6,
+    parser = { lines -&gt; lines.first().split(&quot;,&quot;).map { it.toInt() } },
+    part1 = { input -&gt;
+        var fishes = input
+        repeat(80) {
+            fishes = fishes.flatMap { if (it &gt; 0) listOf(it - 1) else listOf(6, 8) }
+        }
+        fishes.size
+    },
+    expectedTestPart1 = 5934,
+    part2 = { input -&gt;
+        val cache = mutableMapOf&lt;Pair&lt;Int, Int&gt;, Long&gt;()
+        fun countChildren(fish: Int, daysLeft: Int): Long = cache.getOrPut(daysLeft to fish) {
+            val direct = (daysLeft + 6 - fish) / 7
+            val indirect = (0 until direct).sumOf { sonIdx -&gt;
+                countChildren(fish = 8, daysLeft = daysLeft - fish - 1 - sonIdx * 7)
+            }
+            direct + indirect
+        }
+        input.size + input.sumOf { fish -&gt; countChildren(fish = fish, daysLeft = 256) }
+    },
+    expectedTestPart2 = 26984457539,
+)
+//sampleEnd
+
+fun main() {
+    Day06.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;3,4,3,1,2&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;1,1,3,5,3,1,1,4,1,1,5,2,4,3,1,1,3,1,1,5,5,1,3,2,5,4,1,1,5,1,4,2,1,4,2,1,4,4,1,5,1,4,4,1,1,5,1,5,1,5,1,1,1,5,1,2,5,1,1,3,2,2,2,1,4,1,1,2,4,1,3,1,2,1,3,5,2,3,5,1,1,4,3,3,5,1,5,3,1,2,3,4,1,1,5,4,1,3,4,4,1,2,4,4,1,1,3,5,3,1,2,2,5,1,4,1,3,3,3,3,1,1,2,1,5,3,4,5,1,5,2,5,3,2,1,4,2,1,1,1,4,1,2,1,2,2,4,5,5,5,4,1,4,1,4,2,3,2,3,1,1,2,3,1,1,1,5,2,2,5,3,1,4,1,2,1,1,5,3,1,4,5,1,4,2,1,1,5,1,5,4,1,5,5,2,3,1,3,5,1,1,1,1,3,1,1,4,1,5,2,1,1,3,5,1,1,4,2,1,2,5,2,5,1,1,1,2,3,5,5,1,4,3,2,2,3,2,1,1,4,1,3,5,2,3,1,1,5,1,3,5,1,1,5,5,3,1,3,3,1,2,3,1,5,1,3,2,1,3,1,1,2,3,5,3,5,5,4,3,1,5,1,1,2,3,2,2,1,1,2,1,4,1,2,3,3,3,1,3,5&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day7"><a href="#day7">Day 7</a> (<a href="https://adventofcode.com/2021/day/7">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+import kotlin.math.abs
+
+// https://adventofcode.com/2021/day/7
+object Day07 : AdventOfCode, Solution by Omar_Miatello(
+    day = 7,
+    parser = { lines -&gt; lines.first().split(&quot;,&quot;).map { it.toInt() } },
+    part1 = { input -&gt;
+        (input.min..input.max).minOf { target -&gt;
+            input.sumOf { abs(it - target) }
+        }
+    },
+    expectedTestPart1 = 37,
+    part2 = { input -&gt;
+        (input.min..input.max).minOf { target -&gt;
+            input.sumOf {
+                val distance = abs(it - target)
+                distance * (distance + 1) / 2
+            }
+        }
+    },
+    expectedTestPart2 = 168,
+)
+
+private val List&lt;Int&gt;.max get() = maxOf { it }
+private val List&lt;Int&gt;.min get() = minOf { it }
+//sampleEnd
+
+fun main() {
+    Day07.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;16,1,2,0,4,2,7,1,2,14&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;1101,1,29,67,1102,0,1,65,1008,65,35,66,1005,66,28,1,67,65,20,4,0,1001,65,1,65,1106,0,8,99,35,67,101,99,105,32,110,39,101,115,116,32,112,97,115,32,117,110,101,32,105,110,116,99,111,100,101,32,112,114,111,103,114,97,109,10,62,461,1087,183,1096,431,412,200,486,1543,25,580,1030,15,65,1186,9,226,173,77,119,691,855,451,88,741,221,1465,190,779,327,179,627,366,288,174,1147,49,773,3,5,65,20,172,601,307,611,699,1168,933,1295,832,242,62,8,4,226,768,33,566,21,10,937,15,760,100,574,181,89,72,1054,225,28,0,685,661,131,281,933,90,233,109,1345,81,106,636,1262,193,172,1056,709,1176,447,536,1054,929,171,226,127,274,710,917,218,192,25,128,321,1816,515,181,759,20,258,134,281,151,99,479,623,534,72,576,534,337,54,293,450,230,963,14,357,446,1244,964,16,865,52,1,1171,77,7,275,313,894,577,305,1119,393,285,354,136,1147,241,441,166,1024,650,101,178,1514,186,902,367,5,431,374,56,507,857,1316,0,186,63,118,1062,62,446,266,47,354,168,65,1036,447,689,160,749,728,791,1066,99,675,194,891,153,737,801,254,905,1046,21,413,386,204,603,373,218,440,137,1340,1616,121,903,722,841,731,213,219,405,336,1345,144,329,285,213,272,717,47,126,1137,548,32,21,755,219,595,187,143,636,476,397,185,70,345,89,319,80,867,26,1166,509,24,16,151,605,1415,893,814,473,289,377,407,44,184,290,447,1669,116,319,455,294,145,513,58,247,186,1565,31,297,1,226,1051,1561,1233,254,1274,422,547,1638,354,1855,419,71,1003,626,519,109,96,996,117,32,226,424,184,181,720,1311,1162,11,86,438,408,1269,887,612,327,133,1117,1390,345,10,370,175,37,1154,659,707,193,665,65,359,758,1253,498,219,601,59,919,1371,289,9,437,392,626,981,2,51,733,780,101,541,770,464,28,616,81,1708,1515,719,780,1214,673,268,246,25,252,301,205,27,160,0,298,69,285,58,809,1369,812,628,353,47,632,123,168,135,277,303,614,365,330,1385,1117,1346,737,744,1403,385,215,437,276,726,673,668,494,164,1,763,696,487,252,375,1253,42,1111,963,58,63,11,1648,1080,964,526,454,1349,1098,95,59,78,36,42,654,1441,1129,464,740,355,370,44,4,154,986,439,828,287,969,765,565,836,196,387,556,34,586,438,1205,760,798,6,61,260,25,418,1628,566,3,530,753,758,16,92,30,1388,109,240,513,1048,1056,588,1634,418,297,195,447,1145,198,466,0,607,180,57,58,72,319,221,869,744,339,195,1295,268,1336,1310,38,714,326,393,445,422,102,389,188,147,21,805,381,520,561,282,438,115,431,156,482,50,890,470,22,60,46,1588,971,1219,82,380,1061,948,455,99,255,400,1832,91,225,280,520,279,91,172,92,946,434,182,164,142,83,91,281,538,962,77,1104,1522,310,4,961,62,9,1257,596,464,733,338,1166,334,380,509,773,90,498,480,1523,1632,530,543,413,589,748,4,861,11,233,192,699,33,615,1853,205,270,624,1132,1100,227,1402,349,183,179,645,4,1120,962,317,326,128,422,281,302,701,53,179,34,802,272,1254,375,764,418,16,160,943,479,416,717,644,1029,372,140,114,449,351,159,305,1299,749,488,502,180,210,17,533,258,120,333,1097,185,1911,451,360,66,1329,1260,209,1611,454,809,336,783,1438,20,26,609,720,155,578,367,231,1715,64,610,465,752,81,108,389,995,244,1291,1144,159,161,1630,561,813,261,67,1604,124,231,833,14,15,1245,1309,1165,103,1270,228,1,133,644,581,218,481,716,237,155,360,110,1408,931,99,216,5,21,67,348,927,325,759,1127,557,584,696,428,653,548,247,1519,1682,132,3,1648,230,229,136,253,543,1153,204,669,58,81,357,85,82,749,503,139,32,1170,1352,151,653,1441,51,392,474,2,114,64,418,125,514,838,473,794,331,13,327,1476,836,37,3,0,115,18,1784,300,190,99,997,1164,31,1255,96,64,1101,354,698,372,852,1508,100,289,32,704,292,504,191,1342,231,692,12,369,1182,62,809,566,688,218,2,539,234,996,444,228,456,369,115,23,29,226,940,95,404,349,1254,171,69,711,2,1405,1181,34,8,92,173,533,20,181,921,201,1236,185,457,526,2,106,12,601,58,339,457,590,15,1583,473,451,1124,1569,401,72,154,9,1331,471,165,516,463,543,298,197,43,1294,101,1058,1025,1099,4,634,90,104,870,480,412,290,11,924,338,30,281,83,268,20,848,1722,1060,987,9,196,266,28,402,267,199,814,986,440,906,796,1403,1394,62,136,442,412,1729,571,459,91,730,269,172,202,772,305&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day8"><a href="#day8">Day 8</a> (<a href="https://adventofcode.com/2021/day/8">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/8
+object Day08 : AdventOfCode, Solution by Omar_Miatello(
+    day = 8,
+    parser = { lines -&gt;
+        lines.map { line -&gt;
+            val (signalsString, digitsString) = line.split(&quot;|&quot;)
+            signalsString.trim().split(&quot; &quot;) to digitsString.trim().split(&quot; &quot;)
+        }
+    },
+    part1 = { input -&gt;
+        val validDigitsLength = listOf(1, 4, 7, 8).map { allDigits[it].length }
+        input.sumOf { (_, digits) -&gt; digits.count { it.length in validDigitsLength } }
+    },
+    expectedTestPart1 = 26,
+    part2 = { input -&gt;
+        fun findBestConverters(
+            converter: Converter?,
+            sortedSignals: List&lt;Pair&lt;List&lt;Int&gt;, List&lt;String&gt;&gt;&gt;,
+        ): List&lt;Converter&gt; {
+            val (nums, potentialSignals) = sortedSignals.first()
+            val potentials = nums.permutations().mapNotNull { currentNum -&gt;
+                potentialSignals.foldIndexed(converter) { idx, converter, signal -&gt;
+                    when (converter) {
+                        is DigitReader -&gt; converter
+                        is Temp -&gt; converter.tryWith(currentNum[idx], signal)
+                        null -&gt; null
+                    }
+                }
+            }
+            return if (sortedSignals.size &gt; 1) {
+                potentials.flatMap { findBestConverters(it, sortedSignals.drop(1)) }
+            } else {
+                potentials
+            }
+        }
+
+        val lengthToIndexes = (0..9).groupBy { allDigits[it].length }
+        input.sumOf { (signals, digits) -&gt;
+            val sortedSignals = signals
+                .groupBy { lengthToIndexes.getValue(it.length) }
+                .toList()
+                .sortedBy { it.first.size }
+            val digitReader = findBestConverters(Temp(), sortedSignals).first() as DigitReader
+            digits.joinToString(&quot;&quot;) { digitReader.read(it).toString() }.toInt()
+        }
+    },
+    expectedTestPart2 = 61229,
+)
+
+private fun &lt;E&gt; List&lt;E&gt;.permutations(): List&lt;List&lt;E&gt;&gt; {
+    return when (size) {
+        1 -&gt; listOf(this)
+        2 -&gt; listOf(this, listOf(get(1), get(0)))
+        3 -&gt; listOf(
+            this, listOf(get(0), get(2), get(1)),
+            listOf(get(1), get(0), get(2)), listOf(get(1), get(2), get(0)),
+            listOf(get(2), get(0), get(1)), listOf(get(2), get(1), get(0))
+        )
+        else -&gt; error(&quot;too many!&quot;)
+    }
+}
+
+private sealed interface Converter
+
+@JvmInline
+private value class Temp(
+    private val segments: List&lt;String&gt; = allSegments.map { allSegments },
+): Converter {
+    fun tryWith(num: Int, string: String): Converter? {
+        val newConverter = segments.toMutableList()
+        allDigits[num].booleans.forEachIndexed { index, shouldKeep -&gt;
+            newConverter[index] = newConverter[index].filter(if (shouldKeep) {
+                { it in string }
+            } else {
+                { it !in string }
+            })
+        }
+        return newConverter.takeIf { segment -&gt; segment.all { it.isNotEmpty() } }?.let { segment -&gt;
+            if (segment.all { it.length == 1 }) {
+                DigitReader(segment.withIndex().associate { (idx, segment) -&gt; segment.first() to allSegments[idx] })
+            } else {
+                Temp(segment)
+            }
+        }
+    }
+}
+
+@JvmInline
+private value class DigitReader(
+    private val converter: Map&lt;Char, Char&gt;,
+): Converter {
+    fun read(digit: String): Int {
+        val realDigit = digit.map { converter.getValue(it) }.sorted().joinToString(&quot;&quot;)
+        return allDigitsStrings.indexOf(realDigit)
+    }
+}
+
+private class N(str: String) {
+    val length = str.length
+    val booleans = allSegments.map { it in str }
+}
+
+private const val allSegments = &quot;abcdefg&quot;
+private val allDigitsStrings = listOf(
+    &quot;abcefg&quot;,   // 0
+    &quot;cf&quot;,       // 1
+    &quot;acdeg&quot;,    // 2
+    &quot;acdfg&quot;,    // 3
+    &quot;bcdf&quot;,     // 4
+    &quot;abdfg&quot;,    // 5
+    &quot;abdefg&quot;,   // 6
+    &quot;acf&quot;,      // 7
+    &quot;abcdefg&quot;,  // 8
+    &quot;abcdfg&quot;,   // 9
+)
+private val allDigits = allDigitsStrings.map { N(it) }
+
+
+//sampleEnd
+
+fun main() {
+    Day08.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
+edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
+fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg
+fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb
+aecbfdg fbg gf bafeg dbefa fcge gcbea fcaegb dgceab fcbdga | gecf egdcabf bgf bfgea
+fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf | gebdcfa ecba ca fadegcb
+dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe
+bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbgef
+egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
+gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;ecgabfd gfbe dgbeaf aeg gfbda eg bgdcaf efgdca abced eadgb | begf decgfa aeg eg
+ebfg bfgdea gaf gf baedgc dafec cfdabg ecfabgd fdgea dbaeg | gaedbc egbf dbgcea dagfebc
+cfadeg ca bacg dfabe dgcbf dbegafc dac afbdgc gcbedf bfcda | fbdac adbef bgcdfae dcagfe
+eag cdgfae cbdge ae fcgad eabdfg ecaf gefbadc dgafcb degca | dacbefg fcdage agdcf fedagb
+dga edac gdfbea bgdfec da cfbga dbgec cadgb bdgace dcbfage | acgfb gaecbfd dag gedfab
+cefb fb abcgefd fagbde fcbgae faecg cbadg cbfga bfa agcdef | gbacf agbfc bgcaef baf
+ebdacf cbgfae cgdebaf afdcb gabdc df cdf eafd ecabf begdfc | cbdaf gdabc fd cbefda
+ge daebc fcagb fdebac gaed ecabg egc gacedb cbdfeg adcfbeg | gec gebdca ebagc adbgcfe
+bgfade gcefbd eafgd fcae cadgf gcf dgcba cfdega cagbdfe cf | cdgeaf agfed cf cf
+abfge ebac acfegbd bc fcged gbfec cfgbad fecabg agbfde fcb | aefgdb cfb egbfca cbfaedg
+dfcbag gda dcafe gcdeb ag ecgdaf edagc bcdaef gcbadfe gaef | gbced dga cbadef fgecda
+cagb adgceb cdb cfgeda egfbd abcefd decag bc cgebd bgedfca | cegbd dfegac dbc befdg
+cbfe bgefdc ceabdfg cf dbgaef gdfbac edcga gcfed dfc fbedg | fgbaed fcd fcegd becf
+degabf bfg bcgaf gdacf dbfc gecfda gcaeb fagedbc adfgbc bf | egbdfa gbf adfbceg dcfb
+dbfae dfbc ecadg cb cbdea fcebag fgadbec gadebf bec ceabfd | dbfc bgfcead agbedf fdabe
+dafcge ecafbg cegaf egdac abegd cd debfca edc cgfd bfdeagc | dec dc ecd dbgae
+fgabce bfa acbfegd fcegda bfgd acgfd bcaed bfcda bf cbagdf | bf bafgcd bfdg dgbacfe
+fgea gad fcbgaed gdebc afdeb fagcbd cbfeda ag egfdba degab | dgeab badge eacfbdg fdceba
+fabdce cagdb gcb bcefag degba dfagbc dgcf dcfab egfcabd cg | befcda dbagc cbdgfa gcdf
+be fgaced fdeag badegf fdbea ebdg bea agfbec ebgadcf bcfad | acdfge agbfce debaf dgafe
+cdfbeg bg fegca gdefac cadbf eadbcgf cgb egba gcfbea cagfb | gfaced agfcb cbdfaeg cgfdabe
+fadcebg cgda ebfag adebc fcebdg fadbce gd begcda bdg gedba | dcga fbage dcabef fcebadg
+bfcga adfbgc fbcdage gfedac ab gcfbe cgafd efabgd gab bdca | gcafd cdba gba dfabgc
+bdfae gfa cdgabe egfba fg gfeadc acegb fgcb fbecgad ecafgb | bgeaf agfecbd fga agdceb
+dgab ebfad cdefgb gbefd fab cefabg fegcbda aedcf ba ebadgf | defbag afb gbfead dbefag
+cfabed ecabf cgafdeb bfc fecbgd dcab cb bfeda eagfc adfgeb | fgcae dfbega ebcdfg fabec
+eb cbgaef eagcfbd caebd gaedbc badfc abe degac dgeb cgdeaf | aeb gfaebc bceafg abcged
+gdecba ecbdgf def fcbade fd fdcg bgfae gdecb gfbde faegdbc | fbage ecgdbf egdfb dfe
+dc dac egcadbf gadbe cgaebd abgcd geadbf agfced edcb gabfc | agcbefd edbc bacfg cd
+gaebfc gdc cedbg dbeag cefd cd bcfgde cbgfda bcegf dabgecf | bgdea dbgec fecd cfed
+afd dfcbga dcbeagf bfecda egbcdf dagec fa bgfa fdbcg fgadc | egbcdf decga gbfa fa
+fg baefc gafeb dgaf cbgdea afegbd fbg cebgfd gaecdfb dbgae | ebfag dgbae gafd abgedfc
+cbaed gedac cefgbda feba be cadebf gdcefb fcbad bde cdagbf | bcadef cfgdab fdabc feab
+cfbdg fdgce adgcbf fb cbf acfegdb adgebc ebafdc dbacg agbf | fgba fgced ecfdabg bf
+fceabd gfb agfdb deabg beacgf cfdgbae fcdg gf abfdc dfbgca | dbaeg bfdga dgeab dfcg
+gfde facbde dcgbf fg gbf ecafgb cfgdbe ecdfb adcgb ecafbdg | gcdbf fg cfbdg fdeg
+fbgdce bg bacefg decab cbg fecgd egdcfa dbfg egdcb fagdbce | gb dcbea fedbgc fagecb
+abgcef fgbaedc dfaebg cgad ad egadcb abd cgbea bfecd cabde | efbcd abdfeg afbegd ad
+fagecdb bcafg ecadfb fa bagecf cdgba efbdcg befgc fac agfe | bdfcge ecgbf cfedba edagfcb
+dgf fcdbg cegbd fd bfcega daebgf dfca abgcf gafbdc fbeacgd | bcfdg fdg dfg adcf
+deb cbdgae edfbac dbcgf fbecga gdfcbea bgdec ed ecabg egad | bgcfd faedcb cageb ed
+gecfba dfagc afdbc adbcfg cag cabgdfe fdega cbdg dbacfe cg | afcbdeg dabcf cbafed dcfga
+feab ae cbgfe agecf bgecda bgecdf eca gfebca fcdbgea cgfad | bgdfec gcfbed eca cbdgaef
+fbaceg edcbaf dba becgd egafb degbfca fbadeg dafg da agebd | fbdega gfebca acebdf gbefa
+dbce gfbec defgb ed efdagc def gfbeca abfgd bgfedc fcbgade | fdbgce ebdfcg cgfbdea efcbgd
+abcdfg fcaegb egf dgcaf bdecf aged bdeacfg ge dgcafe gfcde | acbgfd gcadf cgbdaf gafecb
+fb gbfaed eabgdc abcgef adcbfge dgfac fecb bgf fcbga cageb | acebg cfeabg edgcab adgfbce
+fad ceafdg dcfag fbcadge geadbf deac da gcfea gdcfb efcagb | aegdfb cgadf aefbcg bgdcf
+dagcbf ef dacfg gfdce egf ebdgc dfcgea fabdeg aefc ebdacfg | gdefc dcfag bgdceaf acef
+dbegf eabcgd ebdafg fbdac cbg cefg eagbdfc cdbgf gdfbce cg | eabcdgf gecadbf decgbf gc
+degf cbefd bfcdeg bfdaec bcage cfgdba fg fcg fbcge cefgdba | fged cfgedab fdgceb efcbd
+cgbdae dbeca bcfdeg fcaged edgca be cbdaf ebd gfbadec egba | cefdgab cdfega bcgeda agcbde
+cdfgea gbedacf gacbf cdb decag db edcabf gabedc dgeb bgdca | bcfag bcgad ecdgfab bd
+ebcg cfgbae acgdbef eag agdfc ge edgabf cgefa facbe dacebf | cbgefa agcfd fgcad dfgac
+beagcf dafcgbe da acd bedcf begacd cdbae cefadg bagd bgcae | da fgbecad bdcef bfdec
+dg acgfebd fagecb bgeadf ebfgc gdb cdbgf dbafc gecd debfgc | egcbf cafbd facbd afbegcd
+geabd cadefb ec eadgfcb cedag gdbeca dec gfbdae dcfag cbeg | ec bdeafgc cbdafe ebcg
+be bfade caefgb eab gdbafe bedg agfdb edacfbg gdcabf daefc | acfegb bae fecadgb bgcfea
+be acdfb cgfae cbe agbe fgeacbd adegcf bcfae bgcefa fgbecd | cfabeg ecb efcdbg ageb
+afbg cfedb dacfgb fgdcb bgfedac cbdage bg acgdf fadceg dgb | cdbgfa fgeadc bafg dfbce
+debfc efb adgbce ef fbadec dfcbg feac dacgebf aebdc eadgfb | fcdgb efca cbdeaf edbca
+gcbde dgcbf dfc bfcgda df ceadgbf gcabf dbaf gcefab dfcega | adfb egcdb dgbce bdfa
+egbdca bgfed baefd cfdgaeb gdefc gcbfed gcfead bg cfgb egb | dcbage cbdgef dgfbe aedbcg
+dceaf fc fcge bgdaec agced dfbea cgeabdf adcfbg fdc egcfad | fedca fadeb dabegc aedfb
+acfbgd efcda cfagd decg de efcgdab eabfc gdaecf dae bedfag | fceda acdef ed cfeba
+defbcg ge egb eagbdc afdgcb cgbae fcadebg geda dcagb efcba | gdecba abgce gbadc daeg
+afbd fadgce gbfdea fcgedb bf bgf gefda bfedgac bgcea gaebf | bgfaed fdgecb fbgedc bfg
+cbafgd cbdge bc cbd bcef fgbde afgbde fgcbed dgebfca edcga | cb cb acged fdgbec
+acgd dceagf dc bafde fbaceg ced cdfbge fdeca egcabfd cgefa | dc egdcfa afegcd efcgbd
+bgdfac fb aebgc bfde bdecaf bfa aebcf edabfcg cgdeaf daefc | decfa fb baf fcbdea
+bdfegc gebda gecbfa fedbg fed dgfc fabdec dbcagef fd gfcbe | edcfbag dgfeb cdeafb fd
+gbeadf fdcga ecadb bceg ge egd dgebacf beafcd aedgc cgbade | dabec dge begdac dgaebc
+begc dcgbfa eb dfeag eafgb bae bcgaf gfaebc fbagecd becfad | gabdcfe fdcagb bgcdaf be
+eca febdcg fedag ecdaf fcba beagdc fcdeb ca dbefca acebfdg | ebdcgf fdceb gecdab cedfbga
+decfbga abgdce gefd afd aecdbf gcfeda acgde cafbg fd fadcg | edgf dafbceg egfd cedga
+faedgbc fbgaec dacb eba geacdb bcgefd ba bdegc eadbg gdaef | dfcbge deabcg bfecadg gfcbaed
+egfacbd acdgf gecdab ebacf abcfed eg begf caegf aeg bfgeca | dafbcge cadfg fbace cefdbag
+dgcfbae ac gbfeca badce gcad dfgcbe defab cea acgdbe dbgce | cgdeba egcdb gcad cagd
+dcfg agdfbc caedfgb df bagecf daf gcafb ebcad fdbac agebdf | bdfage fgdbac daf fd
+agefbd agcbfde egafb eg adge fge bfaced egdbcf daefb cabgf | bagef afgbe eg efbcdg
+adfegb caefgb ade ecgd cafed dbfeacg de fgcae fbcda fgadce | dbefgac eafcg gbaefc fedgac
+dbafg ecfga gfbae bae egdbac geabfc gcedfab ebcf eb cagdef | be cbfe bae be
+cfgadbe eca bcfadg ebdgac adgcb ebdca adbfe egcb cadfeg ec | adebgc feabd cae cgdfea
+caefdg cdfagbe fadbc afd eacbd fd bcadeg cgfba dacfeb bfed | df afcgb fceabdg fda
+edcgaf cfbdag cbfdaeg ec cae bgeafc cdafe abfde decg gdcaf | eca dbcafg aec ce
+fbgae cagef egdbac cg gcdafbe cfbg bgefda gce ceadf gebfac | gadbce cdegba gc cg
+bafgecd bdf ecabfg dgbfe dcefg gbefa bdea bdfcga bd bgfdae | cdfagb cfeabg faebgd fagbe
+afg dfcg fg eacdbg fgadeb cfdgea ecagd fcagebd eacfg bacfe | fg dagecb egdca cfdg
+dac dc fgcd agbecf gcdaef agbed edcabf fgace caged faecdbg | dabge gceaf gdafecb cdafgeb
+aefbg egf bagcf afegdc dfgceab begd gafebd eafbd eg fabcde | egadfb feg bgcfa efg
+fa debfg acgfdb eagbc dcebagf cedfbg dafe baf febga eagbfd | af cbfdga dcfgab befcdg
+db dbfe fdbga cafdg adgceb egbfa dbg bgfdcea ceagbf befagd | afdbge dceabg gdfab fdaegb
+fgeacdb cadg dfg edfga fdagce dg dfaec gebfa cbefgd defabc | geabf dfaec cfdae faegb
+abdce bafcg gdecaf cegba fbcadge adbcfe degb eg bdcgae eag | abdec facbg edgb ebagcd
+bcaef fg dgbcae adegb bafeg feadcgb egbfad fdgb fecagd efg | agfeb fge fdgb eadgb
+dbfage cdab bgcaef ecb cb dgfce dfbce fedbgac deabf beadcf | cbfed dabfe ebadf cefbd
+gcedb ceafdg dcg gecdfb dcfaeb cg egdba befdgac fdceb gcfb | begdc bedag eadgb dfecb
+bf dbcgea eabdfc feb gbfeac fagb becga fcdaebg dcgef gecfb | efbdcag abceg gcdabef gcbef
+ged dagfbe eg cgfe bgfacde gedac dceba agcfd cadegf gcfdba | gefc ge ge acegfbd
+gfabed aecdgf ecbag dge gbdae befd bfgad fdcabeg de fagbdc | egbad afdbg dgacef gdafb
+dabfegc gbcad gafd acd da fgbadc ecdabf bfgca fcabge gbdec | gbface fgcab bdgac ebdcg
+afbceg cdgfb gb afcbed dfcbge gbf adfgc fecbgad egdb bcdfe | fedbc cfeabd edbg cfebgd
+cbdae gc gdfc ebgdf gcafbe fbaecdg gbedc ecg fbgecd fdebag | gcedb ebgafc acfgdeb ceg
+bdce efacgd dgfbc ebfgad bcfga gdc fgbedac egdfb dc bfdgce | bagdfec efdgb ecbd fdaegc
+bdgefc fbca bc gfbcae fdcgae gdaeb cbega gcb efagdcb feagc | gcb bacefgd ecdbgf cfab
+fdbe defcbga adf cfgeba gcdae bacef cfadgb df fdeca dcefba | cbegfa degfcab fad acgfbe
+gabfdc ebcfd bacgf da fcgbea aedbfcg gdfa eadcbg cdfba abd | dab dabcf afcgb ad
+gb bfgcae dbgf cadeg bagdc gefadcb gbc acdbef cgabdf dbafc | gb fbdcae afdbgce dabgc
+cfgadbe agecfd ea gedfc edafc fage fbdgce ead aecdbg fabdc | fcbdage cdbage fbadc ae
+decgbaf edcgba afgd aebgfd da bfeag gfbcae bad cebfd bfeda | ecfdb eagbf efdba eabgdf
+cfdbae dc gbdef fbedag egbfcd gafec edc edacgbf egdcf bdgc | fceag gacfe daegfb bgdcef
+cbgda egdfb agebd cgedfb aed bfgdcea ae agdefb efab facedg | gdcaef aefb faeb begfd
+fdc begdf adecg gfaced cf efac abedfgc cbedag gdbacf fecgd | cdf fbgadc cabgdf acfe
+fedbg gabfe feda gde fcdbg de dbegacf bdfaeg abcdeg cegbfa | bgaef gadebf efgbac gbefa
+dgf fgdbea dg dafcb gdec edcfbga dbegfc gbdcf cfbge gcebfa | bdfgc dg egcfab bcdafge
+ceg daecb gcfdea fgacbe ecadbfg eg gbacdf cgabf ebfg ecabg | acgeb bfgca geacdf cge
+ge geabf gea abecgf fdabg caedbf egbc cgebafd cbfea agdefc | feabc bcdafe age eg
+gecdba ebdfg gcdef ecf cefadb fgac cf ecgafd cbfgead adgec | dfecg afcg bcfead ecadg
+gd cbfad fdagb cfbeag fabge efabdg aged bdgfec dgf gbfadec | acefgb eabfgc becagf bfgda
+ebgc fedabcg fdbgce fdebg eg badgf ebcdf edg adcfeb cfgade | bgefd cbgefd bgefd abfdg
+dgbfc abecfg gcdab fcgdbe dfge cbdfea defbc fgc dabgefc gf | gf dbgecf bafgec cgf
+degbac fda cdbag eafgbcd df fdbc agfdcb dabfg fbgea fcgade | fd bdceafg fdagbce df
+cedaf fgeabc egdbf gbaedcf aeg cgda dfaeg cfdbea fagdce ga | febadc gefad bfacde gae
+gea ebfgdc bcae cgafd abecfgd gbced ea gbdeaf dcgae gebcda | efgdab fcegdb cbgade acged
+cdabgef gb fceag fgb bfdgac gbcfa cbadfe dfcegb fbdca bgda | bg cbgfa dcfgeb afcgb
+fcbage adefc gceda bdegca cbeag dgeb efacdgb cfbgda adg dg | gad gabced gebd dg
+ecbdga gedbf dafeg faecbdg eacfg dbaf ad dbfcge gda dfbeag | ad gfbcde dgfea aecfg
+agfbde begfca bca baegc bc bcef ecdgbfa adegc bgaef acbfdg | fdbcag baecg cgdbaf bcdagf
+beafc badfc daecfb fd fad fdec badefg cbdag fbecgad gecfab | dcfe cbgeaf gdcfabe agdbc
+caedgbf fcgead ca gbadf abcd adcfbg fegbc dfaebg gfbac agc | fcgeda dbac afcgb dafebg
+gdfeb gdbafe bc ecb ebfagdc bgfce gfeca fdcbge aebdcf bcdg | cdfbeg gdbfe gefcb dbcafe
+gfbca gcdfe dbafgc cafgbe eacfbgd cdb agdb db cgdbf ecdbaf | adfcbe abdgfc cdb fcabed
+bcdaf fbed edbac cdaegf ed dbgaecf edc ebgac dbagfc fdbace | cbgae efdb gcdafe gbafedc
+cdfba cbdfae cfga bafdgc aedfgbc dbgef dag adgfb bdaegc ag | ebacgd adfgcb bdaefc gfac
+caefd ce abfdc egcbdf cfe fgaced bdgfea gcae fadcbge eagfd | fcdae fgecad ec cbefgd
+eafbd deb aefdg bd aecfbg bdcf abcfe gebcdaf agdbec bcaedf | dbcfae abfecd efabcd cbafe
+bdafeg efg gfcdae bagfd dfacgb ef dgfecba befa efbdg dbceg | fe gadbf aebfdg afeb
+cgbef ceb bfdgcae gedbac acgfbe be gceafd eacfg fcdgb fbea | abcedg dcgefa be fcegadb
+gacb gfbaedc fagdc baf gadcef bfcdea fgebd gfabd cfdgba ba | baf cadfg gbfad fab
+gafce df cbdfge gfd gdecb gecdf fdeb cadbeg agdbcf abgdcef | cgfea abgcde decgf fgcdbea
+egdbf cbfgde aed befa gfdbae ea abcgd edfcga bcaegdf agdbe | bfae cagbfde cbgda gedcaf
+eb dfbacge dbgae becafg abe gadfb cdega cedagb ecfgad debc | cfgeda fagedc afdbg fdcega
+efcba becagd gafcdbe eafdbg dagbcf agfbd gefd de bfaed deb | fabce bgaedc ceadbg bed
+cbaedf fdgebca gdbe dabce eag ge bacge bagcf decfga bgecda | defgabc bceagd aeg gbacf
+dgeabf aefgcdb ad bcfae bdacf dacg bgfdc ebfdgc gfdbac abd | dcga adgc decfbg bafce
+fgcba cbdfeag dagfb dcgbaf dcaegb ecbafg bdg bd fcbd faegd | bgdaec feadg cbdage dcgafb
+bdc dcfgeb ebgca bdea bdcga abfecg gdcaf bd aecdbfg aebgdc | bade bdecgf bdc cbadg
+bcdaeg facgbd caedfb aefdb dgfbe eba ae dcegfab fcea fbcad | cbafed baecdf ae ceabfd
+efcbg egd dg cabgef bfdceag fgcbde fdcea gdfb dgebca dfcge | fdgb gd fbgd deg
+cbgdfa ebgcfa abdge bdeca efcgbad cd fbedac abecf adc edcf | agebd gfabedc dabfegc abfce
+edg abdgce gcefb dcbge dgabfe gcdab de cdebfga cdae fdabcg | gbdafc agcdb dgfceab bafgdec
+acdb dgbfec eagfcdb dafbec cae ebdfc ca gfaed acdef gfebac | defac begdfc daegf fdeacb
+cgedf gfadce debgcf fedagcb aefbc bcdagf db ebfcd bfd begd | db cgfde dbefc gedcfb
+afcbegd dcfge edgbf bdg fabd dabfeg gaebdc abgecf gfeab db | debacg gfbaec fadbegc afcgbe
+fcbg cdegf ecdga eacdfb befdg dcf fc dfegba dbfgce agdfcbe | dcf adcge fbcg dgaefbc
+bcfea fcbead ecd cgeafb aebcgd bfed bcgedfa de cadfg fedac | de egadfbc debf bfagec
+efcdabg afecbd defba cabfd ebca cgdaf dfabeg bc efcdbg fbc | bgdefc afcgebd gdefcb efabgd
+edbaf agfbcde gbfcae ag dega aefcdb dfbega dfgbc afdgb bag | dagefb ga decbfa aecbgf
+cbdg aegbcfd badce dgaebf abdcfe gad cgeda gd fcage ceagbd | fdcaeb dbeca beafdc bdace
+decb dagfe dcgbafe fecbda acfdb adfbcg agefbc fec ec faced | fcadeb cdagfb agbfce gcfdba
+acdbef dgca gbfae agecfdb ebdcg bda bgeda gedbfc ad bcadge | cgdbe cdag dcga efdcgab
+gc efbdg eadcf ebcafg adecgf gfdbaec gcf gcda dcgfe dcbaef | gc acedbf fcead gdca
+bfgce dabfg ecdf cebgfa dfegb ed deb fecbgda becgda cfbedg | cdgbefa ebd gafdb cdgefba
+ce gecb ecd debaf ecdfb dcfega dagcbef fbgcd bdcgaf dcgfeb | dec dfbec agcfed bedfa
+cgbfd gb dcafg gadb gbfcea bcfdeag fcbde fbg gcbfad agdfec | dcfgab bfgdc dfaceg dfgac
+bgacef cdagf bgdcae gd dag dbagfc fecagbd fdbg cfead agbfc | gfcba adgcf facgb gd
+efdc adbgc gec acfgde feadg gbecaf fbdgae agdec daefbgc ce | ec cedf cge bdfagce
+aecdbg cabfe acfgeb bcefda fgac fdgeb afdcbge bcg cebfg gc | gcbfae febcda facg baefcg
+dgbafce gfacdb gecb dcaefg gfaeb egf gebacf bdefa bgcaf eg | abfge fgabe fge deagfc
+ceafdb dcbega afd gdbeaf fdgea fgeac gbade cbfadeg fd dfbg | adbcge gdcfeab afd fd
+dacegf ed dfcbg cfgea dcfge fcgdbae acgbef ced eagd abefcd | dfbeac fgcdb geda dbfgc
+egbcdf ecbdga afegc aefdbgc dgeca dge dg dcfbae dgab cdbea | gcead eabdcf gdeac cfadbe
+gca fceagd fdgbc ga fecab fgcabed bgcaf cdbfge adbg acdfgb | agdb bfadcg bfgac gbfca
+acgdeb baefd fa gdfa bgdea bdcfe fdagebc fdgbea ecfgba fab | adbecg agcbed febagc feagcdb
+fedagc dcfge ef bgdcf gdceba egf fead edcag gfbaec fdgaebc | cgade aecfdg efg eadf
+dbagf gcdefab fc badfc cbaed gfadbe dgfc gfbcad gaebfc bcf | cfb cdbea bdagf fc
+bae be gcadeb dbge dgebacf eagcd geabc fbcga eagfdc edbafc | gcabf ecdfbag afbcg cbgfa
+bd gdbcf cbfegd cfbeag febdagc fbd fcgeb decb afgbed dfgac | cbefg eadcbfg cbegfad egdfcb
+febacg dega cegfd cefda ae agebcfd abcdf eca defacg ecgfbd | badcf cae bdcefg acedf
+geabcd gdbcfa gaedc cbeagf bdgeacf gdefc bdacg ae adbe cae | gcebad agfbdc gefbcad ea
+fa bfdacge adecgb eacf bdfgac gfdbe aegdc egacfd gadfe fga | gedfb egfbd efagd dagfbc
+gcdb dg beagdf feacg cebgdfa afbcd adcgf dbfcga ebfdac agd | gd acdfg dcbaf gacfe
+aefgbd cgfdb gfdea eabfgc dcgfe cfe ceda gdcaef ce fdeabgc | bdcgf edgaf cbdfg egfbda
+facegb cfdabeg bd cedgbf adcfeb cfabe cdb eadb cgdfa dfbca | dfbca eadb adecbgf bdc
+bacfeg agfcdeb acegf gfcade ecagbd fdbag afegd cdfe ed edg | dfce egd degaf dagfb
+df gdfcea efbadg cegafbd eacfd fad cedbga dgaec dfcg fbcea | caedg dgafbe edgac df
+bfdac cdbgfa cefbgd bfag afgbdec cdgafe cbfdg acf ecbda fa | dgcfae af cabfd beadc
+befgd dea ecab baefcd gfbcad ea bafcd dbcgefa afebd cadfeg | gfbadc eda cadgfb eda
+gf cgadb gebf becfdga gaefcd febac gcbaf cbfdea bfgeac fag | fg afcbg efbg afg
+ba aebg gafdceb bca bdacg dagcf fcbdae gcbed cadebg bgcefd | dcagf gdabc afgcd edcfgb
+de dbec bfaecdg gdfeca fegcb edg dbgaf fceabg febcgd bgdef | afdbg adbfg debfgc bdgfa
+afbced adebfg efagdbc caebf afgec ecgb ega eg fgdac acegfb | aedgbf cbge egbfda badfgec
+fg gbfcdea eafbcd fdaeb cdage egf agdefb fdcbge efgda fgab | deacg cdage gedca adfeb
+gde gbdc dg fdgec dfaegb fedca bcgefd fbeacg gadecbf fcbeg | cgfabe edcgf fgeabdc cbefg
+befcdg agbcef fcbdeag gdfae bdecf eab fcdeab ab efbad bcad | cfgeba befda aefgd degbcfa
+abcef dbfaegc aefcg dcgbae fbcg efgacb cg cdabfe gec dfeag | dgfae gdefa agcbde afbced
+dgf fcbega afdbeg fgabe dg efadg bged adfbceg agbcfd fedca | aefgb begd fceda debg
+cdgaeb ba befgdca defbc gdecaf bae gabc afgdeb gedac decab | fbecd bae gdecfa edcba
+ebagfd dfg dcbaeg dgbceaf gf gacdf fcade gacbd gcfb fbagcd | adgfc acbgd edbagf degabc
+gba eagbcf gb gbacf dacgebf bceg gcafed acfeg acbfd adegfb | abfcdeg dbcfage faecg afebgc&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day9"><a href="#day9">Day 9</a> (<a href="https://adventofcode.com/2021/day/9">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/9
+object Day09 : AdventOfCode, Solution by Omar_Miatello(
+    day = 9,
+    parser = { lines -&gt; lines.map { line -&gt; line.map { &quot;$it&quot;.toInt() } } },
+    part1 = { input -&gt;
+        fun getOrMax(x: Int, y: Int) = input.getOrNull(y)?.getOrNull(x) ?: Int.MAX_VALUE
+
+        input.flatMapIndexed { y, row -&gt;
+            row.filterIndexed { x, n -&gt;
+                listOf(x + 1 to y, x - 1 to y, x to y + 1, x to y - 1)
+                    .map { (x1, y1) -&gt; getOrMax(x1, y1) }
+                    .all { n &lt; it }
+            }.map { it + 1 }
+        }.sum()
+    },
+    expectedTestPart1 = 15,
+    part2 = { input -&gt;
+        val booleans = input.map { it.map { it != 9 }.toMutableList() }
+        fun getOrFalse(x: Int, y: Int) = booleans.getOrNull(y)?.getOrNull(x) ?: false
+        fun findSize(x: Int, y: Int): Int = if (getOrFalse(x, y)) {
+            booleans[y][x] = false
+            1 + listOf(x + 1 to y, x - 1 to y, x to y + 1, x to y - 1)
+                .sumOf { (x1, y1) -&gt; findSize(x1, y1) }
+        } else 0
+
+        val basinSizes = booleans.flatMapIndexed { y, row -&gt;
+            row.indices.map { x -&gt; findSize(x, y) }
+        }
+        basinSizes.sortedDescending().take(3).reduce { acc, n -&gt; acc * n }
+    },
+    expectedTestPart2 = 1134,
+)
+//sampleEnd
+
+fun main() {
+    Day09.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;2199943210
+3987894921
+9856789892
+8767896789
+9899965678&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;9899899864598765321239999546794323489012356910136789234678999765986432109874349897678921298754345856
+8798788978989899992398798932986734678943869872345679129789999843497643298765456789568910129983236745
+7676567899976998789977587891297945789654699964557789298999987932599954399897897893457891239765101234
+6545459789765497679765476789349657898765789985668999987899876893989876988998998932378932349874323457
+6435345678987984568974345678998998999997893596779789876789765689878989877569789949989864556995434567
+4323234799999876789743234789997899990199952129895698975678934599769998966445679897899876769876546789
+3210125899989987897654348999876789989987641016954987654699545678958986543234598786788989895989657899
+4391434989878999998776567898765434878999832345693198766789956799346995432123987655677899934598978978
+5989549876567899899987898997654323459876546598789239979899897890239876543099878434566789545987899769
+9878998765456789788798999998765434568997687678898945989999789994345987654987654312345689656976793244
+9767989654345897652649999899876685678998798899987899995697679879959998765699873201239798769865692123
+8656976543234789341234987676987899899219999912345678934987599767898999978798765412345689898764789045
+9947987654375693210359876565499999931929898924569789875699987659946792499899886643459898999893492123
+9858998765466789391398765454346789649898767895798999997893987548937921398965998754567987897632459234
+8769879876879899989989764321234698798789656896897689889902998437898943497994339867899986796543678945
+9897765989989999867879865430126789987654546789989549778919876545999654986789123979999765689954567956
+9976544393499987853467954321245678998793235678965434567924998656998965987991094989998654578899778998
+9999932239599876542346986434358789899986545689876545679895698787897896799432989999987943348799889999
+8987890198989987621234976565469896799998676896987656996789789898956789898549878909876821234589997891
+7896991987678998210123989679578935678999787965498899875678999989545789987699868912985310345678956932
+6545689998899879321234598798689323489899898978309987664567899975434699998989957899976431458999349893
+5434578999998765442456679899799912398789959793212986543446798766323578949879898998997643467921236789
+4323467899989887663567889979899893987664234689323985431234579654212349939765789987698754567890945699
+3214347999876998898779998765998789998543123456939876420256689799903467897654579876569866678999899789
+4301236897654459989899659984345678987655234597899987834569798987894979996543456987456978789298798999
+3213345789542345678978939873234789398976349989999998945678987676569899987632169876345989892197696989
+5624567899643456789568998764566991299987898767998999987989986543456789198721098765456799943987575878
+5438678978954567895478679875678992989998939654767899999899976432345899239433679899587899656943434567
+6648789367896788901234567987789889879899029953459987899769865431235678945954567998679978969832123458
+9859895456789899212349678999898776768799998764567896988998765610123479959895979989989967898751012345
+9967997667899954324568989789999654356679879985778934567899654321234567896789898978997856987632123456
+9878998789999876535679495698998743244598965797899323456998767434345798965698767869896549876543478567
+2989899899999987646789323457987653123697854698965414568959876545756799454987655456789659987754569678
+1095798998989899756793212568999761019986543569876501278945987767867895323986542345678978998978678899
+2124567897679789868965425799999832198765432479987612378929898989978976568997721239899989539989789999
+3236678998554678979996934989987543239874321389998724567998769694989989679999843345789894312999895689
+4545699965433459989989899976797654647989433479999837678909654543295798797899756789898765109876954799
+5666789876212567899876798765698987656897654567892948789219763210134569896798767991949966212965432878
+9877899998434678998555679954459898768998765789910959898923987321949698965329878910123954329896421267
+5989999997565789997434567892346789878919878894329878987894596439898997643201989543239865498765432349
+4399998998776899876723478921234567989329989999456989656789989598797689764312399654345986569989643578
+1299897679897939765434589210565699995498797998968996546789679987654578975323478965696798679698754689
+2989788567998929876547895342456988976987656877989965432433567976543459987634569996989899889579965691
+9976543456899998987656789756769876799876546766899876541012456798952348998545678989878954993499876792
+8765432337899987698767899897898765689985432345789987632323577899891276789789989878767893212988989893
+9875430123789976569898945989999854578997643487892398743439688998789345689899998765456789329776598954
+9965321934567895452959999878987543567898797698990129965998999987678956789998987654349899998665456895
+9875439899998954321234988768987654678999898979789249879867899876598967899987598985269989876542347896
+6986598798789865632459876543298765889899989563678956998756998765456978999876459876378978965431238987
+5597989587678978643598995432139876998798765472489767987645797654327899998764323987889769896670123598
+4459965454597897659987689321025987998679977321238989998434589765458954987643212498997656795431245789
+2398854323456989798776567992134699876468893210137999987514678976579763296543101359894245695432356897
+1987643412345678939654467689657899884245789543236789987623569989697654197653212346792136789565456795
+2498532101246989549743234578968998762136898654345698765434678999789765298894343478891017899877567896
+3987643212397999959832175999878999754547899865466789987545789567996978349965454567892128998987688987
+4998784323498999899943567899989398767898999989877995998766893459545989459876565678943469876898999798
+9859897654679987799654678967895459898919498694989234889877965667934696567989876789656778965569899659
+8743998767899866698769899345989969999902397543992125679989878799323597689999987898767889654398788945
+9632349878998754569889943239879898997893598679875234567897999989434698799989698989898999965235667896
+6531267989989986678997632198767767896789989789994345789976567978965699899978559678999987892123456789
+7545459899878998789898543986553656789899879897989976789987699869998789998765432568990196789014567891
+7656797658768899894698754965432348999998765956978987998798987658789892399986543479989985698925678992
+8769989545656789923999869876521234689998754349869898997679799645679901989987756569876674567896999989
+9898978934345679899897998765420127899976543209655789876567697536796899878999867898985543456789878978
+9997657921234698789656789876431236789898754498743678975434598987895679767899879987654102345678966466
+8987546892945987678945678987654345698789865999654569876545679799934698654568992976543212456789854345
+7895435789896976567998789998765456789679979898785678997697989689996789763499201987954323589898763234
+6796576798789895456899899989876577894578998789876899789989993498989899852178919998765454678997654346
+5987678987676789345901939876987689923489987654987987698778921397878989943267898999986869789039766467
+4599999876575689234899029965499897634590976543499996545567892986565679894356997896897999892123978578
+3459898765434590135678998764345976545692985432459896532346979875434598789459876785698989993239899989
+2599749854325679246999569878967989656789987653498789431234567994323987689998765834569878989398789992
+1987630965434994356789479989878998787896599765987678932345679765509876567899954323498769878987678891
+9999521398946789969892398995989999898965439899876567894467989876798765458998763214987654567898546789
+8998432987656899899901987854699987999654323934985458965678999987987654367959984523986543456789434899
+7987674598967958789319876543598996598743209129994346899899019998998765488945965439876431345678924997
+5499789679878945689498765432387897679654998998789235679999198999879896569239876567989642456789213456
+9329898789989235578999878541266799998769876987698945791098987898965987892123987678998753768995101234
+8910959895490123467899999320145987899898765976587997892397596987654998999934999789989967989654312689
+7892345986321434678978989431239986989987654989456789989996465698789869898899889898879878998765424578
+6996456795432375679767978932398895878996432198568999878789324249898756797765678987666989129987435699
+5979677986545699897659867893987674567987643987678968965679210136999645975654457896544598998976546989
+4367999987656988976543956895698543467998754599889757894568921245695439984323298989323567897987659878
+3246798998789867897432348986987674578979895789997645953457999356976698793210129678912378976498798767
+2124687899898756789321467999898765689357987899898756892345678968998997654323234567924459765349987656
+1012456923987645995436578987789876791268998989769878954596789989459898969864347979895689921234596545
+2423677899999766898656679876565987892379129678945989965678992191298769798765456798789789890145985434
+7634988998919878998787899985434598943468934589959999876899321019497653669986599987678998789959876515
+8795999687909989999998999875323459976567896799898921989987432198976442456797987876589998679899987601
+9989896545798998989659298765435678997878987899767899898976543987664321345679976565456895466789998312
+9878789434567897878943019876546899898989098987656965787987674976543210146798765434345689345679876543
+9965678923456996567932129987656998779692199998767893656899895698956343234999875323239791236799987654
+9876799544799987459543298598998999657569987999898912345678976989765464349878974210178943478989899785
+0999898765678942378954997459679996545498876891959101234567899878999878498769865323367894569876799876
+1298999898799865489769876323589989432397545790943212345678998967889989998659876554459965679965587997
+2997899939894987999878965104678978921239834899865623456789987654378999867543987678767897898743456898
+9876789921923999899999874324989867890398765689976784568891298763254987658902398789879998987652345999
+7665567890199895679765965449898756789459876789987896878932459542123496543212479893989459876541256899
+8543458932987684567964987598765435678968997895398987989656899643234569854324569912995312997632345789
+7652369543498543678932197679886545799878998943219998999768998754545698765537678929876109876543467899&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day10"><a href="#day10">Day 10</a> (<a href="https://adventofcode.com/2021/day/10">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/10
+object Day10 : AdventOfCode, Solution by Omar_Miatello(
+    day = 10,
+    parser = { it },
+    part1 = { input -&gt;
+        val charToPoints = listOf(3, 57, 1197, 25137)
+            .mapIndexed { i, points -&gt; Symbol.close[i] to points }
+            .toMap()
+        input.sumOf { line -&gt; charToPoints[line.illegalChar] ?: 0 }
+    },
+    expectedTestPart1 = 26397,
+    part2 = { input -&gt;
+        val charToPoints = Symbol.close.mapIndexed { i, c -&gt; c to i + 1 }.toMap()
+        input
+            .mapNotNull { line -&gt;
+                line.missingChars?.let { (chars, sizes) -&gt;
+                    var points = 0L
+                    chars.withIndex().reversed().forEach { (charIdx, c) -&gt;
+                        (1..sizes[charIdx]).forEach {
+                            points = points * 5 + charToPoints.getValue(c)
+                        }
+                    }
+                    points
+                }
+            }
+            .sorted()
+            .let { it[it.size / 2] }
+    },
+    expectedTestPart2 = 288957,
+)
+
+private object Symbol {
+    private const val all = &quot;([{&lt;)]}&gt;&quot;
+    val open = all.take(4)
+    val close = all.drop(4)
+    val openToClose = open.zip(close).toMap()
+}
+
+private sealed interface Issue
+
+@JvmInline
+private value class IllegalChar(val ic: Char) : Issue
+
+@JvmInline
+private value class MissingChars(val mc: Pair&lt;List&lt;Char&gt;, List&lt;Int&gt;&gt;) : Issue
+
+private val String.missingChars get() = (findIssue() as? MissingChars)?.mc
+
+private val String.illegalChar get() = (findIssue() as? IllegalChar)?.ic
+
+private fun String.findIssue(): Issue? {
+    val queue = mutableListOf&lt;Char&gt;()
+    val sizes = mutableListOf&lt;Int&gt;()
+    forEach { c -&gt;
+        if (c in Symbol.open) {
+            if (c == queue.lastOrNull()) {
+                sizes[sizes.lastIndex]++
+            } else {
+                queue += c
+                sizes += 1
+            }
+        } else {
+            if (c == Symbol.openToClose[queue.lastOrNull()]) {
+                val newSize = --sizes[sizes.lastIndex]
+                if (newSize == 0) {
+                    queue.removeLast()
+                    sizes.removeLast()
+                }
+            } else {
+                return IllegalChar(c)
+            }
+        }
+    }
+    return if (queue.isNotEmpty()) {
+        MissingChars(queue.map { Symbol.openToClose.getValue(it) } to sizes)
+    } else null
+}
+
+//sampleEnd
+
+fun main() {
+    Day10.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;[({(&lt;(())[]&gt;[[{[]{&lt;()&lt;&gt;&gt;
+[(()[&lt;&gt;])]({[&lt;{&lt;&lt;[]&gt;&gt;(
+{([(&lt;{}[&lt;&gt;[]}&gt;{[]{[(&lt;()&gt;
+(((({&lt;&gt;}&lt;{&lt;{&lt;&gt;}{[]{[]{}
+[[&lt;[([]))&lt;([[{}[[()]]]
+[{[{({}]{}}([{[{{{}}([]
+{&lt;[[]]&gt;}&lt;{[{[{[]{()[[[]
+[&lt;(&lt;(&lt;(&lt;{}))&gt;&lt;([]([]()
+&lt;{([([[(&lt;&gt;()){}]&gt;(&lt;&lt;{{
+&lt;{([{{}}[&lt;[[[&lt;&gt;{}]]]&gt;[]]&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;((((&lt;([&lt;{(&lt;(&lt;[&lt;&gt;&lt;&gt;&gt;[{}()]&gt;{{()[]}&lt;[][]&gt;}){{(()&lt;&gt;)(&lt;&gt;())}}&gt;{&lt;(([]())({}&lt;&gt;))[&lt;{}()&gt;{{}{}}]&gt;}){{&lt;
+&lt;{&lt;[([{&lt;{{&lt;{[({}())[&lt;&gt;()]]([{}()]{{}[]})}{([[]]&lt;{}[]&gt;){&lt;&lt;&gt;[]&gt;&lt;&lt;&gt;[]&gt;}}&gt;}}{[{[{[[]{}]&lt;[][]&gt;&gt;{[&lt;
+[([&lt;[(({(&lt;[&lt;[(&lt;&gt;&lt;&gt;)([]())][((){})&lt;&lt;&gt;[]&gt;]&gt;{([&lt;&gt;()]&lt;&lt;&gt;[]&gt;)({{}&lt;&gt;})}][{(&lt;()()&gt;{&lt;&gt;&lt;&gt;}){[&lt;&gt;[]][&lt;
+[&lt;[[[{{&lt;{{((&lt;[[][]][[]&lt;&gt;]&gt;&lt;({}[])&gt;){{[&lt;&gt;()]{{}{}}}&lt;(()())[&lt;&gt;[]]}}){[(({}{}))](&lt;(&lt;&gt;)&gt;{(&lt;&gt;())(&lt;&gt;[])})}}&lt;&lt;[&lt;&lt;&lt;&gt;&lt;
+{{{[{[[{{{{{&lt;&lt;{}&lt;&gt;&gt;{{}[]}&gt;[{&lt;&gt;()}&lt;&lt;&gt;{}&gt;]}&lt;{&lt;&lt;&gt;{}&gt;{[]&lt;&gt;}}({&lt;&gt;()}&lt;(){}&gt;)&gt;}[[(([]&lt;&gt;)&lt;{}()&gt;)]{{[&lt;&gt;{}](&lt;&gt;&lt;&gt;)}{([
+{{&lt;[([&lt;[({(&lt;{([][])[{}{}]&gt;([{}&lt;&gt;](&lt;&gt;&lt;&gt;))&gt;&lt;[[&lt;&gt;{}]]&lt;{&lt;&gt;&lt;&gt;}{{}()}&gt;&gt;)&lt;[[([]{})]([&lt;&gt;[]]({}[]))]({(
+({(([[&lt;&lt;([(([([]())&lt;{}&lt;&gt;&gt;](&lt;()[]&gt;[[]{}])){{{()[]}&lt;&lt;&gt;&lt;&gt;&gt;}})&lt;{((&lt;&gt;&lt;&gt;)[()[]]]}&gt;])&gt;&lt;{&lt;(([{()[]}])[{[{}&lt;&gt;]({
+{[&lt;{(([{[([(&lt;[(){}]&lt;()[]&gt;&gt;[&lt;{}&lt;&gt;&gt;[[]&lt;&gt;]&gt;)]{{({[]}({}()))&lt;&lt;{}&lt;&gt;&gt;{&lt;&gt;{}}&gt;}[({&lt;&gt;[]}[[]&lt;&gt;])([{}[]](&lt;&gt;[]))]})
+[({&lt;({([&lt;{&lt;&lt;({()()}&lt;[]{}&gt;)&lt;&lt;&lt;&gt;()&gt;[&lt;&gt;()])&gt;[(&lt;{}&lt;&gt;&gt;[[]()])&lt;(()()){[]&lt;&gt;}&gt;]&gt;}[([&lt;&lt;{}&lt;&gt;&gt;({}{})&gt;[&lt;[]&lt;&gt;&gt;&lt;&lt;&gt;()
+[([(&lt;[([&lt;[([[((){})&lt;()[]&gt;]([{}[]](&lt;&gt;()))]){&lt;[&lt;&lt;&gt;()&gt;(&lt;&gt;{})][[&lt;&gt;&lt;&gt;]]&gt;({([][]){&lt;&gt;[]}}[{{}}&lt;()()&gt;])}
+{{[[(([{{((&lt;{[{}[]][{}()]}{((){})&lt;()()&gt;}&gt;(&lt;[{}{}]{()&lt;&gt;}&gt;(&lt;{}()&gt;(()()))))){[[[&lt;{}[]&gt;&lt;[]&lt;&gt;&gt;][[{}[]]{
+[{(&lt;{&lt;[&lt;(&lt;{({[()[]]([]&lt;&gt;)}[[&lt;&gt;()]{(){}}])}({{&lt;{}&lt;&gt;&gt;&lt;{}()&gt;}{([]())[()&lt;&gt;]}}[(((){})&lt;&lt;&gt;[]&gt;)])&gt;&lt;([[&lt;()
+[{&lt;[&lt;{&lt;(({&lt;&lt;{{{}&lt;&gt;}}{[[]()]}&gt;&gt;}[((&lt;[&lt;&gt;][[]&lt;&gt;]&gt;))(({[()&lt;&gt;]&lt;&lt;&gt;()&gt;}&lt;{[][]}&lt;[][]&gt;&gt;))&gt;))&gt;}&gt;&lt;[&lt;&lt;&lt;([{{([][])({}&lt;&gt;)
+&lt;{([({[&lt;{{{&lt;(&lt;[]()&gt;[()&lt;&gt;])({&lt;&gt;&lt;&gt;}[{}])}}&lt;[(&lt;[]&lt;&gt;&gt;((){})){({}[])(&lt;&gt;&lt;&gt;)}]&lt;[[&lt;&gt;[]]&lt;{}()&gt;]&gt;&gt;}{[&lt;&lt;([
+&lt;[{[[[{&lt;{[&lt;({[[]{}]{&lt;&gt;]}[[[]{}]&lt;[]&lt;&gt;&gt;])&gt;]}{{{({&lt;&lt;&gt;{}&gt;(&lt;&gt;&lt;&gt;)}[&lt;{}[]&gt;]){([[][]](&lt;&gt;{}))}}{&lt;[(()())(&lt;&gt;(
+(&lt;{(&lt;[({&lt;(&lt;((&lt;(){}&gt;[{}&lt;&gt;])&lt;{(){}}({}[])&gt;)&lt;{&lt;{}[]&gt;{()[]}}([()&lt;&gt;]&lt;&lt;&gt;[]&gt;)&gt;){&lt;&lt;&lt;{}()&gt;&lt;{}[]&gt;&gt;{{[][]}}
+[((((&lt;[(([[&lt;{{()[]}{&lt;&gt;()}}{&lt;[]{}&gt;{&lt;&gt;[]}}&gt;[[{&lt;&gt;{}}([]{})]]][([&lt;()&lt;&gt;&gt;&lt;{}{}&gt;]&lt;&lt;[]()&gt;{{}()}&gt;)]](&lt;{[[
+&lt;(({&lt;{[(([&lt;[{(&lt;&gt;)&lt;&lt;&gt;{}&gt;}[(&lt;&gt;{}){{}&lt;&gt;}]]&gt;(((([][])(&lt;&gt;{}))))](([{{&lt;&gt;()}(()[])}{&lt;&lt;&gt;&gt;}][([{}{}]
+[{({[[[[&lt;{(&lt;[{()}&lt;[]&lt;&gt;&gt;]{([])}&gt;[(&lt;()&lt;&gt;&gt;({}&lt;&gt;))[({})]]){&lt;&lt;[[]]{&lt;&gt;{}}&gt;{({}{})[&lt;&gt;()]}&gt;&lt;{{()&lt;&gt;}({}[])
+[[([[{(((&lt;{(({(){}}[[]{}])[{{}()}[{}()]])[&lt;&lt;{}[]&gt;((){})&gt;]}&gt;{&lt;&lt;[&lt;(){}&gt;](&lt;[]&lt;&gt;&gt;{{}&lt;&gt;})&gt;&gt;}))[{{(({[&lt;&gt;&lt;&gt;][
+{({{[{{&lt;&lt;&lt;&lt;&lt;((&lt;&gt;())&lt;[]&lt;&gt;&gt;)&lt;&lt;()&lt;&gt;&gt;({}[])&gt;&gt;&gt;(&lt;{[[]{}]{&lt;&gt;[]}}(&lt;()&lt;&gt;&gt;{[]&lt;&gt;})&gt;({{[][]}([]())}{({}{})[[]
+(((&lt;(([&lt;[[{&lt;{[[]&lt;&gt;][[]&lt;&gt;]}&gt;{&lt;&lt;&lt;&gt;[]&gt;&gt;([[]()][{}()])}}]&lt;{&lt;{(()&lt;&gt;)[&lt;&gt;()&gt;}[[{}[]]]&gt;[&lt;[&lt;&gt;[]]([]
+{[&lt;[&lt;[[&lt;[[&lt;([{{}{}}&lt;[]()&gt;](&lt;{}&lt;&gt;&gt;(()())))&lt;[([]&lt;&gt;){[]&lt;&gt;}]&lt;[&lt;&gt;{}]&lt;[]{}&gt;&gt;&gt;&gt;[([([])[[]{}]]{&lt;{}&lt;&gt;&gt;&lt;[]&lt;
+&lt;({&lt;[&lt;{&lt;[&lt;{[(&lt;{}()&gt;)[[[][]]&lt;&lt;&gt;{}&gt;]]{[[()()]&lt;[]&lt;&gt;&gt;][&lt;[]()&gt;{{}[]}]}}[({&lt;{}&lt;&gt;&gt;})&lt;[{{}()}{()&lt;&gt;}]{&lt;[]&lt;&gt;&gt;(
+({&lt;[&lt;&lt;{&lt;[[&lt;{(&lt;{}()&gt;&lt;(){}&gt;)&lt;&lt;[][]&gt;{{}{}}&gt;}[&lt;[{}&lt;&gt;][&lt;&gt;[]]&gt;({()()}&lt;[][]&gt;)]&gt;]}({(&lt;(&lt;&lt;&gt;[]&gt;[&lt;&gt;()])&gt;&lt;
+[({((({[&lt;{&lt;{{[&lt;&gt;{}]({}{})}}&gt;&lt;&lt;({()[]}{(){}})([[][]]&lt;&lt;&gt;[]&gt;)&gt;{&lt;{()}(&lt;&gt;)&gt;}&gt;}&gt;&lt;{&lt;(&lt;&lt;{}&gt;(()[])&gt;)
+&lt;{&lt;([&lt;{{[(&lt;({&lt;{}[]&gt;&lt;[][]&gt;}&lt;{(){}}&lt;[]&gt;&gt;)&lt;&lt;({}{})&gt;[{(){}}&lt;[]()&gt;]&gt;&gt;{&lt;{{[]&lt;&gt;)[[]()]}{(&lt;&gt;[])[()&lt;&gt;]}&gt;[
+[&lt;&lt;{(&lt;[{[{&lt;{&lt;[(){}]&gt;&lt;{&lt;&gt;}&lt;[]()&gt;&gt;}{&lt;[&lt;&gt;{}](&lt;&gt;&gt;&gt;}&gt;[[&lt;{()()}[()[]]&gt;{[{}()]&lt;{}[]&gt;}]]}]}]&gt;{{&lt;[&lt;[&lt;&lt;{()[]}[[]()]&gt;
+&lt;(&lt;{&lt;[[{&lt;&lt;((&lt;(&lt;&gt;[])(&lt;&gt;{})&gt;&lt;[[][]]({}[])&gt;))&gt;(&lt;{&lt;&lt;&lt;&gt;[]&gt;{{}[]}&gt;[({}&lt;&gt;)[()&lt;&gt;]]}&gt;)&gt;}]]&gt;}{{(&lt;&lt;&lt;[
+&lt;[((([&lt;{({({[({}&lt;&gt;}({}{})]&lt;(()())[&lt;&gt;()]&gt;}{{&lt;()[]&gt;}{&lt;&lt;&gt;()&gt;(&lt;&gt;{})}})[&lt;[({}())(&lt;&gt;[])]&lt;{{}()}&gt;&gt;
+[{(&lt;[&lt;((&lt;(({&lt;([]())({}[])&gt;([&lt;&gt;()]{[][]})}){&lt;[([]())({}[])]&lt;&lt;&lt;&gt;()&gt;&gt;&gt;})&gt;{&lt;{&lt;([[]{}][[]()])&lt;(()&lt;&gt;)(&lt;&gt;{})&gt;&gt;}{&lt;{{
+&lt;{[[{({[{[&lt;{(([]&lt;&gt;)&lt;(){}&gt;)&lt;&lt;&lt;&gt;&lt;&gt;&gt;[[]&lt;&gt;]&gt;}&gt;{({{()[]}(()[])}&lt;[[]()]&gt;){[([]&lt;&gt;)&lt;[]{}&gt;]}}](&lt;&lt;{[(){}]{&lt;&gt;}}{([]&lt;&gt;)(
+&lt;{(&lt;&lt;[&lt;[[&lt;[[[{()[]}[&lt;&gt;{}]](&lt;&lt;&gt;{}&gt;&lt;[][]&gt;)]{(([]){[][]})&lt;&lt;()&lt;&gt;&gt;&gt;}]&gt;[&lt;[({(){}]){&lt;{}{}&gt;([][])}]&gt;(({[&lt;&gt;[]
+&lt;{[&lt;&lt;({[(&lt;({([()][{}()])}([{{}{}}([]&lt;&gt;)]{{{}}&lt;{}()&gt;})){&lt;{{{}}(()[])}([[]&lt;&gt;]{()[]})&gt;&lt;&lt;(&lt;&gt;[]
+{({[{[(&lt;&lt;[&lt;{[&lt;&lt;&gt;()&gt;[[]&lt;&gt;&gt;](&lt;&lt;&gt;()&gt;[&lt;&gt;()])}&lt;&lt;[()[]]&lt;&lt;&gt;{}&gt;&gt;{{(){}}[[][]]}&gt;&gt;]&gt;&gt;[(({({([]{})&lt;&lt;&gt;{}&gt;}&lt;{()[]}{[]{}}
+([(({[{&lt;{{[&lt;{&lt;{}{}&gt;(&lt;&gt;{})}&gt;([&lt;{}[]&gt;&lt;&lt;&gt;&lt;&gt;&gt;]{(()&lt;&gt;){&lt;&gt;&lt;&gt;}})]}[([&lt;[()[]]{&lt;&gt;&lt;&gt;}&gt;&lt;{[]}{{}[])&gt;]([({}&lt;&gt;)&lt;()&lt;&gt;&gt;]))
+{&lt;&lt;&lt;[([(&lt;&lt;&lt;{&lt;{{}[]}{&lt;&gt;()}&gt;&lt;&lt;{}()&gt;&lt;(){}&gt;&gt;}&gt;[&lt;&lt;[&lt;&gt;&lt;&gt;]&lt;()()&gt;&gt;&lt;&lt;(){}&gt;{[]&lt;&gt;}&gt;)(&lt;{(){}}({}{})&gt;{[
+(({({[&lt;[(([[(({}[]){&lt;&gt;()})]]&lt;([([]())&lt;{}[]&gt;]){{{{}[]}{&lt;&gt;()}}([[][]](&lt;&gt;{}))}&gt;)[&lt;[{&lt;{}()&gt;{{}&lt;&gt;}}]&lt;&lt;
+{{(({{&lt;((&lt;&lt;({[(){}]&lt;[]()&gt;}(&lt;{}()&gt;[&lt;&gt;()]))[{{{}&lt;&gt;}[&lt;&gt;()]}[{[]}{()()}]]&gt;][(&lt;&lt;&lt;[]&lt;&gt;&gt;{{}()}&gt;(&lt;{}{}&gt;{&lt;&gt;{
+({([{&lt;{{{[{({{[]()}&lt;[]{}&gt;})[{&lt;&lt;&gt;()&gt;{[]}}&lt;({}{})({}&lt;&gt;)&gt;]}&lt;{[[[]&lt;&gt;][{}()]][[()&lt;&gt;]([]&lt;&gt;)]}({[&lt;&gt;[]]&lt;{}&lt;&gt;&gt;}&lt;
+[[(&lt;[[({&lt;[{({&lt;{}()&gt;[()[]]}{{[]()}{[][]}})[(({}&lt;&gt;)&lt;&lt;&gt;&lt;&gt;&gt;)[([]&lt;&gt;)&lt;{}[]&gt;]]}]&gt;&gt;[{&lt;&lt;(&lt;[[]&lt;&gt;](()[])&gt;[&lt;{}&gt;&lt;[]()&gt;
+(&lt;&lt;&lt;&lt;[{&lt;{({&lt;(&lt;{}&lt;&gt;&gt;)&gt;{({[]{}}&lt;&lt;&gt;{}&gt;)&lt;[{}&lt;&gt;]&lt;[]()&gt;&gt;}}){{{{([]&lt;&gt;){(){}}}[{[]&lt;&gt;}[[]{})]}[({(){}
+({[{{[{[[&lt;([[&lt;{}()&gt;[[][]]]{((){}){()&lt;&gt;}}](([{}[]][[][]])[([]())]))&gt;]]{&lt;&lt;&lt;&lt;([{}[]])&lt;([])[{}{}
+({(((({{{[[[[{&lt;&gt;&lt;&gt;}]&lt;[&lt;&gt;&lt;&gt;][(){}]&gt;]{{(&lt;&gt;()){&lt;&gt;[]}}{&lt;()&lt;&gt;&gt;{&lt;&gt;}}}]]}}&lt;[&lt;&lt;((&lt;{}&lt;&gt;&gt;&lt;&lt;&gt;[]&gt;){&lt;&lt;&gt;&lt;&gt;&gt;{()
+{{&lt;&lt;{{[&lt;&lt;[[&lt;[&lt;{}&gt;[{}&lt;&gt;]]&lt;&lt;&lt;&gt;&lt;&gt;&gt;([]())&gt;&gt;(&lt;(&lt;&gt;())(&lt;&gt;{})&gt;(({}{})(&lt;&gt;&lt;&gt;)))]&lt;{{{[]{}}[&lt;&gt;{}]}(&lt;(){}&gt;[()()]
+[&lt;(&lt;&lt;{(([{{(((()()){&lt;&gt;()}){[[]()]})((&lt;{}()&gt;[&lt;&gt;&lt;&gt;])[({}[])([]&lt;&gt;)])}{([(&lt;&gt;[])&lt;{}&lt;&gt;&gt;]{[()()][{}()]}){[{&lt;&gt;()}&lt;&lt;&gt;
+(&lt;{(&lt;&lt;{[({{([[[]&lt;&gt;][[][]]][&lt;&lt;&gt;()&gt;[[][]]])}[&lt;&lt;([]())&lt;()()&gt;&gt;{[{}()]&lt;[]()&gt;}&gt;&lt;({{}[]}{&lt;&gt;()})&gt;]})[{[[([{}]&lt;{
+&lt;&lt;[[(((({&lt;({{([][]){&lt;&gt;()}}}&lt;{(()())&lt;{}()&gt;}{[[][]]&lt;&lt;&gt;()&gt;}&gt;)&gt;})[{{&lt;{[{&lt;&gt;&lt;&gt;}[(){}]]((()[])(&lt;&gt;&lt;&gt;))}&gt;([&lt;
+&lt;([&lt;{&lt;{{[[[{&lt;{{}&lt;&gt;}&lt;{}]&gt;({&lt;&gt;{}}[{}&lt;&gt;])}(((&lt;&gt;())&lt;[]()&gt;)((()&lt;&gt;){{}[]}))]&lt;{[[&lt;&gt;][&lt;&gt;{}]][([]())]}([[()&lt;&gt;]{(
+{&lt;((&lt;[[{{([&lt;[[()[]]]&lt;{[]{}}{{}}&gt;&gt;(&lt;(()&lt;&gt;)&lt;[]&lt;&gt;&gt;&gt;[&lt;&lt;&gt;()&gt;[{}&lt;&gt;]])]){([[&lt;[]{}&gt;([]())][{()&lt;&gt;}]]&lt;{&lt;
+((([[&lt;(&lt;&lt;(&lt;({{()[]}{[][]}}{&lt;[]()&gt;[{}()]})[(&lt;&lt;&gt;()&gt;([]&lt;&gt;))&lt;[&lt;&gt;{}]&gt;]&gt;)&lt;&lt;[&lt;[[]&lt;&gt;]&gt;{(()[]){()&lt;&gt;}}]{(
+(&lt;({&lt;{&lt;{[([{{&lt;&lt;&gt;{}&gt;(()[])}}[(({}())([][]))[{{}{}}([]&lt;&gt;)]]](&lt;([[]{}]([]{}))([&lt;&gt;&lt;&gt;](()&lt;&gt;))&gt;{[({}{})[()()]][
+{&lt;{{{{{(&lt;{((({{}}[[][]]){([]{}&gt;})&lt;{{()()}[{}&lt;&gt;]}([(){}])&gt;)&lt;&lt;([&lt;&gt;[]]&lt;&lt;&gt;&gt;)[(()&lt;&gt;)([])]&gt;&lt;{&lt;()&lt;&gt;&gt;}(&lt;&lt;&gt;&lt;
+{{&lt;[{([{{&lt;{([&lt;[]&lt;&gt;&gt;[&lt;&gt;{}]][({}()&gt;&lt;&lt;&gt;()&gt;])[&lt;[()[]](()())&gt;&lt;[[]]&lt;[]()&gt;&gt;]}{[([&lt;&gt;[]])[&lt;[]{}&gt;]]{{(&lt;&gt;&lt;&gt;){{}&lt;&gt;}}(
+[(&lt;({&lt;[{&lt;({[[{[]&lt;&gt;}[[][]]]&lt;{[]()}&lt;[]()&gt;&gt;]&lt;[[[][]]{[]&lt;&gt;}][&lt;[]&lt;&gt;&gt;{[]()}]&gt;}[&lt;&lt;(&lt;&gt;{})[{}{}]&gt;[{{}()}[()()]]&gt;&lt;[(
+&lt;([[&lt;(({&lt;{[{{&lt;()[]&gt;&lt;{}()&gt;}{{{}&lt;&gt;}}}([{{}[]}&lt;{}&lt;&gt;&gt;]{&lt;[]&lt;&gt;&gt;({}[])})]}&gt;((([{&lt;[]&lt;&gt;&gt;{&lt;&gt;[])}(&lt;&lt;&gt;[]
+({{&lt;[[([{&lt;{{&lt;[&lt;&gt;{}](()&lt;&gt;)&gt;&lt;(()())&gt;}[[&lt;{}[]&gt;&lt;&lt;&gt;()}]&lt;{()&lt;&gt;}[()()]&gt;]}&gt;{&lt;&lt;([&lt;&gt;()]([]{}))((&lt;&gt;())[[][]])&gt;
+([((([[[{{&lt;((&lt;&lt;&gt;&lt;&gt;&gt;{[]})&lt;(&lt;&gt;&lt;&gt;)&lt;()&lt;&gt;&gt;&gt;){([[]{}][[][]])&lt;&lt;{}&lt;&gt;&gt;{{}&lt;&gt;}&gt;}&gt;{&lt;&lt;[(){}][()()]&gt;[&lt;[]()&gt;&lt;
+[&lt;&lt;[[({&lt;&lt;[[&lt;&lt;&lt;()&lt;&gt;&gt;[()[]]&gt;&lt;(()())&gt;&gt;(((()[])[(){}])((&lt;&gt;[]){{}[]&gt;))]&lt;&lt;{[[]()][()]}&gt;{(&lt;{}&lt;&gt;&gt;(&lt;&gt;&lt;&gt;))&lt;[&lt;&gt;()][
+{{{[([(({{{(([{}[]](()&lt;&gt;))({{}{}})){[({}())(&lt;&gt;[])]}}{&lt;(([][])[&lt;&gt;()])([(){}][{}[]])&gt;[[[[]()]]({&lt;&gt;()}&lt;&lt;&gt;&gt;)]}
+{&lt;(&lt;(([&lt;[&lt;&lt;[[({}[])&lt;&lt;&gt;&lt;&gt;&gt;]]({&lt;[]()&gt;}({[]()}&lt;[]()&gt;))&gt;&lt;&lt;(((){})(&lt;&gt;[]))&gt;({{&lt;&gt;[]}({}&lt;&gt;)}{&lt;{}()&gt;(()())})&gt;&gt;([&lt;{{
+[&lt;{[[&lt;[({{{&lt;{{[]{}}&lt;[]{}&gt;}{&lt;&lt;&gt;&lt;&gt;&gt;}&gt;}[{[([][])&lt;{}()&gt;]({[]&lt;&gt;}[()()])}[([{}[]][[]&lt;&gt;])]]}}&lt;&lt;{[([{}(
+{[([(&lt;{{{([{&lt;[&lt;&gt;&lt;&gt;]&lt;&lt;&gt;{}&gt;&gt;[&lt;{}[]&gt;[[]&lt;&gt;]]}])&lt;({[&lt;[][]&gt;&lt;[]&lt;&gt;&gt;][&lt;&lt;&gt;&lt;&gt;&gt;&lt;{}()&gt;]})&gt;}(&lt;{&lt;[(()[])&lt;()
+{((((&lt;{[[[{([(()[])[&lt;&gt;()]]){[{{}()}]}}{{{({}[]){[][]}}[&lt;[]()&gt;]}}]]{[[&lt;({&lt;&gt;&lt;&gt;}(&lt;&gt;[]))[({}{})&lt;()()&gt;]&gt;]{{[
+[(({[[&lt;&lt;{&lt;[[(({}{}){{}{}}&gt;[[[][]]&lt;{}&lt;&gt;&gt;]][{{&lt;&gt;()}{[][]}}]]&gt;[[[&lt;&lt;{}[]&gt;&gt;[[&lt;&gt;[]][&lt;&gt;{}]]]{{{{}(
+[([[[[{((&lt;([{[{}{}]([]())}{[()()][{}&lt;&gt;]}])&lt;({{{}{}}&lt;()()&gt;}&lt;([]{})[(){}]&gt;)&lt;({{}{}}&lt;&lt;&gt;[]&gt;)&lt;[&lt;&gt;&lt;&gt;][(){}]&gt;&gt;&gt;&gt;[[
+[{{&lt;[{&lt;((([{{&lt;[][]&gt;{&lt;&gt;[]}}({&lt;&gt;&lt;&gt;}&lt;&lt;&gt;&lt;&gt;&gt;)}&lt;&lt;&lt;{}{}&gt;{[]{}}&gt;{[[]&lt;&gt;]({})}&gt;][&lt;&lt;{{}}(&lt;&gt;())&gt;{{[][]}&lt;[]&gt;}&gt;
+[(([({&lt;(&lt;{[{&lt;{&lt;&gt;{}}&gt;&lt;[()()]&lt;()[]&gt;&gt;}{((()())&lt;&lt;&gt;&lt;&gt;&gt;)[&lt;{}&lt;&gt;&gt;[&lt;&gt;()]]}]}{{{(&lt;{}{}&gt;&lt;&lt;&gt;[]&gt;){{{}}[(){}]}}}{[&lt;{[]{}}&gt;{
+{[[{&lt;[(&lt;&lt;[({({{}{}}[{}&lt;&gt;])[(&lt;&gt;{})&lt;&lt;&gt;&lt;&gt;&gt;]}(([{}{}](()()))(&lt;[]&gt;[&lt;&gt;[]])))&lt;({&lt;[]()&gt;}[[&lt;&gt;&lt;&gt;]&lt;()
+&lt;[({({&lt;[((&lt;[&lt;({}&lt;&gt;)({}())&gt;]&gt;[({{[]}&lt;{}()&gt;})((&lt;[][]&gt;((){}))[&lt;(){}&gt;&lt;()()&gt;])])([[([{}{}]&lt;(){}&gt;)](&lt;&lt;{}[]&gt;{{}&lt;&gt;}&gt;)
+&lt;&lt;&lt;[&lt;{[[&lt;{[&lt;&lt;([]&lt;&gt;}[{}{}]&gt;&gt;{[(()()){()&lt;&gt;}][&lt;&lt;&gt;{}&gt;{{}{}}]}][[&lt;[[]&lt;&gt;]{&lt;&gt;}&gt;&lt;{[]&lt;&gt;}{{}{}}&gt;]&lt;[{()
+([({{[({{{({&lt;[[]]&lt;{}[]&gt;&gt;}{{&lt;[]()]&lt;&lt;&gt;&lt;&gt;&gt;}{[()&lt;&gt;]([]())}}){{[&lt;&lt;&gt;&lt;&gt;&gt;&lt;&lt;&gt;{}&gt;]&lt;(&lt;&gt;&lt;&gt;)([]{})&gt;}}}(
+{[[[({{({[((&lt;[[])(&lt;&gt;{})&gt;{[[]&lt;&gt;]&lt;()&gt;})[[&lt;[]&lt;&gt;&gt;[()()]][{[]&lt;&gt;}&lt;&lt;&gt;[]&gt;]])[&lt;{&lt;{}{}&gt;([]())}{[&lt;&gt;{}]}&gt;]]}[((&lt;
+[&lt;(&lt;&lt;&lt;{{((&lt;&lt;({[]{}}([]{})&gt;&lt;({}{})&gt;&gt;&lt;({&lt;&gt;{}}&lt;()[]&gt;)({[]()}[{}()])&gt;&gt;(([[()[]]&lt;&lt;&gt;[]&gt;](&lt;&lt;&gt;()&gt;({}&lt;&gt;)))&lt;&lt;([
+{[[{{&lt;&lt;[[[[[([()()}(&lt;&gt;[]))]((&lt;&lt;&gt;&lt;&gt;&gt;[[]{}])(&lt;{}[]&gt;[{}()]))]{&lt;{{{}&lt;&gt;}}({&lt;&gt;()}{()()})&gt;{{&lt;{}()&gt;&lt;{}&lt;&gt;&gt;}}}]]&lt;({&lt;
+&lt;&lt;&lt;[[{(&lt;{({([{&lt;&gt;&lt;&gt;}&lt;[][]&gt;]&lt;([]())[{}]&gt;)})&lt;&lt;[&lt;{[]()}({}{})&gt;](&lt;{{}[]}[()[]]&gt;(&lt;[]&lt;&gt;&gt;&lt;&lt;&gt;()&gt;)))&gt;}
+([([((([(&lt;({&lt;[[]&lt;&gt;][()()]&gt;})[[&lt;&lt;&lt;&gt;&gt;&lt;&lt;&gt;[]&gt;&gt;({()()}([][]))][&lt;({}[])&lt;&lt;&gt;[]&gt;&gt;{{{}()}{[]{}}}]]&gt;&lt;&lt;[&lt;{(){
+{[([{{&lt;{{[{{{&lt;&lt;&gt;{}&gt;}}&lt;[(())(&lt;&gt;{})]{({}&lt;&gt;)[{}[]&gt;}&gt;}{&lt;([[]()]([][]))[[&lt;&gt;[]]&lt;()[]&gt;]&gt;}]({{{[[]{}]{{}()}}}}([[
+{[&lt;[(&lt;&lt;&lt;[&lt;{([(&lt;&gt;[])&lt;{}()&gt;]{[[]{}]&lt;[]&lt;&gt;&gt;})}&gt;]{{[(&lt;{&lt;&gt;&lt;&gt;}[{}()]&gt;{[[]{}][{}{}]}){[([]&lt;&gt;)({}())]{{(){}}({
+((({&lt;{&lt;[[[({&lt;[[]()]{()()}&gt;&lt;[&lt;&gt;()][{}[]]&gt;}&lt;(&lt;{}[]&gt;)((&lt;&gt;&lt;&gt;)&lt;{}{}&gt;)&gt;)]]{((&lt;&lt;[{}{}][[]()]&gt;(([]&lt;&gt;)[[]{}])&gt;&lt;[{[
+{&lt;[&lt;&lt;([&lt;&lt;&lt;{([{&lt;&gt;[]}[()[]]]([{}&lt;&gt;]&lt;[]&lt;&gt;&gt;))&lt;[{&lt;&gt;[]}[{}]]&gt;}[[&lt;[&lt;&gt;&lt;&gt;](&lt;&gt;{})&gt;{[()&lt;&gt;)[{}()]}](&lt;((){})([]&lt;&gt;)&gt;)]&gt;
+{[((&lt;[&lt;((&lt;&lt;&lt;{{{}&lt;&gt;}(&lt;&gt;[])}({&lt;&gt;&lt;&gt;}(&lt;&gt;{}))&gt;[[&lt;(){}&gt;((){})]((()[]){&lt;&gt;()})]&gt;[&lt;{[[]{}][{}()]}({(){}}&lt;{}
+[{[&lt;{&lt;(([[([(&lt;[]()&gt;((){}))[([]{})[&lt;&gt;{}]]]{&lt;{{}()}(&lt;&gt;{})&gt;})&lt;{(&lt;{}{}&gt;((){}))&lt;{&lt;&gt;[]}&lt;&lt;&gt;()&gt;&gt;}&gt;]({&lt;([{}&lt;&gt;]{&lt;&gt;(
+&lt;{(&lt;([&lt;&lt;{([&lt;{([]{})&lt;[]()&gt;}&lt;{[][]}({}[])&gt;&gt;{(&lt;&lt;&gt;{}&gt;){[()[]]&lt;()()&gt;}}]&lt;[&lt;(&lt;&gt;())&gt;&lt;{()()}[()&lt;&gt;]&gt;]&gt;){&lt;{[&lt;(){}&gt;&lt;
+(&lt;([([&lt;{&lt;{[&lt;(({}[])((){}))[[{}()](&lt;&gt;())]&gt;][[{[[]()]&lt;()()&gt;]]&lt;&lt;{[]()}&gt;{[{}&lt;&gt;]&lt;[]()&gt;}&gt;]}&lt;&lt;([{{}&lt;&gt;}&lt;()
+[({(({[[[[({{[{}{}]}{(()())[&lt;&gt;[]]}}&lt;{&lt;&lt;&gt;()&gt;(&lt;&gt;[])}(([]){&lt;&gt;{}})&gt;)&lt;&lt;{{[]}[&lt;&gt;()]}{{&lt;&gt;[]}&lt;[]()&gt;})&gt;]]]]})[&lt;[
+&lt;((([[{({(&lt;[&lt;{{}&lt;&gt;&gt;[[]()]&gt;&lt;&lt;[][]&gt;[{}()]&gt;][&lt;&lt;{}[]&gt;&lt;{}&lt;&gt;&gt;&gt;{[{}()]{&lt;&gt;{}}}]&gt;&lt;[{&lt;(){}&gt;{()()}}&lt;(&lt;&gt;{
+[{&lt;{(&lt;{[((&lt;{&lt;{{}[]}({}{})&gt;{({}[])[&lt;&gt;[]]}}{({[]()}){[{}()]&lt;()&gt;}}&gt;&lt;&lt;([[]]{&lt;&gt;&lt;&gt;}){[[]()](&lt;&gt;{})}&gt;{(&lt;(){}&gt;{[]
+&lt;&lt;([{(&lt;&lt;(([{[{&lt;&gt;&lt;&gt;}&lt;{}&lt;&gt;&gt;][[()&lt;&gt;]]}([(()[])[[]()]}&lt;&lt;&lt;&gt;{}&gt;{(){}}&gt;)])[(&lt;&lt;{()()}&gt;&lt;[()[]]{&lt;&gt;()}&gt;&gt;&lt;(([]{})
+[(&lt;([&lt;{&lt;{{((&lt;((){})&lt;[]{}&gt;&gt;({()[]}({}&lt;&gt;))))}([&lt;[(&lt;&gt;())[{}[]]]((&lt;&gt;[])[{}[]])&gt;[[[(){}]{&lt;&gt;{}}]]])}[{({(&lt;()()){{}
+{({&lt;(&lt;(&lt;{{(({{&lt;&gt;[]}{&lt;&gt;[]}}[{{}}&lt;&lt;&gt;&gt;]))&lt;&lt;[&lt;()[]&gt;&lt;()[]&gt;]&lt;({}{})&lt;&lt;&gt;[]&gt;&gt;&gt;{[[[]())&lt;[]()&gt;]}&gt;}{{{(&lt;[]&lt;&gt;&gt;&lt;
+{[{{[(&lt;[[[({[{[]()}[[]]]&lt;&lt;&lt;&gt;[]&gt;&lt;()()&gt;&gt;})][[(([&lt;&gt;{}]{{}()}){&lt;{}&lt;&gt;&gt;{[]&lt;&gt;}})[{({}&lt;&gt;)}]]&lt;&lt;{(&lt;&gt;&lt;&gt;)&lt;{}()&gt;}&lt;(&lt;&gt;())&lt;&lt;
+&lt;{&lt;{{[&lt;[&lt;{&lt;(([[]{}])[[{}{}]{()[]}])&lt;&lt;{()()}{()&lt;&gt;)&gt;&gt;&gt;}&lt;[&lt;[[{}{}][()[]]]&lt;&lt;[]()&gt;(&lt;&gt;[])&gt;&gt;[(([])
+(([{([&lt;&lt;{{((({()()}[()&lt;&gt;])({&lt;&gt;&lt;&gt;}))&lt;&lt;{[][]}[{}()]&gt;{([]{})}&gt;)}}(&lt;&lt;{(&lt;[]()&gt;{[]()})((()()){&lt;&gt;&lt;
+[[{&lt;{{{{&lt;(&lt;{{{()[]}{{}[]}}}&gt;&lt;&lt;&lt;&lt;{}[]&gt;{{}()}&gt;&lt;[{}&lt;&gt;](()[])&gt;&gt;{{({}()&gt;&lt;(){}&gt;}&lt;{[]()}[{}]&gt;}&gt;)&gt;[[[{[[{}&lt;&gt;]&lt;()()&gt;][
+[(&lt;&lt;{[{([{[[[{(){}}]&lt;[[][]][&lt;&gt;[]]&gt;]&lt;[&lt;()[]&gt;(()&lt;&gt;)]&lt;&lt;[]()&gt;{[]&lt;&gt;}&gt;&gt;]&lt;&lt;{&lt;{}{}&gt;{{}&lt;&gt;}}{&lt;&lt;&gt;&lt;&gt;&gt;[{}&lt;&gt;]}&gt;[
+&lt;[{[({[[[[([([[]&lt;&gt;]&lt;&lt;&gt;{}&gt;)(&lt;{}[]&gt;[&lt;&gt;&lt;&gt;])]{[[[]&lt;&gt;}{&lt;&gt;&lt;&gt;}]{(()())[()[]]}}){&lt;(&lt;()[]&gt;&lt;{}{}&gt;)&gt;{((&lt;&gt;&lt;&gt;)[&lt;&gt;&lt;&gt;]){{&lt;&gt;
+{([((&lt;{[&lt;({{(&lt;[]&gt;({}{})]{[&lt;&gt;{}]&lt;{}()&gt;}}{([&lt;&gt;{}]&lt;(){}&gt;)[[&lt;&gt;{}](())]}})&gt;[{{&lt;[&lt;&lt;&gt;[]&gt;({}[])]&lt;&lt;{}{}&gt;{
+[&lt;&lt;{([{{{([(&lt;[&lt;&gt;[]][()&lt;&gt;]&gt;(&lt;[]()&gt;&lt;&lt;&gt;[]&gt;))(((()()){{}()})&lt;&lt;&lt;&gt;{}&gt;[()&lt;&gt;]&gt;)][{({[]{}}(&lt;&gt;&lt;&gt;))[{(){}]]}{&lt;([]&lt;&gt;)
+{[&lt;(([[[{{[{&lt;(&lt;&gt;&lt;&gt;)&lt;&lt;&gt;{}&gt;&gt;}]{&lt;{&lt;&lt;&gt;&lt;&gt;&gt;}&gt;{[{[]()}[&lt;&gt;&lt;&gt;]]([()()][()()])}}}&lt;[{(&lt;()&lt;&gt;&gt;{{}&lt;&gt;})}]{{[&lt;()&gt;{{}[]}]{{{}
+[&lt;[{({{{[&lt;[({&lt;&lt;&gt;{}&gt;{{}{}}})&lt;((&lt;&gt;{}))[{(){}}]&gt;]&gt;&lt;((&lt;{[]()}&gt;[([][])]))[[(&lt;()()&gt;&lt;{}{}&gt;)[[{}&lt;&gt;]&lt;&lt;&gt;{}}]]{[[&lt;&gt;&lt;&gt;
+([{&lt;(([(((&lt;{({()[]}{[]&lt;&gt;})[{[]{}}]}&gt;(&lt;{&lt;()[]&gt;}(([]{})[[]])&gt;)){{{({{}()})(&lt;&lt;&gt;()&gt;&lt;[]&lt;&gt;&gt;)}&lt;[{[]{}}]&lt;(()[]&gt;([](&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day11"><a href="#day11">Day 11</a> (<a href="https://adventofcode.com/2021/day/11">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/11
+object Day11 : AdventOfCode, Solution by Omar_Miatello(
+    day = 11,
+    parser = { lines -&gt; lines.map { line -&gt; line.map { &quot;$it&quot;.toInt() } } },
+    part1 = { input -&gt;
+        var flashes = 0
+        input.loopUntil { loopIdx, frame -&gt;
+            flashes += frame.sumOf { row -&gt; row.count { it == 0 } }
+            loopIdx &lt; 100
+        }
+        flashes
+    },
+    expectedTestPart1 = 1656,
+    part2 = { input -&gt;
+        var all0Idx = 0
+        input.loopUntil { loopIdx, frame -&gt;
+            val all0 = frame.all { row -&gt; row.all { it == 0 } }
+            all0Idx = loopIdx
+            !all0
+        }
+        all0Idx
+    },
+    expectedTestPart2 = 195,
+)
+
+private val nearbyPos: List&lt;Pair&lt;Int, Int&gt;&gt; = (-1..1).flatMap { x -&gt; (-1..1).map { y -&gt; x to y } } - (0 to 0)
+
+private fun List&lt;List&lt;Int&gt;&gt;.loopUntil(
+    condition: (loopIdx: Int, frame: List&lt;List&lt;Int&gt;&gt;) -&gt; Boolean,
+) {
+    var loopIndex = 0
+    val frame = map { it.toMutableList() }
+    while (condition(loopIndex++, frame)) {
+        val willExplode = mutableSetOf&lt;Pair&lt;Int, Int&gt;&gt;()
+        val exploded = mutableSetOf&lt;Pair&lt;Int, Int&gt;&gt;()
+        frame.forEachIndexed { y, row -&gt;
+            row.indices.forEach { x -&gt;
+                if (++row[x] &gt; 9) willExplode += x to y
+            }
+        }
+        while (willExplode.isNotEmpty()) {
+            willExplode.toList().forEach { (x, y) -&gt;
+                nearbyPos.forEach { (xNear, yNear) -&gt;
+                    val x1 = x + xNear
+                    val y1 = y + yNear
+                    val item = frame.getOrNull(y1)?.getOrNull(x1)
+                    if (item != null && ++frame[y1][x1] &gt; 9 && x1 to y1 !in exploded) {
+                        willExplode += x1 to y1
+                    }
+                }
+                willExplode -= x to y
+                exploded += x to y
+            }
+        }
+        exploded.forEach { (x, y) -&gt; frame[y][x] = 0 }
+    }
+}
+
+//sampleEnd
+
+fun main() {
+    Day11.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;5483143223
+2745854711
+5264556173
+6141336146
+6357385478
+4167524645
+2176841721
+6882881134
+4846848554
+5283751526&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;1553421288
+5255384882
+1224315732
+4258242274
+1658564216
+6872651182
+5775552238
+5622545172
+8766672318
+2178374835&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day12"><a href="#day12">Day 12</a> (<a href="https://adventofcode.com/2021/day/12">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/12
+object Day12 : AdventOfCode, Solution by Omar_Miatello(
+    day = 12,
+    parser = { lines -&gt; lines.map { it.split(&quot;-&quot;) } },
+    part1 = { input -&gt;
+        val nodesMap = input.toNodesMap()
+        fun buildPaths(node: String, path: List&lt;String&gt; = emptyList()): List&lt;List&lt;String&gt;&gt; {
+            val newPath = path + node
+            return nodesMap.getValue(node).flatMap { child -&gt;
+                when {
+                    child == &quot;end&quot; -&gt; listOf(newPath + child)
+                    !child.isSmallCave() || child !in path -&gt; buildPaths(child, newPath)
+                    else -&gt; emptyList()
+                }
+            }
+        }
+
+        buildPaths(&quot;start&quot;).size
+    },
+    expectedTestPart1 = 10,
+    part2 = { input -&gt;
+        fun visitSmallCave(path: List&lt;String&gt;, child: String, canTwice: Boolean) = if (canTwice) {
+            path.count { it == child } &lt; 2
+        } else {
+            child !in path
+        }
+
+        fun nowCanTwice(path: List&lt;String&gt;, canTwice: Boolean) = if (canTwice) {
+            val nodes = mutableSetOf&lt;String&gt;()
+            path.forEach { node -&gt;
+                if (node.isSmallCave() && !nodes.add(node)) return false
+            }
+            true
+        } else false
+
+        val nodesMap = input.toNodesMap()
+        fun buildPaths(node: String, path: List&lt;String&gt; = emptyList(), canTwice: Boolean = true): List&lt;List&lt;String&gt;&gt; {
+            val newPath = path + node
+            return nodesMap.getValue(node).flatMap { child -&gt;
+                when {
+                    child == &quot;start&quot; -&gt; emptyList()
+                    child == &quot;end&quot; -&gt; listOf(newPath + child)
+                    !child.isSmallCave() || visitSmallCave(path, child, canTwice) -&gt; {
+                        buildPaths(child, newPath, nowCanTwice(path + child, canTwice))
+                    }
+                    else -&gt; emptyList()
+                }
+            }
+        }
+
+        buildPaths(&quot;start&quot;).size
+    },
+    expectedTestPart2 = 36,
+)
+
+private fun List&lt;List&lt;String&gt;&gt;.toNodesMap() = flatMap { (v1, v2) -&gt; listOf(v1 to v2, v2 to v1) }
+    .distinct()
+    .groupBy(keySelector = { it.first }, valueTransform = { it.second })
+
+private fun String.isSmallCave() = all { it.isLowerCase() }
+
+//sampleEnd
+
+fun main() {
+    Day12.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;start-A
+start-b
+A-c
+A-b
+b-d
+A-end
+b-end&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;EG-bj
+LN-end
+bj-LN
+yv-start
+iw-ch
+ch-LN
+EG-bn
+OF-iw
+LN-yv
+iw-TQ
+iw-start
+TQ-ch
+EG-end
+bj-OF
+OF-end
+TQ-start
+TQ-bj
+iw-LN
+EG-ch
+yv-iw
+KW-bj
+OF-ch
+bj-ch
+yv-TQ&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day13"><a href="#day13">Day 13</a> (<a href="https://adventofcode.com/2021/day/13">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/13
+object Day13 : AdventOfCode, Solution by Omar_Miatello(
+    day = 13,
+    parser = { lines -&gt;
+        lines.indexOf(&quot;&quot;).let { splitPos -&gt;
+            TransparentPaper(
+                dots = lines.subList(0, splitPos).map { line -&gt;
+                    line.split(&quot;,&quot;)
+                        .let { it[0].toInt() to it[1].toInt() }
+                },
+                foldList = lines.subList(splitPos + 1, lines.size).map { line -&gt;
+                    line.takeLastWhile { it != ' ' }
+                        .split(&quot;=&quot;)
+                        .let { (direction, n) -&gt;
+                            when (direction) {
+                                &quot;x&quot; -&gt; n.toInt() to 0
+                                &quot;y&quot; -&gt; 0 to n.toInt()
+                                else -&gt; error(&quot;Unknown direction $direction $n&quot;)
+                            }
+                        }
+                },
+            )
+        }
+    },
+    part1 = { (dots, foldList) -&gt;
+        dots.foldInPosition(foldList.first()).size
+    },
+    expectedTestPart1 = 17,
+    part2 = { (dots, foldList) -&gt;
+        val finalDots = foldList.fold(dots) { acc, foldIn -&gt; acc.foldInPosition(foldIn) }
+        printPaper(finalDots)
+        0
+    },
+    expectedTestPart2 = 0,
+)
+
+private fun printPaper(dots: List&lt;Pair&lt;Int, Int&gt;&gt;) {
+    (0..dots.maxOf { it.second }).forEach { y -&gt;
+        (0..dots.maxOf { it.first }).forEach { x -&gt;
+            print(if (x to y in dots) '#' else ' ')
+        }
+        println()
+    }
+}
+
+private fun List&lt;Pair&lt;Int, Int&gt;&gt;.foldInPosition(
+    foldIn: Pair&lt;Int, Int&gt;,
+): List&lt;Pair&lt;Int, Int&gt;&gt; {
+    val (foldX, foldY) = foldIn
+    return if (foldX != 0) {
+        map { (x, y) -&gt; (if (x &gt; foldX) 2 * foldX - x else x) to y }
+    } else {
+        map { (x, y) -&gt; x to (if (y &gt; foldY) 2 * foldY - y else y) }
+    }.distinct()
+}
+
+private data class TransparentPaper(
+    val dots: List&lt;Pair&lt;Int, Int&gt;&gt;,
+    val foldList: List&lt;Pair&lt;Int, Int&gt;&gt;,
+)
+//sampleEnd
+
+fun main() {
+    Day13.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;6,10
+0,14
+9,10
+0,3
+10,4
+4,11
+6,0
+6,12
+4,1
+0,13
+10,12
+3,4
+3,0
+8,4
+1,10
+2,14
+8,10
+9,0
+
+fold along y=7
+fold along x=5&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;994,18
+1014,343
+84,406
+219,849
+570,488
+575,395
+387,213
+904,382
+676,479
+1028,437
+500,123
+202,735
+716,315
+1153,822
+197,397
+678,154
+1104,285
+1041,799
+262,159
+925,543
+1193,299
+918,159
+1170,826
+1181,889
+938,9
+843,481
+5,480
+95,416
+944,831
+853,285
+276,108
+435,717
+616,383
+766,893
+863,611
+442,521
+5,446
+272,26
+1146,876
+244,845
+117,747
+457,397
+336,235
+249,169
+612,443
+251,693
+67,333
+376,840
+16,719
+1190,617
+95,857
+955,511
+984,180
+134,613
+413,145
+1141,416
+681,830
+162,308
+411,70
+1041,239
+184,382
+460,791
+798,79
+1161,429
+238,450
+649,296
+445,53
+616,495
+244,519
+669,781
+15,105
+157,296
+411,824
+713,450
+922,311
+373,173
+5,190
+1156,347
+1262,392
+441,656
+984,744
+810,123
+216,1
+395,185
+930,893
+669,864
+934,600
+160,121
+1170,628
+713,562
+512,290
+1058,618
+1294,719
+910,683
+338,661
+910,298
+172,547
+694,495
+1041,95
+875,717
+269,95
+902,385
+599,737
+825,693
+1232,848
+1138,235
+887,640
+1066,845
+13,47
+1272,511
+622,289
+1190,277
+1148,586
+776,3
+780,271
+713,239
+649,25
+107,513
+35,799
+825,84
+363,565
+609,621
+1250,708
+1121,605
+401,668
+306,810
+880,635
+628,98
+885,504
+952,694
+1116,254
+80,98
+947,351
+1067,152
+406,270
+1059,693
+1102,238
+785,30
+232,311
+1232,64
+994,876
+1133,429
+1260,330
+524,386
+167,324
+28,393
+132,516
+1305,296
+72,698
+385,254
+475,477
+587,287
+1049,168
+142,64
+172,235
+1002,679
+430,515
+741,593
+528,289
+768,266
+716,260
+910,235
+1305,704
+870,399
+1146,18
+1077,751
+281,53
+830,164
+306,35
+142,127
+610,880
+480,705
+1113,397
+257,51
+734,46
+649,598
+300,322
+1058,52
+913,843
+638,175
+1200,893
+1158,276
+1131,346
+1066,729
+669,47
+55,269
+1141,362
+774,208
+387,661
+842,555
+1181,617
+84,488
+85,301
+356,277
+196,297
+152,637
+274,221
+423,640
+1267,283
+1116,444
+412,854
+256,690
+656,240
+1278,737
+90,65
+522,516
+639,789
+527,351
+445,343
+576,848
+408,660
+1124,339
+641,113
+890,354
+239,611
+141,768
+1131,122
+413,749
+276,142
+937,534
+1133,1
+1148,296
+1086,483
+5,704
+706,142
+311,339
+915,185
+80,576
+103,294
+840,767
+928,607
+45,595
+710,714
+902,770
+236,325
+947,187
+1180,386
+1156,464
+251,201
+452,436
+1056,7
+214,292
+162,596
+415,425
+1297,864
+858,21
+922,235
+448,436
+632,292
+1156,99
+1158,637
+425,106
+785,478
+595,9
+1275,203
+971,28
+1255,269
+813,598
+1034,752
+974,222
+773,501
+1186,873
+788,378
+246,621
+1036,221
+50,330
+1118,225
+944,887
+843,654
+892,688
+10,170
+624,327
+59,325
+796,404
+560,583
+634,158
+430,820
+361,771
+1004,84
+848,732
+1020,577
+570,630
+951,255
+231,702
+186,555
+239,835
+177,270
+626,617
+597,2
+1068,488
+70,879
+939,507
+997,781
+202,383
+1174,124
+142,290
+1086,820
+763,269
+1246,383
+276,451
+308,215
+1232,512
+594,442
+1068,157
+1240,15
+22,451
+1017,729
+788,516
+35,95
+897,609
+189,605
+267,824
+701,299
+0,395
+447,163
+900,434
+691,691
+1062,270
+758,288
+1148,308
+902,124
+880,596
+796,490
+492,596
+470,319
+874,343
+535,275
+110,449
+894,2
+798,736
+1278,157
+932,786
+1226,712
+216,893
+186,714
+457,53
+1265,299
+1251,549
+959,688
+974,235
+631,861
+1161,653
+895,835
+59,9
+686,648
+1200,449
+956,602
+149,494
+234,92
+328,296
+872,757
+910,659
+353,136
+206,609
+43,171
+470,799
+246,385
+610,14
+669,113
+527,95
+1074,617
+1110,737
+726,879
+1069,749
+701,621
+773,119
+835,865
+1049,280
+567,374
+447,843
+1287,879
+1233,501
+743,822
+1124,180
+621,165
+1047,49
+681,136
+171,276
+753,240
+1064,621
+108,294
+688,157
+557,218
+149,429
+1230,268
+576,325
+616,368
+996,784
+534,3
+1092,175
+850,444
+731,28
+1081,838
+1022,78
+392,63
+383,849
+728,401
+669,847
+441,238
+415,835
+937,165
+154,99
+618,868
+764,294
+1012,893
+853,53
+569,581
+1146,856
+261,589
+1071,59
+994,170
+619,169
+20,747
+291,259
+864,238
+505,848
+177,449
+311,789
+97,228
+1091,717
+691,203
+65,502
+242,488
+1043,233
+1156,547
+1266,213
+525,49
+54,42
+974,683
+887,752
+1280,556
+1260,623
+775,619
+984,296
+256,204
+296,255
+1230,57
+397,101
+186,443
+1066,273
+246,273
+1064,837
+316,101
+569,761
+341,702
+570,264
+780,67
+341,192
+759,121
+536,208
+582,151
+1086,411
+512,736
+430,635
+78,288
+80,823
+1230,161
+1071,649
+1044,659
+1243,633
+90,887
+773,53
+1104,443
+443,609
+753,228
+1168,255
+218,175
+579,649
+564,719
+393,838
+304,292
+954,277
+1004,35
+200,157
+1034,108
+622,597
+246,572
+1299,527
+1094,893
+874,712
+108,495
+552,288
+1168,527
+1173,512
+634,606
+1056,289
+910,605
+713,892
+1092,742
+629,830
+678,227
+514,404
+1207,600
+1287,127
+186,180
+559,702
+213,600
+818,596
+33,640
+542,266
+13,296
+1290,411
+736,268
+339,82
+1011,511
+363,777
+1036,1
+129,617
+11,866
+436,103
+1146,756
+1052,448
+587,561
+194,254
+1302,211
+1076,92
+1250,583
+22,555
+955,383
+728,679
+393,56
+574,268
+171,724
+1138,224
+1056,887
+982,843
+470,751
+219,717
+649,89
+567,163
+957,382
+184,738
+574,71
+1047,497
+1153,192
+863,843
+318,211
+669,270
+348,35
+366,7
+949,837
+875,177
+269,640
+452,10
+338,618
+735,395
+713,655
+55,848
+1220,569
+693,476
+880,515
+609,273
+306,84
+199,298
+440,602
+137,605
+1267,723
+38,383
+208,238
+457,192
+140,107
+810,99
+371,507
+995,759
+157,192
+300,154
+607,621
+721,502
+1238,698
+1290,288
+50,527
+59,549
+335,618
+154,795
+261,676
+1170,787
+452,603
+291,351
+164,876
+1049,589
+366,455
+964,343
+1052,446
+567,420
+944,63
+90,271
+818,242
+1290,362
+110,1
+624,567
+243,152
+137,289
+528,605
+925,450
+544,585
+0,499
+1113,702
+430,298
+691,169
+740,45
+55,401
+107,625
+336,211
+530,827
+676,736
+400,298
+1064,273
+140,266
+199,596
+276,752
+843,240
+1288,443
+1168,830
+537,327
+1091,625
+172,323
+77,841
+738,823
+728,493
+1233,841
+1074,773
+569,593
+78,64
+1161,150
+474,831
+475,865
+904,737
+416,2
+688,289
+547,401
+80,621
+785,497
+746,7
+1069,637
+1297,296
+932,183
+783,635
+977,805
+241,749
+162,296
+594,260
+678,718
+979,324
+261,305
+782,93
+1092,623
+1049,726
+1216,311
+1020,317
+574,318
+1113,192
+194,327
+791,698
+773,327
+880,35
+259,261
+743,693
+1299,28
+1011,383
+525,254
+1305,414
+120,891
+962,604
+1280,567
+514,490
+11,28
+266,191
+1299,418
+892,211
+1173,323
+599,158
+1074,586
+678,740
+1180,829
+1092,719
+557,228
+214,714
+423,254
+1153,744
+692,868
+569,285
+726,463
+537,53
+1302,670
+1250,442
+723,561
+184,512
+520,613
+808,637
+72,316
+599,718
+796,68
+54,266
+952,639
+1278,297
+853,217
+1161,465
+567,245
+546,600
+932,527
+129,169
+574,519
+400,45
+743,474
+683,63
+219,625
+654,240
+402,394
+202,159
+1285,512
+885,390
+1019,19
+157,744
+927,176
+500,464
+177,429
+686,327
+830,730
+257,101
+997,593
+1056,148
+853,609
+828,771
+1078,311
+517,323
+567,72
+1074,596
+70,239
+372,661
+753,676
+1225,761
+8,352
+1133,744
+785,49
+1118,221
+1184,829
+23,575
+254,849
+632,624
+254,887
+641,623
+269,444
+351,688
+293,729
+254,148
+734,569
+574,621
+621,254
+410,210
+631,879
+72,663
+184,95
+8,318
+923,661
+1203,269
+482,99
+938,681
+1285,288
+600,714
+868,521
+691,317
+1272,495
+1043,824
+741,285
+820,74
+1233,53
+728,148
+984,598
+987,772
+326,296
+734,288
+1089,136
+587,261
+1240,879
+734,325
+90,623
+467,15
+1183,707
+80,733
+124,67
+514,826
+1235,245
+400,235
+1310,395
+1148,596
+1181,497
+971,866
+392,159
+713,444
+1299,866
+254,743
+32,597
+644,276
+1074,271
+885,106
+629,382
+87,245
+616,526
+363,187
+795,464
+740,264
+252,52
+191,420
+328,322
+520,501
+326,843
+869,238
+1215,857
+887,254
+274,1
+528,93
+927,830
+1202,399
+452,291
+865,343
+1041,640
+120,667
+132,416
+750,535
+845,289
+406,737
+1058,276
+557,464
+52,893
+604,142
+1081,676
+887,37
+272,868
+805,17
+1126,319
+564,623
+482,771
+956,322
+731,649
+1034,443
+811,394
+569,313
+412,830
+962,479
+904,624
+656,372
+710,490
+1255,401
+679,861
+551,121
+632,227
+1178,192
+977,744
+992,211
+1086,158
+378,527
+1297,47
+410,729
+438,85
+298,445
+582,764
+1251,773
+1000,719
+507,794
+909,668
+969,478
+843,413
+1308,101
+1230,716
+129,254
+458,745
+346,551
+313,593
+761,127
+1053,101
+304,602
+900,281
+1104,3
+736,57
+336,672
+134,137
+43,283
+746,439
+609,299
+1232,606
+689,254
+124,21
+1280,191
+715,9
+25,288
+869,656
+848,757
+870,752
+224,483
+915,136
+132,444
+1153,254
+552,606
+617,628
+177,445
+341,478
+348,290
+547,269
+682,98
+661,805
+743,374
+984,843
+236,569
+452,425
+646,542
+388,659
+1006,292
+339,28
+
+fold along x=655
+fold along y=447
+fold along x=327
+fold along y=223
+fold along x=163
+fold along y=111
+fold along x=81
+fold along y=55
+fold along x=40
+fold along y=27
+fold along y=13
+fold along y=6&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day14"><a href="#day14">Day 14</a> (<a href="https://adventofcode.com/2021/day/14">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/14
+object Day14 : AdventOfCode, Solution by Omar_Miatello(
+    day = 14,
+    parser = { lines -&gt;
+        SubmarinePolymerization(
+            initialValue = lines.first(),
+            converter = lines.drop(2)
+                .map { it.split(&quot; -&gt; &quot;).let { it[0] to it[1].first() } }
+                .groupBy({ it.first.first() }) { it.first[1] to it.second }
+                .mapValues { it.value.toMap() },
+        )
+    },
+    part1 = { (initialValue, converter) -&gt;
+        (1..10)
+            .fold(initialValue.toList()) { acc, _ -&gt;
+                acc.toList()
+                    .windowed(2) { (c1, c2) -&gt; listOf(c1, converter.convert(c1, c2)) }
+                    .flatten() + acc.last()
+            }
+            .groupingBy { it }
+            .eachCount()
+            .values
+            .sorted()
+            .let { counter -&gt; counter.last() - counter.first() }
+    },
+    expectedTestPart1 = 1588,
+    part2 = { (initialValue, converter) -&gt;
+        (1..40)
+            .fold(initialValue.toList().windowed(2).map { (c1, c2) -&gt; (c1 to c2) to 1L }.sum()) { acc, _ -&gt;
+                acc.flatMap { (pair, n) -&gt;
+                    val (c1, c2) = pair
+                    val x = converter.convert(c1, c2)
+                    listOf((c1 to x) to n, (x to c2) to n)
+                }.sum()
+            }
+            .map { (pair, n) -&gt; pair.first to n }
+            .groupBy({ it.first }) { it.second }
+            .mapValues { it.value.sum() }
+            .toMutableMap()
+            .also { map -&gt; map[initialValue.last()] = map.getValue(initialValue.last()) + 1 }
+            .values
+            .sorted()
+            .let { counter -&gt; counter.last() - counter.first() }
+    },
+    expectedTestPart2 = 2188189693529,
+)
+
+
+data class SubmarinePolymerization(
+    val initialValue: String,
+    val converter: Map&lt;Char, Map&lt;Char, Char&gt;&gt;,
+)
+
+private fun Map&lt;Char, Map&lt;Char, Char&gt;&gt;.convert(c1: Char, c2: Char) = getValue(c1).getValue(c2)
+
+private fun List&lt;Pair&lt;Pair&lt;Char, Char&gt;, Long&gt;&gt;.sum() = groupBy({ it.first }) { it.second }
+    .mapValues { it.value.sum() }
+    .toList()
+//sampleEnd
+
+fun main() {
+    Day14.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    expectedTestPart1: RES1,
+    part2: (PARSED) -&gt; RES2,
+    expectedTestPart2: RES2,
+    filenamePart1: String = &quot;Day${day}&quot;,
+    filenamePart2: String = &quot;Day${day}&quot;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        filename: String,
+        expected: RES? = null,
+        block: (List&lt;String&gt;) -&gt; RES,
+    ) {
+        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block(input) }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
+    on(filename = filenamePart1) { part1(parser(it)) }
+    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
+    on(filename = filenamePart2) { part2(parser(it)) }
+}
+
+val inputTest = &quot;&quot;&quot;NNCB
+
+CH -&gt; B
+HH -&gt; N
+CB -&gt; H
+NH -&gt; C
+HB -&gt; C
+HC -&gt; B
+HN -&gt; C
+NN -&gt; C
+BH -&gt; H
+NC -&gt; B
+NB -&gt; B
+BN -&gt; B
+BB -&gt; N
+BC -&gt; B
+CC -&gt; N
+CN -&gt; C&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;KOKHCCHNKKFHBKVVHNPN
+
+BN -&gt; C
+OS -&gt; K
+BK -&gt; C
+KO -&gt; V
+HF -&gt; K
+PS -&gt; B
+OK -&gt; C
+OC -&gt; B
+FH -&gt; K
+NV -&gt; F
+HO -&gt; H
+KK -&gt; H
+CV -&gt; P
+SC -&gt; C
+FK -&gt; N
+VV -&gt; F
+FN -&gt; F
+KP -&gt; O
+SB -&gt; O
+KF -&gt; B
+CH -&gt; K
+VF -&gt; K
+BH -&gt; H
+KV -&gt; F
+CO -&gt; N
+PK -&gt; N
+NH -&gt; P
+NN -&gt; C
+PP -&gt; H
+SH -&gt; N
+VO -&gt; O
+NC -&gt; F
+BC -&gt; B
+HC -&gt; H
+FS -&gt; C
+PN -&gt; F
+CK -&gt; K
+CN -&gt; V
+HS -&gt; S
+CB -&gt; N
+OF -&gt; B
+OV -&gt; K
+SK -&gt; S
+HP -&gt; C
+SN -&gt; P
+SP -&gt; B
+BP -&gt; C
+VP -&gt; C
+BS -&gt; K
+FV -&gt; F
+PH -&gt; P
+FF -&gt; P
+VK -&gt; F
+BV -&gt; S
+VB -&gt; S
+BF -&gt; O
+BB -&gt; H
+OB -&gt; B
+VS -&gt; P
+KB -&gt; P
+SF -&gt; N
+PF -&gt; S
+HH -&gt; P
+KN -&gt; K
+PC -&gt; B
+NB -&gt; O
+VC -&gt; P
+PV -&gt; H
+KH -&gt; O
+OP -&gt; O
+NF -&gt; K
+HN -&gt; P
+FC -&gt; H
+PO -&gt; B
+OH -&gt; C
+ON -&gt; N
+VN -&gt; B
+VH -&gt; F
+FO -&gt; B
+FP -&gt; B
+BO -&gt; H
+CC -&gt; P
+CS -&gt; K
+NO -&gt; V
+CF -&gt; N
+PB -&gt; H
+KS -&gt; P
+HK -&gt; S
+HB -&gt; K
+HV -&gt; O
+SV -&gt; H
+CP -&gt; S
+NP -&gt; N
+FB -&gt; B
+KC -&gt; V
+NS -&gt; P
+OO -&gt; V
+SO -&gt; O
+NK -&gt; K
+SS -&gt; H&quot;&quot;&quot;.lines()
+</code>
+
+</main>
+</body>
+</html>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+</head>
+
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 
 <script src="https://unpkg.com/kotlin-playground@1"></script>
 
