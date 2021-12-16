@@ -8,7 +8,7 @@ object Day10 : AdventOfCode, Solution by Omar_Miatello(
             .toMap()
         input.sumOf { line -> charToPoints[line.illegalChar] ?: 0 }
     },
-    expectedTestPart1 = 26397,
+    testsPart1 = result(26397),
     part2 = { input ->
         val charToPoints = Symbol.close.mapIndexed { i, c -> c to i + 1 }.toMap()
         input
@@ -26,7 +26,7 @@ object Day10 : AdventOfCode, Solution by Omar_Miatello(
             .sorted()
             .let { it[it.size / 2] }
     },
-    expectedTestPart2 = 288957,
+    testsPart2 = result(288957),
 )
 
 private object Symbol {

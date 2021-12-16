@@ -23,7 +23,7 @@ object Day14 : AdventOfCode, Solution by Omar_Miatello(
             .sorted()
             .let { counter -> counter.last() - counter.first() }
     },
-    expectedTestPart1 = 1588,
+    testsPart1 = result(1588),
     part2 = { (initialValue, converter) ->
         (1..40)
             .fold(initialValue.toList().windowed(2).map { (c1, c2) -> (c1 to c2) to 1L }.sum()) { acc, _ ->
@@ -42,7 +42,7 @@ object Day14 : AdventOfCode, Solution by Omar_Miatello(
             .sorted()
             .let { counter -> counter.last() - counter.first() }
     },
-    expectedTestPart2 = 2188189693529,
+    testsPart2 = result(2188189693529),
 )
 
 

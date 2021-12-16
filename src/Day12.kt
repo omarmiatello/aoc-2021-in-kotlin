@@ -17,7 +17,7 @@ object Day12 : AdventOfCode, Solution by Omar_Miatello(
 
         buildPaths("start").size
     },
-    expectedTestPart1 = 10,
+    testsPart1 = result(10),
     part2 = { input ->
         fun visitSmallCave(path: List<String>, child: String, canTwice: Boolean) = if (canTwice) {
             path.count { it == child } < 2
@@ -50,7 +50,7 @@ object Day12 : AdventOfCode, Solution by Omar_Miatello(
 
         buildPaths("start").size
     },
-    expectedTestPart2 = 36,
+    testsPart2 = result(36),
 )
 
 private fun List<List<String>>.toNodesMap() = flatMap { (v1, v2) -> listOf(v1 to v2, v2 to v1) }

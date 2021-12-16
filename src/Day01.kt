@@ -7,7 +7,7 @@ object Day01 : AdventOfCode, Solution by Omar_Miatello(
             .windowed(2)
             .count { it[1] > it[0] }
     },
-    expectedTestPart1 = 7,
+    testsPart1 = result(7),
     part2 = { input ->
         input
             .windowed(3)
@@ -15,5 +15,5 @@ object Day01 : AdventOfCode, Solution by Omar_Miatello(
             .windowed(2)
             .count { it[1] > it[0] }
     },
-    expectedTestPart2 = 5,
+    testsPart2 = result(5),
 )

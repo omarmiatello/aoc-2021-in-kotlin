@@ -9,7 +9,7 @@ object Day07 : AdventOfCode, Solution by Omar_Miatello(
             input.sumOf { abs(it - target) }
         }
     },
-    expectedTestPart1 = 37,
+    testsPart1 = result(37),
     part2 = { input ->
         (input.min..input.max).minOf { target ->
             input.sumOf {
@@ -18,7 +18,7 @@ object Day07 : AdventOfCode, Solution by Omar_Miatello(
             }
         }
     },
-    expectedTestPart2 = 168,
+    testsPart2 = result(168),
 )
 
 private val List<Int>.max get() = maxOf { it }

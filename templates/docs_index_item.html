@@ -20,19 +20,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -42,11 +39,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;<!--inputTest-->&quot;&quot;&quot;.lines()
 

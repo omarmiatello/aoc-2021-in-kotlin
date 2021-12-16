@@ -14,7 +14,7 @@ object Day05 : AdventOfCode, Solution by Omar_Miatello(
             .findDoublePoints()
             .size
     },
-    expectedTestPart1 = 5,
+    testsPart1 = result(5),
     part2 = { input ->
         input
             .filter {
@@ -25,7 +25,7 @@ object Day05 : AdventOfCode, Solution by Omar_Miatello(
             .findDoublePoints()
             .size
     },
-    expectedTestPart2 = 12,
+    testsPart2 = result(12),
 )
 
 private fun List<Line>.findDoublePoints(): Set<Pair<Int, Int>> {

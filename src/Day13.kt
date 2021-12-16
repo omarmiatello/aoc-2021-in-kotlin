@@ -22,16 +22,14 @@ object Day13 : AdventOfCode, Solution by Omar_Miatello(
             )
         }
     },
-    part1 = { (dots, foldList) ->
-        dots.foldInPosition(foldList.first()).size
-    },
-    expectedTestPart1 = 17,
+    part1 = { (dots, foldList) -> dots.foldInPosition(foldList.first()).size },
+    testsPart1 = result(17),
     part2 = { (dots, foldList) ->
         val finalDots = foldList.fold(dots) { acc, foldIn -> acc.foldInPosition(foldIn) }
         printPaper(finalDots)
         0
     },
-    expectedTestPart2 = 0,
+    testsPart2 = result(0),
 )
 
 private fun printPaper(dots: List<Pair<Int, Int>>) {

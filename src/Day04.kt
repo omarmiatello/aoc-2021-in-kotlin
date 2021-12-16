@@ -22,7 +22,7 @@ object Day04 : AdventOfCode, Solution by Omar_Miatello(
         }
         res
     },
-    expectedTestPart1 = 4512,
+    testsPart1 = result(4512),
     part2 = { (random, boards) ->
         var res = 0
         random.forEach { r ->
@@ -35,7 +35,7 @@ object Day04 : AdventOfCode, Solution by Omar_Miatello(
         }
         res
     },
-    expectedTestPart2 = 1924,
+    testsPart2 = result(1924),
 )
 
 private data class SquidGame(

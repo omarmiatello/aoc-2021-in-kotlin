@@ -3,7 +3,7 @@ object Day15 : AdventOfCode, Solution by Omar_Miatello(
     day = 15,
     parser = { lines -> lines.mapIndexed { y, row -> row.mapIndexed { x, c -> Chiton(x, y, risk = "$c".toInt()) } } },
     part1 = { input -> input.findShorterPathDistance() },
-    expectedTestPart1 = 40,
+    testsPart1 = result(40),
     part2 = { input ->
         val maxX = input.first().size
         val maxY = input.size
@@ -14,7 +14,7 @@ object Day15 : AdventOfCode, Solution by Omar_Miatello(
             }
         }.findShorterPathDistance()
     },
-    expectedTestPart2 = 315,
+    testsPart2 = result(315),
 )
 
 private data class Chiton(val x: Int, val y: Int, val risk: Int) {

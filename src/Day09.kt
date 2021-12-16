@@ -13,7 +13,7 @@ object Day09 : AdventOfCode, Solution by Omar_Miatello(
             }.map { it + 1 }
         }.sum()
     },
-    expectedTestPart1 = 15,
+    testsPart1 = result(15),
     part2 = { input ->
         val booleans = input.map { it.map { it != 9 }.toMutableList() }
         fun getOrFalse(x: Int, y: Int) = booleans.getOrNull(y)?.getOrNull(x) ?: false
@@ -28,5 +28,5 @@ object Day09 : AdventOfCode, Solution by Omar_Miatello(
         }
         basinSizes.sortedDescending().take(3).reduce { acc, n -> acc * n }
     },
-    expectedTestPart2 = 1134,
+    testsPart2 = result(1134),
 )

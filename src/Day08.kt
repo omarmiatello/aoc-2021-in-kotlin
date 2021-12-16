@@ -11,7 +11,7 @@ object Day08 : AdventOfCode, Solution by Omar_Miatello(
         val validDigitsLength = listOf(1, 4, 7, 8).map { allDigits[it].length }
         input.sumOf { (_, digits) -> digits.count { it.length in validDigitsLength } }
     },
-    expectedTestPart1 = 26,
+    testsPart1 = result(26),
     part2 = { input ->
         fun findBestConverters(
             converter: Converter?,
@@ -44,7 +44,7 @@ object Day08 : AdventOfCode, Solution by Omar_Miatello(
             digits.joinToString("") { digitReader.read(it).toString() }.toInt()
         }
     },
-    expectedTestPart2 = 61229,
+    testsPart2 = result(61229),
 )
 
 private fun <E> List<E>.permutations(): List<List<E>> {
@@ -65,7 +65,7 @@ private sealed interface Converter
 @JvmInline
 private value class Temp(
     private val segments: List<String> = allSegments.map { allSegments },
-): Converter {
+) : Converter {
     fun tryWith(num: Int, string: String): Converter? {
         val newConverter = segments.toMutableList()
         allDigits[num].booleans.forEachIndexed { index, shouldKeep ->
@@ -88,7 +88,7 @@ private value class Temp(
 @JvmInline
 private value class DigitReader(
     private val converter: Map<Char, Char>,
-): Converter {
+) : Converter {
     fun read(digit: String): Int {
         val realDigit = digit.map { converter.getValue(it) }.sorted().joinToString("")
         return allDigitsStrings.indexOf(realDigit)

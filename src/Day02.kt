@@ -15,7 +15,7 @@ object Day02 : AdventOfCode, Solution by Omar_Miatello(
             .reduce { acc, pair -> acc.first + pair.first to acc.second + pair.second }
             .let { (x, y) -> x * y }
     },
-    expectedTestPart1 = 150,
+    testsPart1 = result(150),
     part2 = { parsed ->
         var aim = 0
         var res = 0 to 0
@@ -29,5 +29,5 @@ object Day02 : AdventOfCode, Solution by Omar_Miatello(
         }
         res.first * res.second
     },
-    expectedTestPart2 = 900,
+    testsPart2 = result(900),
 )

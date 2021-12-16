@@ -7,7 +7,9 @@ import kotlin.time.measureTimedValue
 
 sealed interface AdventOfCode
 
-fun interface Solution { fun launch() }
+fun interface Solution {
+    fun launch()
+}
 
 fun List<KClass<out AdventOfCode>>.launchAll() = forEach { (it.objectInstance as Solution).launch() }
 
@@ -15,9 +17,9 @@ fun <PARSED, RES1, RES2> Omar_Miatello(
     day: Int,
     parser: (List<String>) -> PARSED,
     part1: (PARSED) -> RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -> List<Pair<List<String>, RES1>>,
     part2: (PARSED) -> RES2,
-    expectedTestPart2: RES2,
+    testsPart2: (Int) -> List<Pair<List<String>, RES2>>,
 ) = Solution {
     fun <RES> on(
         expected: RES? = null,
@@ -33,10 +35,15 @@ fun <PARSED, RES1, RES2> Omar_Miatello(
     }
 
     println("Day $day")
-    val parsedTest = parser(File("data", "Day${day}_test.txt").readLines())
     val parserDay = parser(File("data", "Day${day}.txt").readLines())
-    on(expected = expectedTestPart1) { part1(parsedTest) }
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
     on { part1(parserDay) }
-    on(expected = expectedTestPart2) { part2(parsedTest) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
     on { part2(parserDay) }
 }
+
+fun <RES> result(expected: RES): (Int) -> List<Pair<List<String>, RES>> = { day: Int ->
+    listOf(File("data", "Day${day}_test.txt").readLines() to expected)
+}
+
+fun <RES> results(vararg inputToRes: Pair<List<String>, RES>): (Int) -> List<Pair<List<String>, RES>> = { inputToRes.toList() }

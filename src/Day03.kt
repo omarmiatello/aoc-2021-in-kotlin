@@ -7,7 +7,7 @@ object Day03 : AdventOfCode, Solution by Omar_Miatello(
         val epsilon = input.commonsByIndex.toInt(valueFor1 = false)
         gamma * epsilon
     },
-    expectedTestPart1 = 198,
+    testsPart1 = result(198),
     part2 = { input ->
         fun findBest(
             initial: List<List<Boolean>>,
@@ -33,7 +33,7 @@ object Day03 : AdventOfCode, Solution by Omar_Miatello(
         )
         oxygen * co2
     },
-    expectedTestPart2 = 230,
+    testsPart2 = result(230),
 )
 
 private val List<List<Boolean>>.commonsByIndex: List<Boolean>

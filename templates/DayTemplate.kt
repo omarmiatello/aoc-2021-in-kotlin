@@ -6,10 +6,10 @@ object Day01 : AdventOfCode, Solution by Omar_Miatello(
         input.size
         1
     },
-    expectedTestPart1 = 1,
+    testsPart1 = result(1),
     part2 = { input ->
         input.size + 1
         2
     },
-    expectedTestPart2 = 2,
+    testsPart2 = result(2),
 )

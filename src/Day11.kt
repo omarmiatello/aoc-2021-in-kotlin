@@ -10,7 +10,7 @@ object Day11 : AdventOfCode, Solution by Omar_Miatello(
         }
         flashes
     },
-    expectedTestPart1 = 1656,
+    testsPart1 = result(1656),
     part2 = { input ->
         var all0Idx = 0
         input.loopUntil { loopIdx, frame ->
@@ -20,7 +20,7 @@ object Day11 : AdventOfCode, Solution by Omar_Miatello(
         }
         all0Idx
     },
-    expectedTestPart2 = 195,
+    testsPart2 = result(195),
 )
 
 private val nearbyPos: List<Pair<Int, Int>> = (-1..1).flatMap { x -> (-1..1).map { y -> x to y } } - (0 to 0)

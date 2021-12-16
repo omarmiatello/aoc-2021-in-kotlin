@@ -9,7 +9,7 @@ object Day06 : AdventOfCode, Solution by Omar_Miatello(
         }
         fishes.size
     },
-    expectedTestPart1 = 5934,
+    testsPart1 = result(5934),
     part2 = { input ->
         val cache = mutableMapOf<Pair<Int, Int>, Long>()
         fun countChildren(fish: Int, daysLeft: Int): Long = cache.getOrPut(daysLeft to fish) {
@@ -21,5 +21,5 @@ object Day06 : AdventOfCode, Solution by Omar_Miatello(
         }
         input.size + input.sumOf { fish -> countChildren(fish = fish, daysLeft = 256) }
     },
-    expectedTestPart2 = 26984457539,
+    testsPart2 = result(26984457539),
 )

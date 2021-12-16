@@ -36,7 +36,7 @@ object Day01 : AdventOfCode, Solution by Omar_Miatello(
             .windowed(2)
             .count { it[1] &gt; it[0] }
     },
-    expectedTestPart1 = 7,
+    testsPart1 = result(7),
     part2 = { input -&gt;
         input
             .windowed(3)
@@ -44,7 +44,7 @@ object Day01 : AdventOfCode, Solution by Omar_Miatello(
             .windowed(2)
             .count { it[1] &gt; it[0] }
     },
-    expectedTestPart2 = 5,
+    testsPart2 = result(5),
 )
 //sampleEnd
 
@@ -60,19 +60,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -82,11 +79,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;199
 200
@@ -2125,7 +2129,7 @@ object Day02 : AdventOfCode, Solution by Omar_Miatello(
             .reduce { acc, pair -&gt; acc.first + pair.first to acc.second + pair.second }
             .let { (x, y) -&gt; x * y }
     },
-    expectedTestPart1 = 150,
+    testsPart1 = result(150),
     part2 = { parsed -&gt;
         var aim = 0
         var res = 0 to 0
@@ -2139,7 +2143,7 @@ object Day02 : AdventOfCode, Solution by Omar_Miatello(
         }
         res.first * res.second
     },
-    expectedTestPart2 = 900,
+    testsPart2 = result(900),
 )
 //sampleEnd
 
@@ -2155,19 +2159,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -2177,11 +2178,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;forward 5
 down 5
@@ -3208,7 +3216,7 @@ object Day03 : AdventOfCode, Solution by Omar_Miatello(
         val epsilon = input.commonsByIndex.toInt(valueFor1 = false)
         gamma * epsilon
     },
-    expectedTestPart1 = 198,
+    testsPart1 = result(198),
     part2 = { input -&gt;
         fun findBest(
             initial: List&lt;List&lt;Boolean&gt;&gt;,
@@ -3234,7 +3242,7 @@ object Day03 : AdventOfCode, Solution by Omar_Miatello(
         )
         oxygen * co2
     },
-    expectedTestPart2 = 230,
+    testsPart2 = result(230),
 )
 
 private val List&lt;List&lt;Boolean&gt;&gt;.commonsByIndex: List&lt;Boolean&gt;
@@ -3256,19 +3264,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -3278,11 +3283,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;00100
 11110
@@ -4330,7 +4342,7 @@ object Day04 : AdventOfCode, Solution by Omar_Miatello(
         }
         res
     },
-    expectedTestPart1 = 4512,
+    testsPart1 = result(4512),
     part2 = { (random, boards) -&gt;
         var res = 0
         random.forEach { r -&gt;
@@ -4343,7 +4355,7 @@ object Day04 : AdventOfCode, Solution by Omar_Miatello(
         }
         res
     },
-    expectedTestPart2 = 1924,
+    testsPart2 = result(1924),
 )
 
 private data class SquidGame(
@@ -4378,19 +4390,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -4400,11 +4409,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
@@ -5052,7 +5068,7 @@ object Day05 : AdventOfCode, Solution by Omar_Miatello(
             .findDoublePoints()
             .size
     },
-    expectedTestPart1 = 5,
+    testsPart1 = result(5),
     part2 = { input -&gt;
         input
             .filter {
@@ -5063,7 +5079,7 @@ object Day05 : AdventOfCode, Solution by Omar_Miatello(
             .findDoublePoints()
             .size
     },
-    expectedTestPart2 = 12,
+    testsPart2 = result(12),
 )
 
 private fun List&lt;Line&gt;.findDoublePoints(): Set&lt;Pair&lt;Int, Int&gt;&gt; {
@@ -5099,19 +5115,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -5121,11 +5134,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;0,9 -&gt; 5,9
 8,0 -&gt; 0,8
@@ -5658,7 +5678,7 @@ object Day06 : AdventOfCode, Solution by Omar_Miatello(
         }
         fishes.size
     },
-    expectedTestPart1 = 5934,
+    testsPart1 = result(5934),
     part2 = { input -&gt;
         val cache = mutableMapOf&lt;Pair&lt;Int, Int&gt;, Long&gt;()
         fun countChildren(fish: Int, daysLeft: Int): Long = cache.getOrPut(daysLeft to fish) {
@@ -5670,7 +5690,7 @@ object Day06 : AdventOfCode, Solution by Omar_Miatello(
         }
         input.size + input.sumOf { fish -&gt; countChildren(fish = fish, daysLeft = 256) }
     },
-    expectedTestPart2 = 26984457539,
+    testsPart2 = result(26984457539),
 )
 //sampleEnd
 
@@ -5686,19 +5706,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -5708,11 +5725,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;3,4,3,1,2&quot;&quot;&quot;.lines()
 
@@ -5737,7 +5761,7 @@ object Day07 : AdventOfCode, Solution by Omar_Miatello(
             input.sumOf { abs(it - target) }
         }
     },
-    expectedTestPart1 = 37,
+    testsPart1 = result(37),
     part2 = { input -&gt;
         (input.min..input.max).minOf { target -&gt;
             input.sumOf {
@@ -5746,7 +5770,7 @@ object Day07 : AdventOfCode, Solution by Omar_Miatello(
             }
         }
     },
-    expectedTestPart2 = 168,
+    testsPart2 = result(168),
 )
 
 private val List&lt;Int&gt;.max get() = maxOf { it }
@@ -5765,19 +5789,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -5787,11 +5808,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;16,1,2,0,4,2,7,1,2,14&quot;&quot;&quot;.lines()
 
@@ -5818,7 +5846,7 @@ object Day08 : AdventOfCode, Solution by Omar_Miatello(
         val validDigitsLength = listOf(1, 4, 7, 8).map { allDigits[it].length }
         input.sumOf { (_, digits) -&gt; digits.count { it.length in validDigitsLength } }
     },
-    expectedTestPart1 = 26,
+    testsPart1 = result(26),
     part2 = { input -&gt;
         fun findBestConverters(
             converter: Converter?,
@@ -5851,7 +5879,7 @@ object Day08 : AdventOfCode, Solution by Omar_Miatello(
             digits.joinToString(&quot;&quot;) { digitReader.read(it).toString() }.toInt()
         }
     },
-    expectedTestPart2 = 61229,
+    testsPart2 = result(61229),
 )
 
 private fun &lt;E&gt; List&lt;E&gt;.permutations(): List&lt;List&lt;E&gt;&gt; {
@@ -5872,7 +5900,7 @@ private sealed interface Converter
 @JvmInline
 private value class Temp(
     private val segments: List&lt;String&gt; = allSegments.map { allSegments },
-): Converter {
+) : Converter {
     fun tryWith(num: Int, string: String): Converter? {
         val newConverter = segments.toMutableList()
         allDigits[num].booleans.forEachIndexed { index, shouldKeep -&gt;
@@ -5895,7 +5923,7 @@ private value class Temp(
 @JvmInline
 private value class DigitReader(
     private val converter: Map&lt;Char, Char&gt;,
-): Converter {
+) : Converter {
     fun read(digit: String): Int {
         val realDigit = digit.map { converter.getValue(it) }.sorted().joinToString(&quot;&quot;)
         return allDigitsStrings.indexOf(realDigit)
@@ -5937,19 +5965,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -5959,11 +5984,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
 edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
@@ -6200,7 +6232,7 @@ object Day09 : AdventOfCode, Solution by Omar_Miatello(
             }.map { it + 1 }
         }.sum()
     },
-    expectedTestPart1 = 15,
+    testsPart1 = result(15),
     part2 = { input -&gt;
         val booleans = input.map { it.map { it != 9 }.toMutableList() }
         fun getOrFalse(x: Int, y: Int) = booleans.getOrNull(y)?.getOrNull(x) ?: false
@@ -6215,7 +6247,7 @@ object Day09 : AdventOfCode, Solution by Omar_Miatello(
         }
         basinSizes.sortedDescending().take(3).reduce { acc, n -&gt; acc * n }
     },
-    expectedTestPart2 = 1134,
+    testsPart2 = result(1134),
 )
 //sampleEnd
 
@@ -6231,19 +6263,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -6253,11 +6282,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;2199943210
 3987894921
@@ -6384,7 +6420,7 @@ object Day10 : AdventOfCode, Solution by Omar_Miatello(
             .toMap()
         input.sumOf { line -&gt; charToPoints[line.illegalChar] ?: 0 }
     },
-    expectedTestPart1 = 26397,
+    testsPart1 = result(26397),
     part2 = { input -&gt;
         val charToPoints = Symbol.close.mapIndexed { i, c -&gt; c to i + 1 }.toMap()
         input
@@ -6402,7 +6438,7 @@ object Day10 : AdventOfCode, Solution by Omar_Miatello(
             .sorted()
             .let { it[it.size / 2] }
     },
-    expectedTestPart2 = 288957,
+    testsPart2 = result(288957),
 )
 
 private object Symbol {
@@ -6466,19 +6502,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -6488,11 +6521,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;[({(&lt;(())[]&gt;[[{[]{&lt;()&lt;&gt;&gt;
 [(()[&lt;&gt;])]({[&lt;{&lt;&lt;[]&gt;&gt;(
@@ -6628,7 +6668,7 @@ object Day11 : AdventOfCode, Solution by Omar_Miatello(
         }
         flashes
     },
-    expectedTestPart1 = 1656,
+    testsPart1 = result(1656),
     part2 = { input -&gt;
         var all0Idx = 0
         input.loopUntil { loopIdx, frame -&gt;
@@ -6638,7 +6678,7 @@ object Day11 : AdventOfCode, Solution by Omar_Miatello(
         }
         all0Idx
     },
-    expectedTestPart2 = 195,
+    testsPart2 = result(195),
 )
 
 private val nearbyPos: List&lt;Pair&lt;Int, Int&gt;&gt; = (-1..1).flatMap { x -&gt; (-1..1).map { y -&gt; x to y } } - (0 to 0)
@@ -6688,19 +6728,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -6710,11 +6747,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;5483143223
 2745854711
@@ -6765,7 +6809,7 @@ object Day12 : AdventOfCode, Solution by Omar_Miatello(
 
         buildPaths(&quot;start&quot;).size
     },
-    expectedTestPart1 = 10,
+    testsPart1 = result(10),
     part2 = { input -&gt;
         fun visitSmallCave(path: List&lt;String&gt;, child: String, canTwice: Boolean) = if (canTwice) {
             path.count { it == child } &lt; 2
@@ -6798,7 +6842,7 @@ object Day12 : AdventOfCode, Solution by Omar_Miatello(
 
         buildPaths(&quot;start&quot;).size
     },
-    expectedTestPart2 = 36,
+    testsPart2 = result(36),
 )
 
 private fun List&lt;List&lt;String&gt;&gt;.toNodesMap() = flatMap { (v1, v2) -&gt; listOf(v1 to v2, v2 to v1) }
@@ -6821,19 +6865,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -6843,11 +6884,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;start-A
 start-b
@@ -6914,16 +6962,14 @@ object Day13 : AdventOfCode, Solution by Omar_Miatello(
             )
         }
     },
-    part1 = { (dots, foldList) -&gt;
-        dots.foldInPosition(foldList.first()).size
-    },
-    expectedTestPart1 = 17,
+    part1 = { (dots, foldList) -&gt; dots.foldInPosition(foldList.first()).size },
+    testsPart1 = result(17),
     part2 = { (dots, foldList) -&gt;
         val finalDots = foldList.fold(dots) { acc, foldIn -&gt; acc.foldInPosition(foldIn) }
         printPaper(finalDots)
         0
     },
-    expectedTestPart2 = 0,
+    testsPart2 = result(0),
 )
 
 private fun printPaper(dots: List&lt;Pair&lt;Int, Int&gt;&gt;) {
@@ -6964,19 +7010,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -6986,11 +7029,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;6,10
 0,14
@@ -7969,7 +8019,7 @@ object Day14 : AdventOfCode, Solution by Omar_Miatello(
             .sorted()
             .let { counter -&gt; counter.last() - counter.first() }
     },
-    expectedTestPart1 = 1588,
+    testsPart1 = result(1588),
     part2 = { (initialValue, converter) -&gt;
         (1..40)
             .fold(initialValue.toList().windowed(2).map { (c1, c2) -&gt; (c1 to c2) to 1L }.sum()) { acc, _ -&gt;
@@ -7988,7 +8038,7 @@ object Day14 : AdventOfCode, Solution by Omar_Miatello(
             .sorted()
             .let { counter -&gt; counter.last() - counter.first() }
     },
-    expectedTestPart2 = 2188189693529,
+    testsPart2 = result(2188189693529),
 )
 
 
@@ -8016,19 +8066,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -8038,11 +8085,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;NNCB
 
@@ -8179,7 +8233,7 @@ object Day15 : AdventOfCode, Solution by Omar_Miatello(
     day = 15,
     parser = { lines -&gt; lines.mapIndexed { y, row -&gt; row.mapIndexed { x, c -&gt; Chiton(x, y, risk = &quot;$c&quot;.toInt()) } } },
     part1 = { input -&gt; input.findShorterPathDistance() },
-    expectedTestPart1 = 40,
+    testsPart1 = result(40),
     part2 = { input -&gt;
         val maxX = input.first().size
         val maxY = input.size
@@ -8190,7 +8244,7 @@ object Day15 : AdventOfCode, Solution by Omar_Miatello(
             }
         }.findShorterPathDistance()
     },
-    expectedTestPart2 = 315,
+    testsPart2 = result(315),
 )
 
 private data class Chiton(val x: Int, val y: Int, val risk: Int) {
@@ -8237,19 +8291,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -8259,11 +8310,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;1163751742
 1381373672
@@ -8425,7 +8483,7 @@ object Day01 : AdventOfCode, Solution by Omar_Miatello(
             .windowed(2)
             .count { it[1] &gt; it[0] }
     },
-    expectedTestPart1 = 7,
+    testsPart1 = result(7),
     part2 = { input -&gt;
         input
             .windowed(3)
@@ -8433,7 +8491,7 @@ object Day01 : AdventOfCode, Solution by Omar_Miatello(
             .windowed(2)
             .count { it[1] &gt; it[0] }
     },
-    expectedTestPart2 = 5,
+    testsPart2 = result(5),
 )
 //sampleEnd
 
@@ -8449,19 +8507,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -8471,11 +8526,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;199
 200
@@ -10514,7 +10576,7 @@ object Day02 : AdventOfCode, Solution by Omar_Miatello(
             .reduce { acc, pair -&gt; acc.first + pair.first to acc.second + pair.second }
             .let { (x, y) -&gt; x * y }
     },
-    expectedTestPart1 = 150,
+    testsPart1 = result(150),
     part2 = { parsed -&gt;
         var aim = 0
         var res = 0 to 0
@@ -10528,7 +10590,7 @@ object Day02 : AdventOfCode, Solution by Omar_Miatello(
         }
         res.first * res.second
     },
-    expectedTestPart2 = 900,
+    testsPart2 = result(900),
 )
 //sampleEnd
 
@@ -10544,19 +10606,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -10566,11 +10625,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;forward 5
 down 5
@@ -11597,7 +11663,7 @@ object Day03 : AdventOfCode, Solution by Omar_Miatello(
         val epsilon = input.commonsByIndex.toInt(valueFor1 = false)
         gamma * epsilon
     },
-    expectedTestPart1 = 198,
+    testsPart1 = result(198),
     part2 = { input -&gt;
         fun findBest(
             initial: List&lt;List&lt;Boolean&gt;&gt;,
@@ -11623,7 +11689,7 @@ object Day03 : AdventOfCode, Solution by Omar_Miatello(
         )
         oxygen * co2
     },
-    expectedTestPart2 = 230,
+    testsPart2 = result(230),
 )
 
 private val List&lt;List&lt;Boolean&gt;&gt;.commonsByIndex: List&lt;Boolean&gt;
@@ -11645,19 +11711,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -11667,11 +11730,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;00100
 11110
@@ -12719,7 +12789,7 @@ object Day04 : AdventOfCode, Solution by Omar_Miatello(
         }
         res
     },
-    expectedTestPart1 = 4512,
+    testsPart1 = result(4512),
     part2 = { (random, boards) -&gt;
         var res = 0
         random.forEach { r -&gt;
@@ -12732,7 +12802,7 @@ object Day04 : AdventOfCode, Solution by Omar_Miatello(
         }
         res
     },
-    expectedTestPart2 = 1924,
+    testsPart2 = result(1924),
 )
 
 private data class SquidGame(
@@ -12767,19 +12837,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -12789,11 +12856,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
@@ -13441,7 +13515,7 @@ object Day05 : AdventOfCode, Solution by Omar_Miatello(
             .findDoublePoints()
             .size
     },
-    expectedTestPart1 = 5,
+    testsPart1 = result(5),
     part2 = { input -&gt;
         input
             .filter {
@@ -13452,7 +13526,7 @@ object Day05 : AdventOfCode, Solution by Omar_Miatello(
             .findDoublePoints()
             .size
     },
-    expectedTestPart2 = 12,
+    testsPart2 = result(12),
 )
 
 private fun List&lt;Line&gt;.findDoublePoints(): Set&lt;Pair&lt;Int, Int&gt;&gt; {
@@ -13488,19 +13562,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -13510,11 +13581,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;0,9 -&gt; 5,9
 8,0 -&gt; 0,8
@@ -14047,7 +14125,7 @@ object Day06 : AdventOfCode, Solution by Omar_Miatello(
         }
         fishes.size
     },
-    expectedTestPart1 = 5934,
+    testsPart1 = result(5934),
     part2 = { input -&gt;
         val cache = mutableMapOf&lt;Pair&lt;Int, Int&gt;, Long&gt;()
         fun countChildren(fish: Int, daysLeft: Int): Long = cache.getOrPut(daysLeft to fish) {
@@ -14059,7 +14137,7 @@ object Day06 : AdventOfCode, Solution by Omar_Miatello(
         }
         input.size + input.sumOf { fish -&gt; countChildren(fish = fish, daysLeft = 256) }
     },
-    expectedTestPart2 = 26984457539,
+    testsPart2 = result(26984457539),
 )
 //sampleEnd
 
@@ -14075,19 +14153,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -14097,11 +14172,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;3,4,3,1,2&quot;&quot;&quot;.lines()
 
@@ -14126,7 +14208,7 @@ object Day07 : AdventOfCode, Solution by Omar_Miatello(
             input.sumOf { abs(it - target) }
         }
     },
-    expectedTestPart1 = 37,
+    testsPart1 = result(37),
     part2 = { input -&gt;
         (input.min..input.max).minOf { target -&gt;
             input.sumOf {
@@ -14135,7 +14217,7 @@ object Day07 : AdventOfCode, Solution by Omar_Miatello(
             }
         }
     },
-    expectedTestPart2 = 168,
+    testsPart2 = result(168),
 )
 
 private val List&lt;Int&gt;.max get() = maxOf { it }
@@ -14154,19 +14236,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -14176,11 +14255,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;16,1,2,0,4,2,7,1,2,14&quot;&quot;&quot;.lines()
 
@@ -14207,7 +14293,7 @@ object Day08 : AdventOfCode, Solution by Omar_Miatello(
         val validDigitsLength = listOf(1, 4, 7, 8).map { allDigits[it].length }
         input.sumOf { (_, digits) -&gt; digits.count { it.length in validDigitsLength } }
     },
-    expectedTestPart1 = 26,
+    testsPart1 = result(26),
     part2 = { input -&gt;
         fun findBestConverters(
             converter: Converter?,
@@ -14240,7 +14326,7 @@ object Day08 : AdventOfCode, Solution by Omar_Miatello(
             digits.joinToString(&quot;&quot;) { digitReader.read(it).toString() }.toInt()
         }
     },
-    expectedTestPart2 = 61229,
+    testsPart2 = result(61229),
 )
 
 private fun &lt;E&gt; List&lt;E&gt;.permutations(): List&lt;List&lt;E&gt;&gt; {
@@ -14261,7 +14347,7 @@ private sealed interface Converter
 @JvmInline
 private value class Temp(
     private val segments: List&lt;String&gt; = allSegments.map { allSegments },
-): Converter {
+) : Converter {
     fun tryWith(num: Int, string: String): Converter? {
         val newConverter = segments.toMutableList()
         allDigits[num].booleans.forEachIndexed { index, shouldKeep -&gt;
@@ -14284,7 +14370,7 @@ private value class Temp(
 @JvmInline
 private value class DigitReader(
     private val converter: Map&lt;Char, Char&gt;,
-): Converter {
+) : Converter {
     fun read(digit: String): Int {
         val realDigit = digit.map { converter.getValue(it) }.sorted().joinToString(&quot;&quot;)
         return allDigitsStrings.indexOf(realDigit)
@@ -14326,19 +14412,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -14348,11 +14431,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
 edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
@@ -14589,7 +14679,7 @@ object Day09 : AdventOfCode, Solution by Omar_Miatello(
             }.map { it + 1 }
         }.sum()
     },
-    expectedTestPart1 = 15,
+    testsPart1 = result(15),
     part2 = { input -&gt;
         val booleans = input.map { it.map { it != 9 }.toMutableList() }
         fun getOrFalse(x: Int, y: Int) = booleans.getOrNull(y)?.getOrNull(x) ?: false
@@ -14604,7 +14694,7 @@ object Day09 : AdventOfCode, Solution by Omar_Miatello(
         }
         basinSizes.sortedDescending().take(3).reduce { acc, n -&gt; acc * n }
     },
-    expectedTestPart2 = 1134,
+    testsPart2 = result(1134),
 )
 //sampleEnd
 
@@ -14620,19 +14710,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -14642,11 +14729,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;2199943210
 3987894921
@@ -14773,7 +14867,7 @@ object Day10 : AdventOfCode, Solution by Omar_Miatello(
             .toMap()
         input.sumOf { line -&gt; charToPoints[line.illegalChar] ?: 0 }
     },
-    expectedTestPart1 = 26397,
+    testsPart1 = result(26397),
     part2 = { input -&gt;
         val charToPoints = Symbol.close.mapIndexed { i, c -&gt; c to i + 1 }.toMap()
         input
@@ -14791,7 +14885,7 @@ object Day10 : AdventOfCode, Solution by Omar_Miatello(
             .sorted()
             .let { it[it.size / 2] }
     },
-    expectedTestPart2 = 288957,
+    testsPart2 = result(288957),
 )
 
 private object Symbol {
@@ -14855,19 +14949,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -14877,11 +14968,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;[({(&lt;(())[]&gt;[[{[]{&lt;()&lt;&gt;&gt;
 [(()[&lt;&gt;])]({[&lt;{&lt;&lt;[]&gt;&gt;(
@@ -15017,7 +15115,7 @@ object Day11 : AdventOfCode, Solution by Omar_Miatello(
         }
         flashes
     },
-    expectedTestPart1 = 1656,
+    testsPart1 = result(1656),
     part2 = { input -&gt;
         var all0Idx = 0
         input.loopUntil { loopIdx, frame -&gt;
@@ -15027,7 +15125,7 @@ object Day11 : AdventOfCode, Solution by Omar_Miatello(
         }
         all0Idx
     },
-    expectedTestPart2 = 195,
+    testsPart2 = result(195),
 )
 
 private val nearbyPos: List&lt;Pair&lt;Int, Int&gt;&gt; = (-1..1).flatMap { x -&gt; (-1..1).map { y -&gt; x to y } } - (0 to 0)
@@ -15077,19 +15175,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -15099,11 +15194,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;5483143223
 2745854711
@@ -15154,7 +15256,7 @@ object Day12 : AdventOfCode, Solution by Omar_Miatello(
 
         buildPaths(&quot;start&quot;).size
     },
-    expectedTestPart1 = 10,
+    testsPart1 = result(10),
     part2 = { input -&gt;
         fun visitSmallCave(path: List&lt;String&gt;, child: String, canTwice: Boolean) = if (canTwice) {
             path.count { it == child } &lt; 2
@@ -15187,7 +15289,7 @@ object Day12 : AdventOfCode, Solution by Omar_Miatello(
 
         buildPaths(&quot;start&quot;).size
     },
-    expectedTestPart2 = 36,
+    testsPart2 = result(36),
 )
 
 private fun List&lt;List&lt;String&gt;&gt;.toNodesMap() = flatMap { (v1, v2) -&gt; listOf(v1 to v2, v2 to v1) }
@@ -15210,19 +15312,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -15232,11 +15331,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;start-A
 start-b
@@ -15303,16 +15409,14 @@ object Day13 : AdventOfCode, Solution by Omar_Miatello(
             )
         }
     },
-    part1 = { (dots, foldList) -&gt;
-        dots.foldInPosition(foldList.first()).size
-    },
-    expectedTestPart1 = 17,
+    part1 = { (dots, foldList) -&gt; dots.foldInPosition(foldList.first()).size },
+    testsPart1 = result(17),
     part2 = { (dots, foldList) -&gt;
         val finalDots = foldList.fold(dots) { acc, foldIn -&gt; acc.foldInPosition(foldIn) }
         printPaper(finalDots)
         0
     },
-    expectedTestPart2 = 0,
+    testsPart2 = result(0),
 )
 
 private fun printPaper(dots: List&lt;Pair&lt;Int, Int&gt;&gt;) {
@@ -15353,19 +15457,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -15375,11 +15476,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;6,10
 0,14
@@ -16358,7 +16466,7 @@ object Day14 : AdventOfCode, Solution by Omar_Miatello(
             .sorted()
             .let { counter -&gt; counter.last() - counter.first() }
     },
-    expectedTestPart1 = 1588,
+    testsPart1 = result(1588),
     part2 = { (initialValue, converter) -&gt;
         (1..40)
             .fold(initialValue.toList().windowed(2).map { (c1, c2) -&gt; (c1 to c2) to 1L }.sum()) { acc, _ -&gt;
@@ -16377,7 +16485,7 @@ object Day14 : AdventOfCode, Solution by Omar_Miatello(
             .sorted()
             .let { counter -&gt; counter.last() - counter.first() }
     },
-    expectedTestPart2 = 2188189693529,
+    testsPart2 = result(2188189693529),
 )
 
 
@@ -16405,19 +16513,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -16427,11 +16532,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;NNCB
 
@@ -16568,7 +16680,7 @@ object Day15 : AdventOfCode, Solution by Omar_Miatello(
     day = 15,
     parser = { lines -&gt; lines.mapIndexed { y, row -&gt; row.mapIndexed { x, c -&gt; Chiton(x, y, risk = &quot;$c&quot;.toInt()) } } },
     part1 = { input -&gt; input.findShorterPathDistance() },
-    expectedTestPart1 = 40,
+    testsPart1 = result(40),
     part2 = { input -&gt;
         val maxX = input.first().size
         val maxY = input.size
@@ -16579,7 +16691,7 @@ object Day15 : AdventOfCode, Solution by Omar_Miatello(
             }
         }.findShorterPathDistance()
     },
-    expectedTestPart2 = 315,
+    testsPart2 = result(315),
 )
 
 private data class Chiton(val x: Int, val y: Int, val risk: Int) {
@@ -16626,19 +16738,16 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     day: Int,
     parser: (List&lt;String&gt;) -&gt; PARSED,
     part1: (PARSED) -&gt; RES1,
-    expectedTestPart1: RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
     part2: (PARSED) -&gt; RES2,
-    expectedTestPart2: RES2,
-    filenamePart1: String = &quot;Day${day}&quot;,
-    filenamePart2: String = &quot;Day${day}&quot;,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
 ) = Solution {
     fun &lt;RES&gt; on(
-        filename: String,
         expected: RES? = null,
-        block: (List&lt;String&gt;) -&gt; RES,
+        block: () -&gt; RES,
     ) {
-        val input = if (filename.endsWith(&quot;test&quot;)) inputTest else inputDay
-        val (output, duration) = measureTimedValue { block(input) }
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
         val millis = duration.inWholeMilliseconds
         if (expected != null) {
             check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
@@ -16648,11 +16757,18 @@ fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
     }
 
     println(&quot;Day $day&quot;)
-    on(filename = &quot;${filenamePart1}_test&quot;, expected = expectedTestPart1) { part1(parser(it)) }
-    on(filename = filenamePart1) { part1(parser(it)) }
-    on(filename = &quot;${filenamePart2}_test&quot;, expected = expectedTestPart2) { part2(parser(it)) }
-    on(filename = filenamePart2) { part2(parser(it)) }
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
 }
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
 
 val inputTest = &quot;&quot;&quot;1163751742
 1381373672
