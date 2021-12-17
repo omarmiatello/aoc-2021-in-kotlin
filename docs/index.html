@@ -8436,6 +8436,152 @@ val inputDay = &quot;&quot;&quot;86561753431194399473119191792793772576891976829
 8391247911139217869276338998734496391173478717461631572924754792241695917352991662734191814376765142&quot;&quot;&quot;.lines()
 </code>
 
+
+<h2 id="day16"><a href="#day16">Day 16</a> (<a href="https://adventofcode.com/2021/day/16">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/16
+object Day16 : AdventOfCode, Solution by Omar_Miatello(
+    day = 16,
+    parser = { lines -&gt; lines.first().flatMap { it.digitToInt(16).toString(2).padStart(4, '0').toList() } },
+    part1 = { input -&gt;
+        fun Packet.versions(): Int = when (this) {
+            is LiteralValue -&gt; version
+            is Operator -&gt; version + packets.sumOf { it.versions() }
+        }
+        input.iterator().parsePacket().versions()
+    },
+    testsPart1 = results(
+        &quot;D2FE28&quot;.lines() to 6,
+        &quot;38006F45291200&quot;.lines() to 9,
+        &quot;EE00D40C823060&quot;.lines() to 14,
+        &quot;8A004A801A8002F478&quot;.lines() to 16,
+        &quot;620080001611562C8802118E34&quot;.lines() to 12,
+        &quot;C0015000016115A2E0802F182340&quot;.lines() to 23,
+        &quot;A0016C880162017C3686B18A3D4780&quot;.lines() to 31,
+    ),
+    part2 = { input -&gt;
+        fun Packet.resolve(): Long {
+            return when (this) {
+                is LiteralValue -&gt; literalValue
+                is Operator -&gt; {
+                    val values = packets.map { it.resolve() }
+                    return when (type) {
+                        OperatorType.Sum -&gt; values.sum()
+                        OperatorType.Product -&gt; values.reduce { acc, n -&gt; acc * n }
+                        OperatorType.Minimum -&gt; values.minOf { it }
+                        OperatorType.Maximum -&gt; values.maxOf { it }
+                        OperatorType.LiteralValue -&gt; error(&quot;What a Terrible Failure!&quot;)
+                        OperatorType.GreaterThan -&gt; if (values[0] &gt; values[1]) 1 else 0
+                        OperatorType.LessThan -&gt; if (values[0] &lt; values[1]) 1 else 0
+                        OperatorType.EqualTo -&gt; if (values[0] == values[1]) 1 else 0
+                    }
+                }
+            }
+        }
+        input.iterator().parsePacket().resolve()
+    },
+    testsPart2 = results(
+        &quot;C200B40A82&quot;.lines() to 3,
+        &quot;04005AC33890&quot;.lines() to 54,
+        &quot;880086C3E88112&quot;.lines() to 7,
+        &quot;CE00C43D881120&quot;.lines() to 9,
+        &quot;D8005AC2A8F0&quot;.lines() to 1,
+        &quot;F600BC2D8F&quot;.lines() to 0,
+        &quot;9C005AC2F8F0&quot;.lines() to 0,
+        &quot;9C0141080250320F1802104A08&quot;.lines() to 1,
+    ),
+)
+
+private sealed interface Packet
+private data class LiteralValue(val version: Int, val type: OperatorType, val literalValue: Long) : Packet
+private data class Operator(val version: Int, val type: OperatorType, val packets: List&lt;Packet&gt;) : Packet
+private enum class OperatorType { Sum, Product, Minimum, Maximum, LiteralValue, GreaterThan, LessThan, EqualTo }
+
+private fun Iterator&lt;Char&gt;.parsePacket(): Packet {
+    val version = nextInt(size = 3)
+    val type = OperatorType.values()[nextInt(size = 3)]
+    return if (type == OperatorType.LiteralValue) LiteralValue(
+        version = version,
+        type = type,
+        literalValue = nextLiteralValue(),
+    ) else {
+        val isTotalLength = next() == '0'
+        Operator(
+            version = version,
+            type = type,
+            packets = if (isTotalLength) {
+                val totalLength = nextInt(15)
+                val iterator = next(totalLength).iterator()
+                buildList { while (iterator.hasNext()) add(iterator.parsePacket()) }
+            } else {
+                val numberOfPackets = nextInt(11)
+                (1..numberOfPackets).map { parsePacket() }
+            },
+        )
+    }
+}
+
+private fun Iterator&lt;Char&gt;.next(size: Int) = List(size) { next() }.joinToString(&quot;&quot;)
+private fun Iterator&lt;Char&gt;.nextInt(size: Int) = next(size).toInt(2)
+private fun Iterator&lt;Char&gt;.nextLiteralValue(): Long = buildString {
+    while (next() == '1') append(next(size = 4))
+    append(next(size = 4))
+}.toLong(2)
+//sampleEnd
+
+fun main() {
+    Day16.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
+    part2: (PARSED) -&gt; RES2,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        expected: RES? = null,
+        block: () -&gt; RES,
+    ) {
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
+}
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
+
+val inputTest = &quot;&quot;&quot;A0016C880162017C3686B18A3D4780&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;020D74FCE27E600A78020200DC298F1070401C8EF1F21A4D6394F9F48F4C1C00E3003500C74602F0080B1720298C400B7002540095003DC00F601B98806351003D004F66011148039450025C00B2007024717AFB5FBC11A7E73AF60F660094E5793A4E811C0123CECED79104ECED791380069D2522B96A53A81286B18263F75A300526246F60094A6651429ADB3B0068937BCF31A009ADB4C289C9C66526014CB33CB81CB3649B849911803B2EB1327F3CFC60094B01CBB4B80351E66E26B2DD0530070401C82D182080803D1C627C330004320C43789C40192D002F93566A9AFE5967372B378001F525DDDCF0C010A00D440010E84D10A2D0803D1761045C9EA9D9802FE00ACF1448844E9C30078723101912594FEE9C9A548D57A5B8B04012F6002092845284D3301A8951C8C008973D30046136001B705A79BD400B9ECCFD30E3004E62BD56B004E465D911C8CBB2258B06009D802C00087C628C71C4001088C113E27C6B10064C01E86F042181002131EE26C5D20043E34C798246009E80293F9E530052A4910A7E87240195CC7C6340129A967EF9352CFDF0802059210972C977094281007664E206CD57292201349AA4943554D91C9CCBADB80232C6927DE5E92D7A10463005A4657D4597002BC9AF51A24A54B7B33A73E2CE005CBFB3B4A30052801F69DB4B08F3B6961024AD4B43E6B319AA020020F15E4B46E40282CCDBF8CA56802600084C788CB088401A8911C20ECC436C2401CED0048325CC7A7F8CAA912AC72B7024007F24B1F789C0F9EC8810090D801AB8803D11E34C3B00043E27C6989B2C52A01348E24B53531291C4FF4884C9C2C10401B8C9D2D875A0072E6FB75E92AC205CA0154CE7398FB0053DAC3F43295519C9AE080250E657410600BC9EAD9CA56001BF3CEF07A5194C013E00542462332DA4295680&quot;&quot;&quot;.lines()
+</code>
+
 </main>
 </body>
 </html>
@@ -16881,6 +17027,152 @@ val inputDay = &quot;&quot;&quot;86561753431194399473119191792793772576891976829
 9111571922348271733199797953979536915998195916688317991255916216419817129423728913622269119972958686
 9959599568987335314713638999897919449512991684446347789183915679567141547281548619496728636288445972
 8391247911139217869276338998734496391173478717461631572924754792241695917352991662734191814376765142&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day16"><a href="#day16">Day 16</a> (<a href="https://adventofcode.com/2021/day/16">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/16
+object Day16 : AdventOfCode, Solution by Omar_Miatello(
+    day = 16,
+    parser = { lines -&gt; lines.first().flatMap { it.digitToInt(16).toString(2).padStart(4, '0').toList() } },
+    part1 = { input -&gt;
+        fun Packet.versions(): Int = when (this) {
+            is LiteralValue -&gt; version
+            is Operator -&gt; version + packets.sumOf { it.versions() }
+        }
+        input.iterator().parsePacket().versions()
+    },
+    testsPart1 = results(
+        &quot;D2FE28&quot;.lines() to 6,
+        &quot;38006F45291200&quot;.lines() to 9,
+        &quot;EE00D40C823060&quot;.lines() to 14,
+        &quot;8A004A801A8002F478&quot;.lines() to 16,
+        &quot;620080001611562C8802118E34&quot;.lines() to 12,
+        &quot;C0015000016115A2E0802F182340&quot;.lines() to 23,
+        &quot;A0016C880162017C3686B18A3D4780&quot;.lines() to 31,
+    ),
+    part2 = { input -&gt;
+        fun Packet.resolve(): Long {
+            return when (this) {
+                is LiteralValue -&gt; literalValue
+                is Operator -&gt; {
+                    val values = packets.map { it.resolve() }
+                    return when (type) {
+                        OperatorType.Sum -&gt; values.sum()
+                        OperatorType.Product -&gt; values.reduce { acc, n -&gt; acc * n }
+                        OperatorType.Minimum -&gt; values.minOf { it }
+                        OperatorType.Maximum -&gt; values.maxOf { it }
+                        OperatorType.LiteralValue -&gt; error(&quot;What a Terrible Failure!&quot;)
+                        OperatorType.GreaterThan -&gt; if (values[0] &gt; values[1]) 1 else 0
+                        OperatorType.LessThan -&gt; if (values[0] &lt; values[1]) 1 else 0
+                        OperatorType.EqualTo -&gt; if (values[0] == values[1]) 1 else 0
+                    }
+                }
+            }
+        }
+        input.iterator().parsePacket().resolve()
+    },
+    testsPart2 = results(
+        &quot;C200B40A82&quot;.lines() to 3,
+        &quot;04005AC33890&quot;.lines() to 54,
+        &quot;880086C3E88112&quot;.lines() to 7,
+        &quot;CE00C43D881120&quot;.lines() to 9,
+        &quot;D8005AC2A8F0&quot;.lines() to 1,
+        &quot;F600BC2D8F&quot;.lines() to 0,
+        &quot;9C005AC2F8F0&quot;.lines() to 0,
+        &quot;9C0141080250320F1802104A08&quot;.lines() to 1,
+    ),
+)
+
+private sealed interface Packet
+private data class LiteralValue(val version: Int, val type: OperatorType, val literalValue: Long) : Packet
+private data class Operator(val version: Int, val type: OperatorType, val packets: List&lt;Packet&gt;) : Packet
+private enum class OperatorType { Sum, Product, Minimum, Maximum, LiteralValue, GreaterThan, LessThan, EqualTo }
+
+private fun Iterator&lt;Char&gt;.parsePacket(): Packet {
+    val version = nextInt(size = 3)
+    val type = OperatorType.values()[nextInt(size = 3)]
+    return if (type == OperatorType.LiteralValue) LiteralValue(
+        version = version,
+        type = type,
+        literalValue = nextLiteralValue(),
+    ) else {
+        val isTotalLength = next() == '0'
+        Operator(
+            version = version,
+            type = type,
+            packets = if (isTotalLength) {
+                val totalLength = nextInt(15)
+                val iterator = next(totalLength).iterator()
+                buildList { while (iterator.hasNext()) add(iterator.parsePacket()) }
+            } else {
+                val numberOfPackets = nextInt(11)
+                (1..numberOfPackets).map { parsePacket() }
+            },
+        )
+    }
+}
+
+private fun Iterator&lt;Char&gt;.next(size: Int) = List(size) { next() }.joinToString(&quot;&quot;)
+private fun Iterator&lt;Char&gt;.nextInt(size: Int) = next(size).toInt(2)
+private fun Iterator&lt;Char&gt;.nextLiteralValue(): Long = buildString {
+    while (next() == '1') append(next(size = 4))
+    append(next(size = 4))
+}.toLong(2)
+//sampleEnd
+
+fun main() {
+    Day16.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
+    part2: (PARSED) -&gt; RES2,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        expected: RES? = null,
+        block: () -&gt; RES,
+    ) {
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
+}
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
+
+val inputTest = &quot;&quot;&quot;A0016C880162017C3686B18A3D4780&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;020D74FCE27E600A78020200DC298F1070401C8EF1F21A4D6394F9F48F4C1C00E3003500C74602F0080B1720298C400B7002540095003DC00F601B98806351003D004F66011148039450025C00B2007024717AFB5FBC11A7E73AF60F660094E5793A4E811C0123CECED79104ECED791380069D2522B96A53A81286B18263F75A300526246F60094A6651429ADB3B0068937BCF31A009ADB4C289C9C66526014CB33CB81CB3649B849911803B2EB1327F3CFC60094B01CBB4B80351E66E26B2DD0530070401C82D182080803D1C627C330004320C43789C40192D002F93566A9AFE5967372B378001F525DDDCF0C010A00D440010E84D10A2D0803D1761045C9EA9D9802FE00ACF1448844E9C30078723101912594FEE9C9A548D57A5B8B04012F6002092845284D3301A8951C8C008973D30046136001B705A79BD400B9ECCFD30E3004E62BD56B004E465D911C8CBB2258B06009D802C00087C628C71C4001088C113E27C6B10064C01E86F042181002131EE26C5D20043E34C798246009E80293F9E530052A4910A7E87240195CC7C6340129A967EF9352CFDF0802059210972C977094281007664E206CD57292201349AA4943554D91C9CCBADB80232C6927DE5E92D7A10463005A4657D4597002BC9AF51A24A54B7B33A73E2CE005CBFB3B4A30052801F69DB4B08F3B6961024AD4B43E6B319AA020020F15E4B46E40282CCDBF8CA56802600084C788CB088401A8911C20ECC436C2401CED0048325CC7A7F8CAA912AC72B7024007F24B1F789C0F9EC8810090D801AB8803D11E34C3B00043E27C6989B2C52A01348E24B53531291C4FF4884C9C2C10401B8C9D2D875A0072E6FB75E92AC205CA0154CE7398FB0053DAC3F43295519C9AE080250E657410600BC9EAD9CA56001BF3CEF07A5194C013E00542462332DA4295680&quot;&quot;&quot;.lines()
 </code>
 
 </div>
