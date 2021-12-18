@@ -8582,6 +8582,102 @@ val inputTest = &quot;&quot;&quot;A0016C880162017C3686B18A3D4780&quot;&quot;&quo
 val inputDay = &quot;&quot;&quot;020D74FCE27E600A78020200DC298F1070401C8EF1F21A4D6394F9F48F4C1C00E3003500C74602F0080B1720298C400B7002540095003DC00F601B98806351003D004F66011148039450025C00B2007024717AFB5FBC11A7E73AF60F660094E5793A4E811C0123CECED79104ECED791380069D2522B96A53A81286B18263F75A300526246F60094A6651429ADB3B0068937BCF31A009ADB4C289C9C66526014CB33CB81CB3649B849911803B2EB1327F3CFC60094B01CBB4B80351E66E26B2DD0530070401C82D182080803D1C627C330004320C43789C40192D002F93566A9AFE5967372B378001F525DDDCF0C010A00D440010E84D10A2D0803D1761045C9EA9D9802FE00ACF1448844E9C30078723101912594FEE9C9A548D57A5B8B04012F6002092845284D3301A8951C8C008973D30046136001B705A79BD400B9ECCFD30E3004E62BD56B004E465D911C8CBB2258B06009D802C00087C628C71C4001088C113E27C6B10064C01E86F042181002131EE26C5D20043E34C798246009E80293F9E530052A4910A7E87240195CC7C6340129A967EF9352CFDF0802059210972C977094281007664E206CD57292201349AA4943554D91C9CCBADB80232C6927DE5E92D7A10463005A4657D4597002BC9AF51A24A54B7B33A73E2CE005CBFB3B4A30052801F69DB4B08F3B6961024AD4B43E6B319AA020020F15E4B46E40282CCDBF8CA56802600084C788CB088401A8911C20ECC436C2401CED0048325CC7A7F8CAA912AC72B7024007F24B1F789C0F9EC8810090D801AB8803D11E34C3B00043E27C6989B2C52A01348E24B53531291C4FF4884C9C2C10401B8C9D2D875A0072E6FB75E92AC205CA0154CE7398FB0053DAC3F43295519C9AE080250E657410600BC9EAD9CA56001BF3CEF07A5194C013E00542462332DA4295680&quot;&quot;&quot;.lines()
 </code>
 
+
+<h2 id="day17"><a href="#day17">Day 17</a> (<a href="https://adventofcode.com/2021/day/17">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+import kotlin.math.sqrt
+
+// https://adventofcode.com/2021/day/17
+object Day17 : AdventOfCode, Solution by Omar_Miatello(
+    day = 17,
+    parser = { lines -&gt; &quot;(-?\\d+)&quot;.toRegex().findAll(lines.first()).map { it.value.toInt() }.toList() },
+    part1 = { (_, _, y1) -&gt;
+        val initialSpeedY = -y1 - 1
+        initialSpeedY * (initialSpeedY + 1) / 2
+    },
+    testsPart1 = result(45),
+    part2 = { (x1, x2, y1, y2) -&gt;
+        val targetX = x1..x2
+        val targetY = y1..y2
+        val initialSpeedX = sqrt(x1 * 2f).toInt()..x2
+        val initialSpeedY = y1..-1 - y1
+        fun hit(speedX: Int, speedY: Int, x: Int = 0, y: Int = 0): Boolean {
+            val newX = x + speedX
+            val newY = y + speedY
+            return when {
+                newX &gt; x2 || newY &lt; y1 -&gt; false
+                newX in targetX && newY in targetY -&gt; true
+                else -&gt; hit(
+                    speedX = (speedX - 1).coerceAtLeast(0),
+                    speedY = speedY - 1,
+                    x = newX,
+                    y = newY,
+                )
+            }
+        }
+        initialSpeedX.sumOf { speedX -&gt;
+            initialSpeedY.count { speedY -&gt;
+                hit(speedX, speedY)
+            }
+        }
+    },
+    testsPart2 = result(112),
+)
+//sampleEnd
+
+fun main() {
+    Day17.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
+    part2: (PARSED) -&gt; RES2,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        expected: RES? = null,
+        block: () -&gt; RES,
+    ) {
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
+}
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
+
+val inputTest = &quot;&quot;&quot;target area: x=20..30, y=-10..-5&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;target area: x=230..283, y=-107..-57&quot;&quot;&quot;.lines()
+</code>
+
 </main>
 </body>
 </html>
@@ -17173,6 +17269,102 @@ fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;):
 val inputTest = &quot;&quot;&quot;A0016C880162017C3686B18A3D4780&quot;&quot;&quot;.lines()
 
 val inputDay = &quot;&quot;&quot;020D74FCE27E600A78020200DC298F1070401C8EF1F21A4D6394F9F48F4C1C00E3003500C74602F0080B1720298C400B7002540095003DC00F601B98806351003D004F66011148039450025C00B2007024717AFB5FBC11A7E73AF60F660094E5793A4E811C0123CECED79104ECED791380069D2522B96A53A81286B18263F75A300526246F60094A6651429ADB3B0068937BCF31A009ADB4C289C9C66526014CB33CB81CB3649B849911803B2EB1327F3CFC60094B01CBB4B80351E66E26B2DD0530070401C82D182080803D1C627C330004320C43789C40192D002F93566A9AFE5967372B378001F525DDDCF0C010A00D440010E84D10A2D0803D1761045C9EA9D9802FE00ACF1448844E9C30078723101912594FEE9C9A548D57A5B8B04012F6002092845284D3301A8951C8C008973D30046136001B705A79BD400B9ECCFD30E3004E62BD56B004E465D911C8CBB2258B06009D802C00087C628C71C4001088C113E27C6B10064C01E86F042181002131EE26C5D20043E34C798246009E80293F9E530052A4910A7E87240195CC7C6340129A967EF9352CFDF0802059210972C977094281007664E206CD57292201349AA4943554D91C9CCBADB80232C6927DE5E92D7A10463005A4657D4597002BC9AF51A24A54B7B33A73E2CE005CBFB3B4A30052801F69DB4B08F3B6961024AD4B43E6B319AA020020F15E4B46E40282CCDBF8CA56802600084C788CB088401A8911C20ECC436C2401CED0048325CC7A7F8CAA912AC72B7024007F24B1F789C0F9EC8810090D801AB8803D11E34C3B00043E27C6989B2C52A01348E24B53531291C4FF4884C9C2C10401B8C9D2D875A0072E6FB75E92AC205CA0154CE7398FB0053DAC3F43295519C9AE080250E657410600BC9EAD9CA56001BF3CEF07A5194C013E00542462332DA4295680&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day17"><a href="#day17">Day 17</a> (<a href="https://adventofcode.com/2021/day/17">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+import kotlin.math.sqrt
+
+// https://adventofcode.com/2021/day/17
+object Day17 : AdventOfCode, Solution by Omar_Miatello(
+    day = 17,
+    parser = { lines -&gt; &quot;(-?\\d+)&quot;.toRegex().findAll(lines.first()).map { it.value.toInt() }.toList() },
+    part1 = { (_, _, y1) -&gt;
+        val initialSpeedY = -y1 - 1
+        initialSpeedY * (initialSpeedY + 1) / 2
+    },
+    testsPart1 = result(45),
+    part2 = { (x1, x2, y1, y2) -&gt;
+        val targetX = x1..x2
+        val targetY = y1..y2
+        val initialSpeedX = sqrt(x1 * 2f).toInt()..x2
+        val initialSpeedY = y1..-1 - y1
+        fun hit(speedX: Int, speedY: Int, x: Int = 0, y: Int = 0): Boolean {
+            val newX = x + speedX
+            val newY = y + speedY
+            return when {
+                newX &gt; x2 || newY &lt; y1 -&gt; false
+                newX in targetX && newY in targetY -&gt; true
+                else -&gt; hit(
+                    speedX = (speedX - 1).coerceAtLeast(0),
+                    speedY = speedY - 1,
+                    x = newX,
+                    y = newY,
+                )
+            }
+        }
+        initialSpeedX.sumOf { speedX -&gt;
+            initialSpeedY.count { speedY -&gt;
+                hit(speedX, speedY)
+            }
+        }
+    },
+    testsPart2 = result(112),
+)
+//sampleEnd
+
+fun main() {
+    Day17.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
+    part2: (PARSED) -&gt; RES2,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        expected: RES? = null,
+        block: () -&gt; RES,
+    ) {
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
+}
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
+
+val inputTest = &quot;&quot;&quot;target area: x=20..30, y=-10..-5&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;target area: x=230..283, y=-107..-57&quot;&quot;&quot;.lines()
 </code>
 
 </div>
