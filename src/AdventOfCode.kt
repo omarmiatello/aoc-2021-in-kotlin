@@ -35,8 +35,8 @@ fun <PARSED, RES1, RES2> Omar_Miatello(
     }
 
     println("Day $day")
-    val parserDay = parser(File("data", "Day${day}.txt").readLines())
     testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    val parserDay = parser(File("data", "Day${day}.txt").readLines())
     on { part1(parserDay) }
     testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
     on { part2(parserDay) }

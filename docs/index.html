@@ -8678,6 +8678,325 @@ val inputTest = &quot;&quot;&quot;target area: x=20..30, y=-10..-5&quot;&quot;&q
 val inputDay = &quot;&quot;&quot;target area: x=230..283, y=-107..-57&quot;&quot;&quot;.lines()
 </code>
 
+
+<h2 id="day18"><a href="#day18">Day 18</a> (<a href="https://adventofcode.com/2021/day/18">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+import kotlin.math.roundToInt
+
+// https://adventofcode.com/2021/day/18
+object Day18 : AdventOfCode, Solution by Omar_Miatello(
+    day = 18,
+    parser = { lines -&gt;
+        fun CharIterator.parseSnailfishNumber(c: Char): SnailfishNumber = if (c.isDigit()) {
+            SnailfishLiteral(
+                value = buildString {
+                    var char = c
+                    while (char.isDigit()) {
+                        append(char)
+                        char = next()
+                    }
+                }.toInt()
+            )
+        } else {
+            SnailfishPair(
+                left = parseSnailfishNumber(next()),
+                right = parseSnailfishNumber(next()),
+            ).also { if (hasNext()) next() }
+        }
+        lines.map { line -&gt; line.iterator().run { parseSnailfishNumber(next()) } }
+    },
+    part1 = { input -&gt;
+        input.reduce { acc, next -&gt; SnailfishPair(acc.tryReduce(), next).tryReduce() }.tryReduce().points()
+    },
+    testsPart1 = results(
+        &quot;[[1,2],[[3,4],5]]&quot;.lines() to 143,
+        &quot;[[[[0,7],4],[[7,8],[6,0]]],[8,1]]&quot;.lines() to 1384,
+        &quot;[[[[1,1],[2,2]],[3,3]],[4,4]]&quot;.lines() to 445,
+        &quot;[[[[3,0],[5,3]],[4,4]],[5,5]]&quot;.lines() to 791,
+        &quot;[[[[5,0],[7,4]],[5,5]],[6,6]]&quot;.lines() to 1137,
+        &quot;[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]&quot;.lines() to 1384,
+        &quot;[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]&quot;.lines() to 3488,
+        &quot;&quot;&quot;[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
+[[[5,[2,8]],4],[5,[[9,9],0]]]
+[6,[[[6,2],[5,6]],[[7,6],[4,7]]]]
+[[[6,[0,7]],[0,9]],[4,[9,[9,0]]]]
+[[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]]
+[[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]]
+[[[[5,4],[7,7]],8],[[8,3],8]]
+[[9,3],[[9,9],[6,[4,9]]]]
+[[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
+[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]&quot;&quot;&quot;.lines() to 4140,
+    ),
+    part2 = { input -&gt;
+        input
+            .flatMap { left -&gt; (input - left).map { right -&gt; SnailfishPair(left, right) } }
+            .maxOf { it.tryReduce().points() }
+    },
+    testsPart2 = result(3993),
+)
+
+private sealed interface SnailfishNumber {
+    fun points(): Int = when (this) {
+        is SnailfishLiteral -&gt; value
+        is SnailfishPair -&gt; left.points() * 3 + right.points() * 2
+    }
+
+    fun tryReduce(): SnailfishNumber {
+        var last = this
+        var ended = false
+        while (!ended) {
+            var current = last.tryExplode()
+            if (current == last) current = last.trySplit()
+            (current == last).also {
+                ended = it
+                last = current
+            }
+        }
+        return last
+    }
+
+    private fun tryExplode(): SnailfishNumber {
+        var lastIndex = -1
+        var explodedLeft = 0
+        var explodedRight = 0
+        var found = false
+        fun SnailfishNumber.explodeStep1(loop: Int): SnailfishNumber = when (this) {
+            is SnailfishLiteral -&gt; {
+                if (!found) lastIndex++
+                this
+            }
+            is SnailfishPair -&gt; {
+                when {
+                    !found && loop == 1 && left is SnailfishPair -&gt; {
+                        found = true
+                        explodedLeft = (left.left as SnailfishLiteral).value
+                        explodedRight = (left.right as SnailfishLiteral).value
+                        SnailfishPair(
+                            left = SnailfishLiteral(0),
+                            right = right,
+                        )
+                    }
+                    !found && loop == 1 && right is SnailfishPair -&gt; {
+                        found = true
+                        explodedLeft = (right.left as SnailfishLiteral).value
+                        explodedRight = (right.right as SnailfishLiteral).value
+                        SnailfishPair(
+                            left = left.also { lastIndex++ },
+                            right = SnailfishLiteral(0),
+                        )
+                    }
+                    else -&gt; SnailfishPair(
+                        left = left.explodeStep1(loop = loop - 1),
+                        right = right.explodeStep1(loop = loop - 1),
+                    )
+                }
+            }
+        }
+
+        fun SnailfishNumber.explodeStep2(): SnailfishNumber =
+            when (this) {
+                is SnailfishLiteral -&gt; {
+                    when (lastIndex--) {
+                        0 -&gt; SnailfishLiteral(value + explodedLeft)
+                        -2 -&gt; SnailfishLiteral(value + explodedRight)
+                        else -&gt; this
+                    }
+                }
+                is SnailfishPair -&gt; SnailfishPair(
+                    left = left.explodeStep2(),
+                    right = right.explodeStep2(),
+                )
+            }
+
+        return explodeStep1(4).let { if (found) it.explodeStep2() else it }
+    }
+
+    private fun trySplit(): SnailfishNumber {
+        var splitted = false
+        fun SnailfishNumber.splitStep1(): SnailfishNumber = when (this) {
+            is SnailfishLiteral -&gt; if (!splitted && value &gt; 9) SnailfishPair(
+                left = SnailfishLiteral((value / 2f).toInt()),
+                right = SnailfishLiteral((value / 2f).roundToInt()),
+            ).also { splitted = true } else this
+            is SnailfishPair -&gt; SnailfishPair(
+                left = left.splitStep1(),
+                right = right.splitStep1(),
+            )
+        }
+        return splitStep1()
+    }
+}
+
+private data class SnailfishPair(val left: SnailfishNumber, val right: SnailfishNumber) : SnailfishNumber {
+    override fun toString() = &quot;[$left,$right]&quot;
+}
+
+private data class SnailfishLiteral(val value: Int) : SnailfishNumber {
+    override fun toString() = value.toString()
+}
+//sampleEnd
+
+fun main() {
+    Day18.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
+    part2: (PARSED) -&gt; RES2,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        expected: RES? = null,
+        block: () -&gt; RES,
+    ) {
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
+}
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
+
+val inputTest = &quot;&quot;&quot;[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
+[[[5,[2,8]],4],[5,[[9,9],0]]]
+[6,[[[6,2],[5,6]],[[7,6],[4,7]]]]
+[[[6,[0,7]],[0,9]],[4,[9,[9,0]]]]
+[[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]]
+[[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]]
+[[[[5,4],[7,7]],8],[[8,3],8]]
+[[9,3],[[9,9],[6,[4,9]]]]
+[[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
+[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;[[[6,[8,3]],[2,0]],[[[9,5],[9,1]],3]]
+[[[9,[2,2]],[5,4]],[[[2,2],[9,6]],[7,7]]]
+[[[0,[3,2]],1],[[0,[2,8]],[2,[0,4]]]]
+[[4,4],[[[7,0],5],[3,1]]]
+[[5,4],1]
+[[[[7,6],4],9],[[9,1],9]]
+[[[1,[7,8]],[[7,7],[1,6]]],[1,[6,[7,1]]]]
+[[[[6,8],[5,6]],[[1,1],8]],[[[2,0],[3,1]],[2,[2,6]]]]
+[[[6,3],[3,[7,1]]],8]
+[[[9,4],[3,[0,6]]],[[2,[3,6]],[[9,8],[1,6]]]]
+[9,[0,[[0,7],2]]]
+[[[[8,4],7],[[9,2],[0,9]]],[[7,9],[8,[0,9]]]]
+[[1,1],[[5,[3,8]],[3,[4,7]]]]
+[[[9,[2,9]],[2,[2,9]]],[[[3,5],5],[[3,3],2]]]
+[[[[5,4],9],0],[[[5,7],2],[[5,2],9]]]
+[[2,[[1,0],[6,2]]],0]
+[[[3,7],[7,6]],[[[2,8],5],[3,[9,7]]]]
+[[2,[2,[8,8]]],[[[9,9],[1,1]],[[8,6],[0,3]]]]
+[[8,1],[3,5]]
+[[7,[[7,6],[2,0]]],4]
+[[5,4],[[1,3],[5,[2,8]]]]
+[7,9]
+[[[[6,9],0],[1,[5,0]]],[[[6,4],3],7]]
+[[[[3,7],3],[2,6]],[[0,4],[9,9]]]
+[[[[1,5],[5,0]],[9,4]],[[[8,3],3],[8,[3,6]]]]
+[[[[3,7],5],[[8,5],[1,5]]],[[0,6],[3,4]]]
+[[[[4,0],2],[7,[8,4]]],[0,[5,[7,8]]]]
+[[[[0,8],[0,4]],[9,3]],[[[5,4],[4,8]],[[1,6],[5,4]]]]
+[[0,[0,3]],[[3,[1,5]],[[9,6],[0,6]]]]
+[[9,[8,4]],[7,1]]
+[[[[1,9],[7,7]],9],[[6,[4,5]],[8,[3,2]]]]
+[5,[[2,[9,5]],[3,[4,0]]]]
+[[[6,2],[[1,8],5]],6]
+[[8,[6,[6,4]]],[0,[[9,8],7]]]
+[[[[6,3],[8,0]],[8,[2,7]]],8]
+[[[6,[3,6]],[[4,0],[4,7]]],[0,[[4,0],[4,5]]]]
+[[[3,[8,1]],1],[2,3]]
+[[[6,[7,0]],[[3,5],[3,4]]],7]
+[[[[8,0],3],8],[[[1,6],3],[[0,5],2]]]
+[[[3,7],[[9,8],8]],[[[8,4],7],[3,[1,7]]]]
+[[[0,5],[[5,5],[7,8]]],[9,[5,[2,2]]]]
+[[2,9],[[[7,4],4],[[8,0],[6,9]]]]
+[[[[7,8],[8,8]],0],9]
+[[[4,[0,6]],[[5,9],[0,1]]],[3,[6,7]]]
+[[[7,[6,9]],[5,[6,4]]],[[[3,9],6],[[0,1],1]]]
+[3,[[[6,9],7],[5,8]]]
+[[[3,9],[[3,5],2]],[[[2,5],[4,6]],[8,0]]]
+[[[9,7],3],[[[2,7],[0,9]],[3,[0,3]]]]
+[[3,[4,0]],[[6,6],[4,5]]]
+[[0,0],[[5,9],1]]
+[[[6,8],[2,6]],[[[1,1],3],7]]
+[[[4,4],[[1,0],[2,4]]],[2,6]]
+[[[[6,0],6],[8,[9,9]]],[[4,2],[[1,8],[5,3]]]]
+[[[[1,6],[4,3]],[5,5]],[[7,[9,9]],4]]
+[[[[6,9],7],[9,3]],[[[9,6],5],0]]
+[[3,[[7,2],[8,1]]],[[7,[3,0]],1]]
+[0,[0,[1,3]]]
+[[[0,5],[[6,1],[4,6]]],[[[0,4],8],[[4,5],9]]]
+[[[[7,5],[7,0]],[6,[7,2]]],[7,[3,[4,1]]]]
+[[3,3],[0,[6,2]]]
+[[[3,8],[[7,3],6]],[[[0,8],3],[[8,9],[2,9]]]]
+[[4,[[5,6],[4,0]]],[[7,[7,5]],[5,0]]]
+[[[[2,5],[5,4]],9],[[[6,0],[0,0]],[[5,1],8]]]
+[[2,[[1,7],7]],[[[4,5],[7,9]],0]]
+[[[0,9],[[5,4],3]],3]
+[[9,[[1,9],[1,6]]],[[9,[0,3]],[[8,8],[0,7]]]]
+[[[[7,2],4],[7,8]],[[[4,1],[3,1]],[2,5]]]
+[[[[1,8],3],[2,5]],[[0,[5,8]],[[1,3],[5,2]]]]
+[[3,9],[[9,6],[5,[7,1]]]]
+[1,[[3,[6,5]],[5,[2,7]]]]
+[[[5,8],6],[8,[[9,4],[0,4]]]]
+[0,[[5,[6,6]],[[7,4],[4,6]]]]
+[[[[6,8],2],[[1,6],[8,2]]],6]
+[7,2]
+[[3,1],7]
+[[[2,[9,5]],0],[[[7,3],4],8]]
+[[[[0,0],[4,2]],5],[[8,6],2]]
+[[1,[7,8]],[2,[[6,6],[5,7]]]]
+[[[3,[6,0]],3],[[7,[4,4]],8]]
+[[[9,[8,7]],[[4,2],4]],[[6,1],[[3,3],[2,2]]]]
+[[[8,1],[[7,4],[5,9]]],9]
+[[[2,[8,6]],[[9,8],2]],[[9,5],[1,[9,8]]]]
+[[[[6,1],[3,1]],[[4,5],1]],[[[6,4],[6,2]],2]]
+[[[[4,0],[0,1]],[[1,4],6]],7]
+[[[[8,9],[0,2]],4],[[[9,8],8],[0,[0,6]]]]
+[0,[[[0,9],1],7]]
+[[1,[[3,7],3]],[[[2,4],3],0]]
+[[[[7,6],3],8],[[5,5],9]]
+[[2,[1,3]],[[[6,7],3],[[3,8],7]]]
+[[[[0,6],6],6],[[5,[0,9]],[8,[2,4]]]]
+[4,[[[3,0],[2,5]],[[7,4],1]]]
+[[[[7,9],3],[0,[8,2]]],[[8,[3,4]],[[2,3],[1,6]]]]
+[[[3,[6,3]],5],[[3,4],2]]
+[[[[1,9],[0,3]],[0,8]],[[[4,2],[4,3]],[[8,9],5]]]
+[[[[2,8],[4,9]],[[3,5],6]],[[6,[1,5]],[0,[9,7]]]]
+[[6,3],[[[7,7],[1,7]],[[6,5],[0,8]]]]
+[[1,[1,[5,8]]],7]
+[[0,6],[9,[[3,4],0]]]
+[[[[0,2],7],9],9]
+[9,6]&quot;&quot;&quot;.lines()
+</code>
+
 </main>
 </body>
 </html>
@@ -17365,6 +17684,325 @@ fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;):
 val inputTest = &quot;&quot;&quot;target area: x=20..30, y=-10..-5&quot;&quot;&quot;.lines()
 
 val inputDay = &quot;&quot;&quot;target area: x=230..283, y=-107..-57&quot;&quot;&quot;.lines()
+</code>
+
+
+<h2 id="day18"><a href="#day18">Day 18</a> (<a href="https://adventofcode.com/2021/day/18">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+import kotlin.math.roundToInt
+
+// https://adventofcode.com/2021/day/18
+object Day18 : AdventOfCode, Solution by Omar_Miatello(
+    day = 18,
+    parser = { lines -&gt;
+        fun CharIterator.parseSnailfishNumber(c: Char): SnailfishNumber = if (c.isDigit()) {
+            SnailfishLiteral(
+                value = buildString {
+                    var char = c
+                    while (char.isDigit()) {
+                        append(char)
+                        char = next()
+                    }
+                }.toInt()
+            )
+        } else {
+            SnailfishPair(
+                left = parseSnailfishNumber(next()),
+                right = parseSnailfishNumber(next()),
+            ).also { if (hasNext()) next() }
+        }
+        lines.map { line -&gt; line.iterator().run { parseSnailfishNumber(next()) } }
+    },
+    part1 = { input -&gt;
+        input.reduce { acc, next -&gt; SnailfishPair(acc.tryReduce(), next).tryReduce() }.tryReduce().points()
+    },
+    testsPart1 = results(
+        &quot;[[1,2],[[3,4],5]]&quot;.lines() to 143,
+        &quot;[[[[0,7],4],[[7,8],[6,0]]],[8,1]]&quot;.lines() to 1384,
+        &quot;[[[[1,1],[2,2]],[3,3]],[4,4]]&quot;.lines() to 445,
+        &quot;[[[[3,0],[5,3]],[4,4]],[5,5]]&quot;.lines() to 791,
+        &quot;[[[[5,0],[7,4]],[5,5]],[6,6]]&quot;.lines() to 1137,
+        &quot;[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]&quot;.lines() to 1384,
+        &quot;[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]&quot;.lines() to 3488,
+        &quot;&quot;&quot;[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
+[[[5,[2,8]],4],[5,[[9,9],0]]]
+[6,[[[6,2],[5,6]],[[7,6],[4,7]]]]
+[[[6,[0,7]],[0,9]],[4,[9,[9,0]]]]
+[[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]]
+[[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]]
+[[[[5,4],[7,7]],8],[[8,3],8]]
+[[9,3],[[9,9],[6,[4,9]]]]
+[[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
+[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]&quot;&quot;&quot;.lines() to 4140,
+    ),
+    part2 = { input -&gt;
+        input
+            .flatMap { left -&gt; (input - left).map { right -&gt; SnailfishPair(left, right) } }
+            .maxOf { it.tryReduce().points() }
+    },
+    testsPart2 = result(3993),
+)
+
+private sealed interface SnailfishNumber {
+    fun points(): Int = when (this) {
+        is SnailfishLiteral -&gt; value
+        is SnailfishPair -&gt; left.points() * 3 + right.points() * 2
+    }
+
+    fun tryReduce(): SnailfishNumber {
+        var last = this
+        var ended = false
+        while (!ended) {
+            var current = last.tryExplode()
+            if (current == last) current = last.trySplit()
+            (current == last).also {
+                ended = it
+                last = current
+            }
+        }
+        return last
+    }
+
+    private fun tryExplode(): SnailfishNumber {
+        var lastIndex = -1
+        var explodedLeft = 0
+        var explodedRight = 0
+        var found = false
+        fun SnailfishNumber.explodeStep1(loop: Int): SnailfishNumber = when (this) {
+            is SnailfishLiteral -&gt; {
+                if (!found) lastIndex++
+                this
+            }
+            is SnailfishPair -&gt; {
+                when {
+                    !found && loop == 1 && left is SnailfishPair -&gt; {
+                        found = true
+                        explodedLeft = (left.left as SnailfishLiteral).value
+                        explodedRight = (left.right as SnailfishLiteral).value
+                        SnailfishPair(
+                            left = SnailfishLiteral(0),
+                            right = right,
+                        )
+                    }
+                    !found && loop == 1 && right is SnailfishPair -&gt; {
+                        found = true
+                        explodedLeft = (right.left as SnailfishLiteral).value
+                        explodedRight = (right.right as SnailfishLiteral).value
+                        SnailfishPair(
+                            left = left.also { lastIndex++ },
+                            right = SnailfishLiteral(0),
+                        )
+                    }
+                    else -&gt; SnailfishPair(
+                        left = left.explodeStep1(loop = loop - 1),
+                        right = right.explodeStep1(loop = loop - 1),
+                    )
+                }
+            }
+        }
+
+        fun SnailfishNumber.explodeStep2(): SnailfishNumber =
+            when (this) {
+                is SnailfishLiteral -&gt; {
+                    when (lastIndex--) {
+                        0 -&gt; SnailfishLiteral(value + explodedLeft)
+                        -2 -&gt; SnailfishLiteral(value + explodedRight)
+                        else -&gt; this
+                    }
+                }
+                is SnailfishPair -&gt; SnailfishPair(
+                    left = left.explodeStep2(),
+                    right = right.explodeStep2(),
+                )
+            }
+
+        return explodeStep1(4).let { if (found) it.explodeStep2() else it }
+    }
+
+    private fun trySplit(): SnailfishNumber {
+        var splitted = false
+        fun SnailfishNumber.splitStep1(): SnailfishNumber = when (this) {
+            is SnailfishLiteral -&gt; if (!splitted && value &gt; 9) SnailfishPair(
+                left = SnailfishLiteral((value / 2f).toInt()),
+                right = SnailfishLiteral((value / 2f).roundToInt()),
+            ).also { splitted = true } else this
+            is SnailfishPair -&gt; SnailfishPair(
+                left = left.splitStep1(),
+                right = right.splitStep1(),
+            )
+        }
+        return splitStep1()
+    }
+}
+
+private data class SnailfishPair(val left: SnailfishNumber, val right: SnailfishNumber) : SnailfishNumber {
+    override fun toString() = &quot;[$left,$right]&quot;
+}
+
+private data class SnailfishLiteral(val value: Int) : SnailfishNumber {
+    override fun toString() = value.toString()
+}
+//sampleEnd
+
+fun main() {
+    Day18.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
+    part2: (PARSED) -&gt; RES2,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        expected: RES? = null,
+        block: () -&gt; RES,
+    ) {
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
+}
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
+
+val inputTest = &quot;&quot;&quot;[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
+[[[5,[2,8]],4],[5,[[9,9],0]]]
+[6,[[[6,2],[5,6]],[[7,6],[4,7]]]]
+[[[6,[0,7]],[0,9]],[4,[9,[9,0]]]]
+[[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]]
+[[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]]
+[[[[5,4],[7,7]],8],[[8,3],8]]
+[[9,3],[[9,9],[6,[4,9]]]]
+[[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
+[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;[[[6,[8,3]],[2,0]],[[[9,5],[9,1]],3]]
+[[[9,[2,2]],[5,4]],[[[2,2],[9,6]],[7,7]]]
+[[[0,[3,2]],1],[[0,[2,8]],[2,[0,4]]]]
+[[4,4],[[[7,0],5],[3,1]]]
+[[5,4],1]
+[[[[7,6],4],9],[[9,1],9]]
+[[[1,[7,8]],[[7,7],[1,6]]],[1,[6,[7,1]]]]
+[[[[6,8],[5,6]],[[1,1],8]],[[[2,0],[3,1]],[2,[2,6]]]]
+[[[6,3],[3,[7,1]]],8]
+[[[9,4],[3,[0,6]]],[[2,[3,6]],[[9,8],[1,6]]]]
+[9,[0,[[0,7],2]]]
+[[[[8,4],7],[[9,2],[0,9]]],[[7,9],[8,[0,9]]]]
+[[1,1],[[5,[3,8]],[3,[4,7]]]]
+[[[9,[2,9]],[2,[2,9]]],[[[3,5],5],[[3,3],2]]]
+[[[[5,4],9],0],[[[5,7],2],[[5,2],9]]]
+[[2,[[1,0],[6,2]]],0]
+[[[3,7],[7,6]],[[[2,8],5],[3,[9,7]]]]
+[[2,[2,[8,8]]],[[[9,9],[1,1]],[[8,6],[0,3]]]]
+[[8,1],[3,5]]
+[[7,[[7,6],[2,0]]],4]
+[[5,4],[[1,3],[5,[2,8]]]]
+[7,9]
+[[[[6,9],0],[1,[5,0]]],[[[6,4],3],7]]
+[[[[3,7],3],[2,6]],[[0,4],[9,9]]]
+[[[[1,5],[5,0]],[9,4]],[[[8,3],3],[8,[3,6]]]]
+[[[[3,7],5],[[8,5],[1,5]]],[[0,6],[3,4]]]
+[[[[4,0],2],[7,[8,4]]],[0,[5,[7,8]]]]
+[[[[0,8],[0,4]],[9,3]],[[[5,4],[4,8]],[[1,6],[5,4]]]]
+[[0,[0,3]],[[3,[1,5]],[[9,6],[0,6]]]]
+[[9,[8,4]],[7,1]]
+[[[[1,9],[7,7]],9],[[6,[4,5]],[8,[3,2]]]]
+[5,[[2,[9,5]],[3,[4,0]]]]
+[[[6,2],[[1,8],5]],6]
+[[8,[6,[6,4]]],[0,[[9,8],7]]]
+[[[[6,3],[8,0]],[8,[2,7]]],8]
+[[[6,[3,6]],[[4,0],[4,7]]],[0,[[4,0],[4,5]]]]
+[[[3,[8,1]],1],[2,3]]
+[[[6,[7,0]],[[3,5],[3,4]]],7]
+[[[[8,0],3],8],[[[1,6],3],[[0,5],2]]]
+[[[3,7],[[9,8],8]],[[[8,4],7],[3,[1,7]]]]
+[[[0,5],[[5,5],[7,8]]],[9,[5,[2,2]]]]
+[[2,9],[[[7,4],4],[[8,0],[6,9]]]]
+[[[[7,8],[8,8]],0],9]
+[[[4,[0,6]],[[5,9],[0,1]]],[3,[6,7]]]
+[[[7,[6,9]],[5,[6,4]]],[[[3,9],6],[[0,1],1]]]
+[3,[[[6,9],7],[5,8]]]
+[[[3,9],[[3,5],2]],[[[2,5],[4,6]],[8,0]]]
+[[[9,7],3],[[[2,7],[0,9]],[3,[0,3]]]]
+[[3,[4,0]],[[6,6],[4,5]]]
+[[0,0],[[5,9],1]]
+[[[6,8],[2,6]],[[[1,1],3],7]]
+[[[4,4],[[1,0],[2,4]]],[2,6]]
+[[[[6,0],6],[8,[9,9]]],[[4,2],[[1,8],[5,3]]]]
+[[[[1,6],[4,3]],[5,5]],[[7,[9,9]],4]]
+[[[[6,9],7],[9,3]],[[[9,6],5],0]]
+[[3,[[7,2],[8,1]]],[[7,[3,0]],1]]
+[0,[0,[1,3]]]
+[[[0,5],[[6,1],[4,6]]],[[[0,4],8],[[4,5],9]]]
+[[[[7,5],[7,0]],[6,[7,2]]],[7,[3,[4,1]]]]
+[[3,3],[0,[6,2]]]
+[[[3,8],[[7,3],6]],[[[0,8],3],[[8,9],[2,9]]]]
+[[4,[[5,6],[4,0]]],[[7,[7,5]],[5,0]]]
+[[[[2,5],[5,4]],9],[[[6,0],[0,0]],[[5,1],8]]]
+[[2,[[1,7],7]],[[[4,5],[7,9]],0]]
+[[[0,9],[[5,4],3]],3]
+[[9,[[1,9],[1,6]]],[[9,[0,3]],[[8,8],[0,7]]]]
+[[[[7,2],4],[7,8]],[[[4,1],[3,1]],[2,5]]]
+[[[[1,8],3],[2,5]],[[0,[5,8]],[[1,3],[5,2]]]]
+[[3,9],[[9,6],[5,[7,1]]]]
+[1,[[3,[6,5]],[5,[2,7]]]]
+[[[5,8],6],[8,[[9,4],[0,4]]]]
+[0,[[5,[6,6]],[[7,4],[4,6]]]]
+[[[[6,8],2],[[1,6],[8,2]]],6]
+[7,2]
+[[3,1],7]
+[[[2,[9,5]],0],[[[7,3],4],8]]
+[[[[0,0],[4,2]],5],[[8,6],2]]
+[[1,[7,8]],[2,[[6,6],[5,7]]]]
+[[[3,[6,0]],3],[[7,[4,4]],8]]
+[[[9,[8,7]],[[4,2],4]],[[6,1],[[3,3],[2,2]]]]
+[[[8,1],[[7,4],[5,9]]],9]
+[[[2,[8,6]],[[9,8],2]],[[9,5],[1,[9,8]]]]
+[[[[6,1],[3,1]],[[4,5],1]],[[[6,4],[6,2]],2]]
+[[[[4,0],[0,1]],[[1,4],6]],7]
+[[[[8,9],[0,2]],4],[[[9,8],8],[0,[0,6]]]]
+[0,[[[0,9],1],7]]
+[[1,[[3,7],3]],[[[2,4],3],0]]
+[[[[7,6],3],8],[[5,5],9]]
+[[2,[1,3]],[[[6,7],3],[[3,8],7]]]
+[[[[0,6],6],6],[[5,[0,9]],[8,[2,4]]]]
+[4,[[[3,0],[2,5]],[[7,4],1]]]
+[[[[7,9],3],[0,[8,2]]],[[8,[3,4]],[[2,3],[1,6]]]]
+[[[3,[6,3]],5],[[3,4],2]]
+[[[[1,9],[0,3]],[0,8]],[[[4,2],[4,3]],[[8,9],5]]]
+[[[[2,8],[4,9]],[[3,5],6]],[[6,[1,5]],[0,[9,7]]]]
+[[6,3],[[[7,7],[1,7]],[[6,5],[0,8]]]]
+[[1,[1,[5,8]]],7]
+[[0,6],[9,[[3,4],0]]]
+[[[[0,2],7],9],9]
+[9,6]&quot;&quot;&quot;.lines()
 </code>
 
 </div>
