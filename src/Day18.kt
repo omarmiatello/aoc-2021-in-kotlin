@@ -110,20 +110,19 @@ private sealed interface SnailfishNumber {
             }
         }
 
-        fun SnailfishNumber.explodeStep2(): SnailfishNumber =
-            when (this) {
-                is SnailfishLiteral -> {
-                    when (lastIndex--) {
-                        0 -> SnailfishLiteral(value + explodedLeft)
-                        -2 -> SnailfishLiteral(value + explodedRight)
-                        else -> this
-                    }
+        fun SnailfishNumber.explodeStep2(): SnailfishNumber = when (this) {
+            is SnailfishLiteral -> {
+                when (lastIndex--) {
+                    0 -> SnailfishLiteral(value + explodedLeft)
+                    -2 -> SnailfishLiteral(value + explodedRight)
+                    else -> this
                 }
-                is SnailfishPair -> SnailfishPair(
-                    left = left.explodeStep2(),
-                    right = right.explodeStep2(),
-                )
             }
+            is SnailfishPair -> SnailfishPair(
+                left = left.explodeStep2(),
+                right = right.explodeStep2(),
+            )
+        }
 
         return explodeStep1(4).let { if (found) it.explodeStep2() else it }
     }
