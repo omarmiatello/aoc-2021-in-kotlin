@@ -10643,6 +10643,143 @@ val inputDay = &quot;&quot;&quot;#.#....########.......##..##.#.#####...#..#..##
 #..###.###..#..##.#####.##.#....##.###.###....#######.#...#.#.#.#..#######...#.....#..##.####.###.##&quot;&quot;&quot;.lines()
 </code>
 
+
+<h2 id="day21"><a href="#day21">Day 21</a> (<a href="https://adventofcode.com/2021/day/21">story</a>)</h2>
+<code class="code-blocks-selector">
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
+
+//sampleStart
+// https://adventofcode.com/2021/day/21
+object Day21 : AdventOfCode, Solution by Omar_Miatello(
+    day = 21,
+    parser = { lines -&gt; lines.map { it.takeLastWhile { it.isDigit() }.toInt() } },
+    part1 = { input -&gt;
+        var diceRoll = 0
+        var diceValue = 0
+        var currentPlayer = 0
+        val space = input.toMutableList()
+        val score = mutableListOf(0, 0)
+        while (!score.any { it &gt;= 1000 }) {
+            diceRoll += 3
+            space[currentPlayer] = (space[currentPlayer] + ++diceValue + ++diceValue + ++diceValue - 1) % 10 + 1
+            score[currentPlayer] += space[currentPlayer]
+            currentPlayer = (currentPlayer + 1) % 2
+        }
+        score[currentPlayer] * diceRoll
+    },
+    testsPart1 = result(739785),
+    part2 = { input -&gt;
+        GameState(currentPlayer = 0, space = input, score = listOf(0, 0))
+            .rollDiracDice()
+            .results
+            .toList()
+            .maxOf { it }
+    },
+    testsPart2 = result(444356092776315L),
+)
+
+private val diracDice = (1..3).let { d -&gt; d.flatMap { d1 -&gt; d.flatMap { d2 -&gt; d.map { d3 -&gt; d1 + d2 + d3 } } } }
+
+private val cache = mutableMapOf&lt;Pair&lt;List&lt;Int&gt;, Int&gt;, GameResult&gt;()
+
+private operator fun Pair&lt;Long, Long&gt;.plus(other: Pair&lt;Long, Long&gt;) = first + other.first to second + other.second
+
+private class GameResult(val results: Pair&lt;Long, Long&gt;)
+
+private class GameState(private val state: List&lt;Int&gt;) {
+    constructor(
+        currentPlayer: Int,
+        space: List&lt;Int&gt;,
+        score: List&lt;Int&gt;,
+    ) : this(listOf(currentPlayer) + space + score)
+
+    fun rollDiracDice(): GameResult = diracDice
+        .fold(GameResult(0L to 0L)) { result, dice -&gt;
+            val roll = cache.getOrPut(state to dice) {
+                val gameState = GameState(
+                    state.toMutableList().also {
+                        val currentPlayer = it[CURRENT_PLAYER]
+                        val newSpace = (it[indexForSpace(currentPlayer)] + dice - 1) % 10 + 1
+                        it[CURRENT_PLAYER] = (currentPlayer + 1) % 2
+                        it[indexForSpace(currentPlayer)] = newSpace
+                        it[indexForScore(currentPlayer)] += newSpace
+                    }
+                )
+                gameState.getWinner()
+                    .takeIf { it.results.first != 0L || it.results.second != 0L } ?: gameState.rollDiracDice()
+            }
+            GameResult(result.results + roll.results)
+        }
+
+    fun getWinner(): GameResult = when {
+        state[SCORE_1] &gt;= WINNING_SCORE -&gt; GameResult(1L to 0L)
+        state[SCORE_2] &gt;= WINNING_SCORE -&gt; GameResult(0L to 1L)
+        else -&gt; GameResult(0L to 0L)
+    }
+
+    companion object {
+        private const val WINNING_SCORE = 21
+        private const val CURRENT_PLAYER = 0
+        private const val SCORE_1 = 3
+        private const val SCORE_2 = 4
+        private fun indexForSpace(currentPlayer: Int) = currentPlayer + 1
+        private fun indexForScore(currentPlayer: Int) = currentPlayer + 3
+    }
+}
+//sampleEnd
+
+fun main() {
+    Day21.launch()
+}
+
+sealed interface AdventOfCode
+
+fun interface Solution { fun launch() }
+
+fun &lt;PARSED, RES1, RES2&gt; Omar_Miatello(
+    day: Int,
+    parser: (List&lt;String&gt;) -&gt; PARSED,
+    part1: (PARSED) -&gt; RES1,
+    testsPart1: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES1&gt;&gt;,
+    part2: (PARSED) -&gt; RES2,
+    testsPart2: (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES2&gt;&gt;,
+) = Solution {
+    fun &lt;RES&gt; on(
+        expected: RES? = null,
+        block: () -&gt; RES,
+    ) {
+        val input = if (expected != null) inputTest else inputDay
+        val (output, duration) = measureTimedValue { block() }
+        val millis = duration.inWholeMilliseconds
+        if (expected != null) {
+            check(output == expected) { &quot;[$millis ms] Something goes wrong! expected: $expected | current: $output&quot; }
+        } else {
+            println(&quot;[${millis}ms]\t$output&quot;)
+        }
+    }
+
+    println(&quot;Day $day&quot;)
+    val parserDay = parser(inputDay)
+    testsPart1(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part1(parser(inputTest)) } }
+    on { part1(parserDay) }
+    testsPart2(day).forEach { (inputTest, expectedTest) -> on(expected = expectedTest) { part2(parser(inputTest)) } }
+    on { part2(parserDay) }
+}
+
+fun &lt;RES&gt; result(expected: RES): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { day: Int -&gt;
+    listOf(inputTest to expected)
+}
+
+fun &lt;RES&gt; results(vararg inputToRes: Pair&lt;List&lt;String&gt;, RES&gt;): (Int) -&gt; List&lt;Pair&lt;List&lt;String&gt;, RES&gt;&gt; = { inputToRes.toList() }
+
+val inputTest = &quot;&quot;&quot;Player 1 starting position: 4
+Player 2 starting position: 8&quot;&quot;&quot;.lines()
+
+val inputDay = &quot;&quot;&quot;Player 1 starting position: 6
+Player 2 starting position: 1&quot;&quot;&quot;.lines()
+</code>
+
 </main>
 </body>
 </html>
